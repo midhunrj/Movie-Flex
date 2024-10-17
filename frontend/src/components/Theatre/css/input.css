@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.custom-clock {
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    padding: 10px;
+  }
+  

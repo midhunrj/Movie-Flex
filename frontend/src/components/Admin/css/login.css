@@ -1,0 +1,13 @@
+.swal2-confirm-btn {
+    font-size: 16px;   
+    width: 100%; 
+    min-height: fit-content; 
+  }
+  
+  
+  .swal2-cancel-btn {
+    font-size: 16px;
+    width: 100%;  
+    min-height: fit-content; 
+
+  }

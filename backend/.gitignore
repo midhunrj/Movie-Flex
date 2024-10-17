@@ -1,0 +1,13 @@
+node_modules/
+
+# Ignore environment variables
+.env
+
+# Ignore build directories
+dist/
+build/
+
+# Ignore log files
+*.log
+# Ignore Firebase service account key
+src/infrastructure/firebase/serviceAccountkey.json
