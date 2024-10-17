@@ -4,7 +4,7 @@ export class LocationService {
     private apiKey: string | null;
 
     constructor(apiKey: string) {
-        this.apiKey = 'pk.eyJ1IjoiYXNoaW5qb3kiLCJhIjoiY2x6aWE4YnNkMDY0ejJxcjBlZmpid2VoYyJ9.Etsb6UwNacChll6vPVQ_1g';
+        this.apiKey = apiKey;
     }
 
     async getCoordinatesFromAddress(addressData: any): Promise<{ lat: number, lng: number }> {
