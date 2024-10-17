@@ -176,36 +176,6 @@ export const completeTheatreProfileData=async(addressData)=>{
     }
 }
 
-export const getCoordinatesFromAddress = async (addressData) => {
-    try {
-        const { housename, place, city, state, pincode } = addressData;
-        const address = `${housename}, ${place}, ${city}, ${state}, ${pincode}`;
-        const GEOCODING_API_KEY = 'AIzaSyDOvUG534DGgjKFodSMB4GRl_UqJh_9yf8';
-
-        const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json`, {
-            params: {
-                address,
-                key: GEOCODING_API_KEY
-            }
-        });
-
-        console.log(response.data, "response from geocode api");
-
-        const { results } = response.data;
-        if (results && results.length > 0) {
-            const location = results[0].geometry.location;
-            return {
-                lat: location.lat,
-                lng: location.lng
-            };
-        } else {
-            throw new Error("Unable to fetch coordinates from the address");
-        }
-    } catch (error) {
-        console.error("Geocoding API error:", error);
-        throw new Error("Unable to fetch coordinates from the address");
-    }
-};
 
 
 
