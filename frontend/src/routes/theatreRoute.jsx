@@ -15,10 +15,16 @@ import TheatreProfile from "../components/Theatre/profile";
 import RollingMovies from "../components/Theatre/Movies";
 import Screens from "../components/Theatre/Screens";
 import TierSeats from "../components/Theatre/tierSeats";
+import ScreensList from "../components/Theatre/ScreensList";
+import ScreensForm from "../components/Theatre/Screens";
+import { IdentifierProvider } from "../utils/context/identifierContext";
+import EditScreen from "../components/Theatre/EditScreen";
+import Parentcomp from "../components/Theatre/parentcomp";
 
 export const TheatreRoute=()=>{
     return(
         // <BrowserRouter>
+        <IdentifierProvider>
         <Routes>
             <Route path='/' element={<TheatreLoginForm/>}/>
             <Route path='/signup' element={<TheatreRegisterForm/>}/>
@@ -29,8 +35,14 @@ export const TheatreRoute=()=>{
             <Route path="/verify-email" element={<TheatrePassVerify/>}/>
             <Route path="/newuser-verify" element={<VerifyTheatre/>}/>
             <Route path="/movies" element={<TheatreProtected><RollingMovies/></TheatreProtected>}/>
-            <Route path='/screens' element={<TheatreProtected><Screens/></TheatreProtected>}/>
+            
+            <Route path='/screens' element={<TheatreProtected><ScreensList/></TheatreProtected>}/>
+            <Route path='/new-screen' element={<TheatreProtected><ScreensForm/></TheatreProtected>}/>
             <Route path='/tier-seats' element={<TheatreProtected><TierSeats/></TheatreProtected>}/>
+            <Route path='/edit-screen/:id'element={<TheatreProtected><EditScreen/></TheatreProtected>}/>
+            <Route path='/parent-comp' element={<Parentcomp/>}/>
+            
         </Routes>
+        </IdentifierProvider>
     )
 }

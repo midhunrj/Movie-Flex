@@ -4,11 +4,13 @@ import { fetchMovies } from "../../redux/user/userThunk"; // Adjust your path fo
 import Footer from "./footer";
 import { BiSearch } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css"
 
 const FullMoviesList = ({ movieType }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { nowShowingMovies, upcomingMovies } = useSelector((state) => state.user);
+  const { nowShowingMovies=[], upcomingMovies=[],isSuccess,isLoading } = useSelector((state) => state.user);
 
   const [movies, setMovies] = useState([]);
   const [filterLanguage, setFilterLanguage] = useState("");
@@ -21,8 +23,13 @@ const FullMoviesList = ({ movieType }) => {
   const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
   useEffect(()=>{
-    dispatch(fetchMovies());
-  },[])
+    dispatch(fetchMovies({
+      page:currentPage,
+      language:filterLanguage,
+      genre:filterGenre,
+      searchQuery
+    }));
+  },[currentPage,filterGenre,filterLanguage,searchQuery])
 
   useEffect(() => {
     if (movieType === "now-showing") {
@@ -32,12 +39,12 @@ const FullMoviesList = ({ movieType }) => {
     }
   }, [movieType,upcomingMovies,nowShowingMovies]);
 
-  const handleSearchChange = (e) => setSearchQuery(e.target.value);
+  const handleSearchChange = (e) =>{ setSearchQuery(e.target.value); setCurrentPage(1) }
   const handleMovieClick = (id) => {
     navigate(`/movies/${id}`);
   };
-  const handleFilterLanguage = (e) => setFilterLanguage(e.target.value);
-  const handleFilterGenre = (e) => setFilterGenre(e.target.value);
+  const handleFilterLanguage = (e) => {setFilterLanguage(e.target.value); setCurrentPage(1) }
+  const handleFilterGenre = (e) => {setFilterGenre(e.target.value); setCurrentPage(1)}
 
   const handleSortChange = (e) => {
     setSortBy(e.target.value);
@@ -119,6 +126,12 @@ const FullMoviesList = ({ movieType }) => {
         </div>
 
         {/* Movie List */}
+        {isLoading ? (
+          <div className="grid grid-cols-4 gap-12">
+            {[...Array(8)].map((_, index) => (
+              <Skeleton key={index} height={400} width={250} />
+            ))}
+          </div>):filteredMovies.length>0?(
         <div className="grid grid-cols-4 gap-12">
           {filteredMovies.map((movie) => (
             <div key={movie._id} className="text-center" onClick={() => handleMovieClick(movie.id)}>
@@ -134,6 +147,12 @@ const FullMoviesList = ({ movieType }) => {
             </div>
           ))}
         </div>
+      ) : (
+    <div className="flex justify-center items-center flex-col">
+      <img src="https://via.placeholder.com/150?text=No+Upcoming+Movies" alt="No Upcoming Movies" className="w-48 h-48 mb-4" />
+      <p className="text-xl font-semibold text-gray-700">No  movies available at this time</p>
+    </div>
+  )}
 
         {/* View All Button */}
         <div className="flex justify-end mt-8">
@@ -155,17 +174,37 @@ const FullMoviesList = ({ movieType }) => {
         </div>
 
          {/* pagination */}
-        <div className="flex justify-center mt-8 space-x-2">
-          {Array.from({ length: totalPages }, (_, index) => (
-            <button
-              key={index + 1}
-              onClick={() => paginate(index + 1)}
-              className={`px-4 py-2 rounded-lg min-h-8 ${currentPage === index + 1 ? 'bg-blue-600 text-white' : 'bg-gray-300'}`}
-            >
-              {index + 1}
-            </button>
-          ))}
-        </div>
+         <div className="flex justify-center mt-8 space-x-2">
+  {/* Previous Button */}
+  <button
+    onClick={() => paginate(currentPage - 1)}
+    disabled={currentPage === 1}
+    className={`px-4 py-2 rounded-lg min-h-8 ${currentPage === 1 ? 'bg-gray-300 text-gray-500 cursor-not-allowed hidden' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+  >
+    Previous
+  </button>
+
+  {/* Page Numbers */}
+  {Array.from({ length: totalPages }, (_, index) => (
+    <button
+      key={index + 1}
+      onClick={() => paginate(index + 1)}
+      className={`px-4 py-2 rounded-lg min-h-8 ${currentPage === index + 1 ? 'bg-blue-600 text-white' : 'bg-gray-300 hover:bg-blue-500 hover:text-white'}`}
+    >
+      {index + 1}
+    </button>
+  ))}
+
+  {/* Next Button */}
+  <button
+    onClick={() => paginate(currentPage + 1)}
+    disabled={currentPage === totalPages}
+    className={`px-4 py-2 rounded-lg min-h-8 ${currentPage === totalPages ? 'bg-gray-300 text-gray-500 cursor-not-allowed hidden' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+  >
+    Next
+  </button>
+</div>
+
       </div>
 
       {/* Footer */}

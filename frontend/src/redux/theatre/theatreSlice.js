@@ -10,9 +10,17 @@ import {
   //logout,
   resendOtp,
   addMoviesToScreen,
-  CompleteTheatreProfile
+  CompleteTheatreProfile,
+  AddScreen,
+  listScreen,
+  fetchMovies,
+  saveTierData,
+  updateScreen,
+  saveMoviesToShowtime
+  
 } from './theatreThunk';
 import { toast } from 'react-toastify';
+import { RollingMoviesData } from './theatreService';
 //import { log } from 'util';
 
 
@@ -40,7 +48,9 @@ const initialState = {
     isLoading:false,
     message:'',
     otpToken:null,
-    isProfileComplete:user?.address?.place?true:false
+    isProfileComplete:user?.address?.place?true:false,
+    screens:[],
+    movies:[]
 };
 
 
@@ -228,25 +238,25 @@ const theatreSlice = createSlice({
         state.isError = true;
         state.message = action.payload;
       })
-      .addCase(addMoviesToScreen.pending, (state) => {
-        state.isLoading = true;
-        state.isSuccess = false;
-        state.isError = false;
-        state.message = '';
-      })
-      .addCase(addMoviesToScreen.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.isSuccess = true;
-        //state.user.is_verified = true;
-        state.message = action.payload.message;
+      // .addCase(addMoviesToScreen.pending, (state) => {
+      //   state.isLoading = true;
+      //   state.isSuccess = false;
+      //   state.isError = false;
+      //   state.message = '';
+      // })
+      // .addCase(addMoviesToScreen.fulfilled, (state, action) => {
+      //   state.isLoading = false;
+      //   state.isSuccess = true;
+      //   //state.user.is_verified = true;
+      //   state.message = action.payload.message;
         
-      })
-      .addCase(addMoviesToScreen.rejected, (state, action) => {
-        state.isLoading = false;
-        state.isSuccess = false;
-        state.isError = true;
-        state.message = action.payload;
-      })
+      // })
+      // .addCase(addMoviesToScreen.rejected, (state, action) => {
+      //   state.isLoading = false;
+      //   state.isSuccess = false;
+      //   state.isError = true;
+      //   state.message = action.payload;
+      // })
       .addCase(CompleteTheatreProfile.pending, (state) => {
         console.log("pending in completeProfile");
          
@@ -273,6 +283,177 @@ const theatreSlice = createSlice({
         state.isSuccess = false;
         state.isError = true;
         state.message = action.payload;
+      })
+      .addCase(AddScreen.pending, (state) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+        state.isError = false;
+        state.message = '';
+      })
+      .addCase(AddScreen.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        //state.user.is_verified = true;
+        state.message = action.payload.message;
+        
+      })
+      .addCase(AddScreen.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(listScreen.pending, (state) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+        state.isError = false;
+        state.message = '';
+      })
+      .addCase(listScreen.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        //state.user.is_verified = true;
+        state.message = action.payload.message;
+        state.screens=action.payload.screenData
+        
+      })
+      .addCase(listScreen.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(fetchMovies.pending, (state) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+        state.isError = false;
+        state.message = '';
+      })
+      .addCase(fetchMovies.fulfilled, (state, action) => {
+        console.log(action,"Action datas");
+        
+        state.isLoading = false;
+        state.isSuccess = true;
+        //state.user.is_verified = true;
+        state.message = action.payload.message;
+        //state.screens=action.payload.screenData
+        state.movies=action.payload.movieData
+      })
+      .addCase(fetchMovies.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(addMoviesToScreen.pending, (state) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+        state.isError = false;
+        state.message = '';
+      })
+      .addCase(addMoviesToScreen.fulfilled, (state, action) => {
+        console.log(action,"Action datas");
+        
+        state.isLoading = false;
+        state.isSuccess = true;
+        //state.user.is_verified = true;
+        state.message = action.payload.message;
+        //state.screens=action.payload.screenData
+        state.screens = state.screens.map(screen => 
+          screen._id === action.payload.screenData._id ? action.payload.screenData : screen
+        );
+      
+        console.log(state.screens.find(screen => screen._id === action.payload.screenData._id).enrolledMovies, "enrolledMovies after update");
+      
+        toast.success(state.message)
+      })
+      .addCase(addMoviesToScreen.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(state.message)
+      })
+      .addCase(saveTierData.pending, (state) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+        state.isError = false;
+        state.message = '';
+      })
+      .addCase(saveTierData.fulfilled, (state, action) => {
+        console.log(action,"Action datas");
+        
+        state.isLoading = false;
+        state.isSuccess = true;
+        //state.user.is_verified = true;
+        state.message = action.payload.message;
+        //state.screens=action.payload.screenData
+        state.screens = state.screens.map(screen => 
+          screen._id === action.payload.screenData._id ? action.payload.screenData : screen
+        );
+      
+        toast.success(state.message)
+      })
+      .addCase(saveTierData.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(state.message)
+      })
+      .addCase(updateScreen.pending, (state) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+        state.isError = false;
+        state.message = '';
+      })
+      .addCase(updateScreen.fulfilled, (state, action) => {
+        console.log(action,"Action datas");
+        
+        state.isLoading = false;
+        state.isSuccess = true;
+        //state.user.is_verified = true;
+        state.message = action.payload.message;
+        //state.screens=action.payload.screenData
+        state.screens = state.screens.map(screen => 
+          screen._id === action.payload.screenData._id ? action.payload.screenData : screen
+        );
+      
+        toast.success(state.message)
+      })
+      .addCase(updateScreen.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(state.message)
+      })
+      .addCase(saveMoviesToShowtime.pending, (state) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+        state.isError = false;
+        state.message = '';
+      })
+      .addCase(saveMoviesToShowtime.fulfilled, (state, action) => {
+        console.log(action,"Action datas");
+        
+        state.isLoading = false;
+        state.isSuccess = true;
+        //state.user.is_verified = true;
+        state.message = action.payload.message;
+        //state.screens=action.payload.screenData
+        // state.screens = state.screens.map(screen => 
+        //   screen._id === action.payload.screenData._id ? action.payload.screenData : screen
+        // );
+      
+        toast.success(state.message)
+      })
+      .addCase(saveMoviesToShowtime.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(state.message)
       })
   },
 });

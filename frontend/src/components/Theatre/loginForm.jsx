@@ -47,6 +47,8 @@ const validateForm = () => {
         }
     };
 
+
+
     const getSignup=()=>
     {
         navigate('/theatre/signup')
@@ -62,11 +64,11 @@ const validateForm = () => {
         //     navigate('/theatre/home')
         //     return
         // }
-        if(isSuccess)
-            {
+        
+            
                 console.log(theatre,"isProfilecomplete");
                 
-                if(theatre.address.place)
+                if(theatre?.address?.place&&token)
                 {
                     
                  navigate('/theatre/home')
@@ -74,11 +76,11 @@ const validateForm = () => {
                 // let user="first"
                
                 //     localStorage.setItem('jifes',user)
-                else{
+                else if(token){
                 localStorage.setItem('incompleteProfile', true);
                 navigate('/theatre/profile')
                 }
-            }
+            
         if(isError)
         {
             toast.error(message)

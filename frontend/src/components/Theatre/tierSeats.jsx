@@ -1,146 +1,144 @@
-// import React, { useEffect, useState } from 'react'
-// import TheatreHeader from './TheatreHeader'
-// import Footer from '../User/footer'
-// import { useLocation } from 'react-router'
-
-// const TierSeats = () => {
-//     const location=useLocation()
-//     const {tier}=location.state||{}
-//     console.log(tier,"tierData");
-
-//     const handleSubmit=(e)=>{
-//         e.preventDefault()
-//     }
-//     const handleTierSeatChange=()=>{
-
-//     }
-
-
-//     const [rows, setRows] = useState(tier?.rows || 0);
-//     //const [columns, setColumns] = useState(tier?.columns || 0);
-//     const [partition, setPartition] = useState(tier?.partition || 0);
-//     const [seatGrid, setSeatGrid] = useState([]);
-
-    
-//     useEffect(() => {
-//         generateSeatGrid(rows,tier.seats,partition);
-//     }, [rows, columns, partition]);
-
-//     // Generate grid based on rows and columns
-//     const generateSeatGrid = (rows,seats,partition) => {
-//         const newSeatGrid = [];
-//         for(let i=0;i<rows;i++)
-//         {
-//             for(let j=i;j)
-//         }
-//         setSeatGrid(newSeatGrid);
-//     };
-
-
-//     const handleRowsChange = (e) => {
-//         setRows(parseInt(e.target.value, 10));
-//     };
-
-//     const handleColumnsChange = (e) => {
-//         setColumns(parseInt(e.target.value, 10));
-//     };
-
-//     const handlePartitionChange = (e) => {
-//         setPartition(parseInt(e.target.value, 10));
-//     };
-//   return (
-//     <>
-//     <TheatreHeader/>
-//     <div className="bg-orange-300 min-h-screen flex  ">
-//     <div className="flex-col p-2 m-4 bg-indigo-950 w-full mx-20  rounded-lg justify-between text-white">
-//         <h1 className="p-2 justify-center text-center text-2xl">Seats Management</h1>
-//     <div className='flex justify-start flex-col  text-lg font-mono gap-4 text-white'>
-//     <span>Name : {tier.name}</span>
-//     <span>Ticket Rate : {tier.ticketRate}</span>
-//         <span>Seats : {tier.seats}</span>
-//     </div>
-//      <form onSubmit={handleSubmit} className="mx-4 mt-12 items-end space-y-4">
-//         <div className='flex justify-between gap-6'>
-//             <div className='flex items-center gap-4'>
-//             <label className='text-md min-w-fit font-medium mb-4'> horizontal partition</label>
-//             <input type="text" value={partition} onChange={handlePartitionChange} className='w-full p-3 mb-4 rounded-lg bg-black border border-amber-400 focus:border-amber-500 outline-none'/>
-//         </div>
-//         </div>
-//         <div  className='flex items-center gap-6'>
-              
-//                 <div  className='flex  flex-1 items-center gap-4'>
-//                     <label className='text-md font-medium min-w-fit mb-4'>No of rows</label>
-//                     <input type="text" value={rows}  onChange={handleRowsChange} className='w-full p-3 mb-4 rounded-lg bg-black border border-amber-400 focus:border-amber-500 outline-none'/>
-//                 </div>
-//                 <div className='flex flex-1 items-center gap-4'>
-//                     <label className='text-md font-medium min-w-fit mb-4'>No of columns</label>
-//                     <input type="text" value={columns} onChange={handleColumnsChange} className='w-full p-3 mb-4 rounded-lg bg-black border border-amber-400 focus:border-amber-500 outline-none'/>
-//                 </div>
-//                 </div>
-//                 <div className="mt-10 grid" style={{
-//                             display: 'grid',
-//                             gridTemplateColumns: `repeat(${columns}, 60px)`,
-//                             gap: '15px',
-//                             justifyContent: 'center'
-//                         }}>
-//                             {seatGrid.map((rowSeats, rowIndex) => (
-//                                 <div key={rowIndex} style={{ display: 'flex', gap: '15px' }}>
-//                                     {rowSeats.map((seat, colIndex) => (
-//                                         <div key={colIndex} className="w-12 h-12 bg-yellow-500 flex items-center justify-center">
-//                                             {`R${seat.row + 1}-C${seat.col + 1}`}
-//                                         </div>
-//                                     ))}
-//                                 </div>
-//                             ))}
-//                         </div>
-//          <div className='flex justify-center mt-8 p-4'>       
-//         <button type="submit" className='items-center rounded min-w-fit p-2  min-h-8 bg-amber-400 text-base text-indigo-950 hover:text-sm hover:bg-yellow-500 '>Save</button>
-     
-//      </div>
-//      </form>
-//      </div>
-//     </div>
-//     <Footer/>
-//     </>
-//   )
-// }
-
-// export default TierSeats
-
-
-
-
 import React, { useState, useEffect } from 'react';
 import TheatreHeader from './TheatreHeader';
 import Footer from '../User/footer';
-import { useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCouch } from "@fortawesome/free-solid-svg-icons";
 import { useDrag, useDrop } from 'react-dnd';
+import { useDispatch, useSelector } from 'react-redux';
+import { saveTierData } from '../../redux/theatre/theatreThunk';
+import TierConfigModal from './configModal';
+import { useIdentifier, useLastIdentifier } from '../../utils/context/identifierContext';
 
 
 const TierSeats = () => {
+    const { lastIdentifier, updateLastIdentifier } = useLastIdentifier();
     const location = useLocation();
     const { tier } = location.state || {};
     console.log(tier, "tierData");
    //let fillseat=0
+   const dispatch=useDispatch()
+   const {theatre,isSuccess,isLoading,screens}=useSelector((state)=>state.theatre)
     const [rows, setRows] = useState(tier?.rows || 0);
+    const [tierConfig, setTierConfig] = useState({
+        startLetter: "A",
+        order: "ascending", 
+        manualLabels: [],    });
+    
     const [columns, setColumns] = useState(tier?.columns || 0);
     const [partition, setPartition] = useState(tier?.partition || 0);
     const [seatGrid, setSeatGrid] = useState([]);
     const [selectedSeats, setSelectedSeats] = useState([]);
-    const [couchOccupied, setCouchOccupied] = useState({}); 
+    const [couchOccupied, setCouchOccupied] = useState({});
+    const [filledSeats, setFilledSeats] = useState([]); 
     const[fillSeat,setFillSeat]=useState(0)
+    const[isConfigModalOpen,setIsConfigModalOpen]=useState(false)
+    
     const ItemTypes = {
         SEAT: 'seat',
-        COUCH: 'couch', // Define a new type for the couch
+        COUCH: 'couch', 
     };
 
+    const getRowLabel = (index) => {
+        let label = '';
+        while (index >= 0) {
+            label = String.fromCharCode(65 + (index % 26)) + label;
+            index = Math.floor(index / 26) - 1;
+        }
+        return label;
+    };
 
-    // Update seat grid when rows, columns, or partition changes
+    const generateLabels = () => {
+        if(!tier) return []
+        const { startLetter, order, manualLabels = [] } = tierConfig;  // Provide a default empty array
+      console.log(tierConfig,"tierconfig in generate label");
+      
+        if (manualLabels.length > 0) return manualLabels; // Use custom labels if provided
+    
+        let labels = [];
+        console.log(lastIdentifier,"last identifier");
+       // let lastTemp=lastIdentifier.charCodeAt(0)
+       // console.log(lastTemp,"lasttemp");
+       let storeTemp = null;
+
+
+       if (tier.seatLayout && tier.seatLayout.length > 0) {
+           
+           for (let column of tier.seatLayout[0]) {
+            
+               if (column.label) {
+                   
+                   storeTemp = column.label.slice(0, 1);
+                   break; 
+               }
+           }
+       }
+       
+       console.log(storeTemp, "store temp");  
+          
+        let temp=storeTemp?storeTemp.charCodeAt(0):startLetter.charCodeAt(0)
+        console.log(temp,"temp start letter");
+            
+        const startCharCode = temp// ASCII code for A or Z
+        const increment = order === "ascending"&& startLetter!="Z" ? 1 : -1;
+          console.log(startCharCode,increment,"startcharcode and increment");
+          
+        for (let i = 0; i < rows; i++) {
+            labels.push(String.fromCharCode(startCharCode + i * increment));
+            console.log(startCharCode,"startcharcode",increment,"increment",startCharCode+i*increment);
+            
+        }
+        console.log(labels,"labels where returning");
+      updateLastIdentifier(labels[labels.length-1])  
+        return labels;
+    };
+    const handleConfigSave = (config) => {
+        console.log(config,"config in tier seats modal");
+        
+        setTierConfig(config);
+        // Close modal after saving
+        setIsConfigModalOpen(false)
+    }
+    
+    
     useEffect(() => {
+        console.log(tier,"tier data check");
+        if (tier && tier.seatLayout && tier.seatLayout.length > 0) {
+                // If a seat layout exists in the tier, use it to initialize the grid
+                setSeatGrid(
+                    // tier.seatLayout.map(seatRow => 
+                    //     seatRow.map(seat => ({
+                    //         ...seat,
+                    //         filled: seat.isFilled || false,
+                    //         isPartition: seat.isPartition || false
+                    //     }))
+                    // )
+                    tier.seatLayout
+                );
+                
+                // Restore other states based on the layout, if needed
+                setFilledSeats(
+                    tier.seatLayout
+                        .flat()
+                        .filter(seat => seat.isFilled)
+                        .map(seat => ({ row: seat.row, col: seat.col, label: seat.label }))
+                );
+                setFillSeat(
+                    tier.seatLayout.flat().filter(seat => seat.isFilled).length
+                );
+                setCouchOccupied(
+                    tier.seatLayout.flat().reduce((acc, seat) => {
+                        if (seat.isFilled) acc[`${seat.row}-${seat.col}`] = true;
+                        return acc;
+                    }, {})
+                );        }
+        else{
         generateSeatGrid(rows, columns,tier.seats,partition);
-    }, [rows, columns, partition]);
+        setFillSeat(0)
+        setFilledSeats([])
+        setCouchOccupied({})
+        }
+    }, [rows, columns, partition,tier]);
 
     const generateSeatGrid = (rows, columns,seats,space) => {
         console.log(rows,"rows",seats,"seat",space,"partition");
@@ -149,20 +147,25 @@ const TierSeats = () => {
         console.log("div columns",divColumns);
         setColumns(divColumns)
         const newSeatGrid = [];
-        for (let row = 1; row <= rows; row++) {
+        let seatNumber=1
+        for (let row = 0; row < rows; row++) {
             const rowSeats = [];
+            const rowLabel = getRowLabel(row)
             let k=1
-            for (let col = 1; col <=divColumns; col++) {
+            for (let col = 0; col <divColumns; col++) {
                 let tab=Math.ceil(divColumns/(space+1))
-                if(col==(tab+1)*k)
-                {
-                rowSeats.push({isPartition:true})
-                  k++
-                }
-                else
-                {
-                rowSeats.push({ row, col, filled: false ,isPartition:false});
-                }
+                console.log("tab",tab);
+                
+                //  if(col==(tab)*k)
+                // //if (space > 0 && col % space === 0 && col !== 0) 
+                // {
+                // rowSeats.push({isPartition:true})
+                //   k++
+                // }
+                // else
+                // {
+                rowSeats.push({ row:rowLabel, col, filled: false ,isPartition:false});
+               // }
             }
             newSeatGrid.push(rowSeats);
             console.log(newSeatGrid,"seatgrid values in rows and columns");
@@ -171,20 +174,31 @@ const TierSeats = () => {
         setSeatGrid(newSeatGrid);
     };
 
-    // Handle seat selection (click to select or fill)
-    // const handleSeatClick = (row, col) => {
-    //     const updatedGrid = seatGrid.map((rowSeats, rowIndex) =>
-    //         rowSeats.map((seat, colIndex) =>
-    //             rowIndex === row && colIndex === col
-    //                 ? { ...seat, filled: !seat.filled } // Toggle filled state
-    //                 : seat
-    //         )
-    //     );
-    //     setSeatGrid(updatedGrid);
-    // };
-
 // Implement Drag and Drop functionality
-const Seat = ({ row, col, filled, isPartition }) => {
+useEffect(()=>{
+    // setTimeout(() => {
+        
+        
+            if(fillSeat==tier.seats)
+                {
+                console.log("kkkkkkk")
+        setSeatGrid((prevGrid) =>
+            prevGrid.map((rowSeats, rowIndex) =>
+                rowSeats.map((seat, colIndex) => {
+                    const seatKey = `${rowIndex}-${colIndex}`;
+                    return couchOccupied[seatKey]
+                        ? seat // Keep filled seats intact
+                        : { ...seat, isPartition: true }; // Mark remaining seats as partitions
+                })
+            )
+        );
+                }
+    // },200);
+},[fillSeat])
+const openConfigModal = () => setIsConfigModalOpen(true);
+    const closeConfigModal = () => setIsConfigModalOpen(false);
+
+const Seat = React.memo(({ row, col, filled, isPartition }) => {
     const [, drop] = useDrop({
         accept: ItemTypes.COUCH,
         drop: () => {
@@ -194,43 +208,396 @@ const Seat = ({ row, col, filled, isPartition }) => {
         canDrop: () => !isPartition && !couchOccupied[`${row}-${col}`], // Check if the seat is not occupied
     });
 
-    const handleSeatClick = () => {
-        // Toggle couch occupied state on click
-        // let currentFill=fillSeat
-        //  setFillSeat(++currentFill)
-        //  console.log(currentFill,"fillSeat");
-       
-         
-        if (!isPartition && !couchOccupied[`${row}-${col}`]) {
+
+            // console.log("vanne vanne");
+
+    
+    const handleSeatClick = (row, col) => {
+        console.log("handle click worked " , row ,col , fillSeat,tier.seats)
+        if (couchOccupied[`${row}-${col}`]) {
+            console.log("1")
+
+            
+            console.log(fillSeat,"fillseat after undo seat");
+            setCouchOccupied((prev) => {
+                const updated = { ...prev };
+                delete updated[`${row}-${col}`]; 
+                return updated;
+            });
+            setSeatGrid((prevGrid) =>
+                prevGrid.map((rowSeats, rowIdx) =>
+                    rowSeats.map((seat, colIdx) => {
+                        const seatKey = `${rowIdx}-${colIdx}`;
+                        return couchOccupied[seatKey]
+                            ? seat 
+                            : { ...seat, isPartition: false }; 
+                                            })
+                )
+            );
+            
+            setFillSeat((prev) => prev - 1); 
+            setFilledSeats((prev) => prev.filter((seat) => !(seat.row === row && seat.col === col)));
+        } else if (fillSeat < tier.seats) {
+            
+            console.log("2")
+            const temp = fillSeat + 1
+          
+
             setCouchOccupied((prev) => ({ ...prev, [`${row}-${col}`]: true }));
-        }
-
-         setFillSeat((prev)=>prev+1)
-        console.log(fillSeat,"fillseat ");
+             setFillSeat((prev) => prev + 1);
+    
+            
+            const updatedFilledSeats = [...filledSeats, { row, col ,filled:true }];
+    
+            
+            const currentRowSeats = updatedFilledSeats
+                .filter((seat) => seat.row === row)
+                .sort((a, b) => a.col - b.col);
+    
+            
+            const updatedRowSeats = currentRowSeats.map((seat, index) => ({
+                ...seat,
+                label: `${generateLabels()[row]}${index + 1}`, 
+            }));
+    
+            
+            const finalSeats = updatedFilledSeats.map((seat) => {
+                if (seat.row === row) {
+                    
+                    return updatedRowSeats.find((updatedSeat) => updatedSeat.col === seat.col);
+                }
+                return seat;
+            });
+             
+            
+            setFilledSeats(finalSeats);
+            
+            
+        } 
+        console.log(fillSeat,"fillseat after filling seat \n filledSeats in array",filledSeats);
+            
         
-    };
+    }
 
+    const seatLabel = filledSeats.find(seat => seat.row === row && seat.col === col)?.label || "";
+ // console.log(filledSeats,"filledseat and seatlabel",seatLabel);
+  
     return isPartition ? (
         <div className='w-12 h-12'></div>
     ) : (
         <div
-            ref={drop}
-            className={`w-12 h-12 ${couchOccupied[`${row}-${col}`] ? 'bg-indigo-950' : 'bg-transparent'} flex items-center border border-yellow-500 justify-center cursor-pointer`}
-            onClick={handleSeatClick} // Call handleSeatClick on click
-        >
+        ref={drop}
+        className={`
+            cursor-pointer flex items-center justify-center 
+            bg-transparent border border-yellow-500 
+            ${couchOccupied[`${row}-${col}`] ? 'bg-indigo-950' : ''} 
+            md:w-8 md:h-8 sm:w-6 sm:h-6  lg:w-12 lg:h-12  // Adjust seat size based on viewport
+            `}  
+        onClick={() => handleSeatClick(row, col)}
+    >
             {couchOccupied[`${row}-${col}`] && (
+                <>
                 <FontAwesomeIcon
                     icon={faCouch}
                     size="2x"
-                    className=" border-yellow-500  text-yellow-400" // Add yellow border
+                    className=" border-yellow-500  w-fit h-fit text-yellow-400" 
                 />
+                {
+                 
+                }
+                 <span className="absolute -mt-4 z-10 text-sm  font-semibold text-blue-950">{seatLabel}</span>
+                 </>
             )}
         </div>
     );
+})
+
+
+
+
+    const CouchLogo = () => {
+        const [{isDragging}, dragRef] = useDrag({
+            type: ItemTypes.COUCH,
+            item: {}, 
+        });
+
+        return (
+            fillSeat<tier.seats ?
+            <div className='grid-flow-col space-y-2 '>
+            <div
+            ref={dragRef}
+            className={`cursor-pointer p-2 border-4 w-fit  border-yellow-400 rounded-md ${
+              isDragging ? "opacity-50" : "opacity-100"
+            }`}
+          >
+            <FontAwesomeIcon icon={faCouch} size="2x" color="#FFD700" />
+            
+          </div>
+          <div className="text-yellow-500 "> Seats left: {tier.seats - fillSeat}</div>
+          </div>:null
+        );
+    };
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+
+        
+    };
+
+    const handleRowsChange = (e) => {
+        setRows(parseInt(e.target.value, 10));
+    };
+
+    const handleColumnsChange = (e) => {
+        setColumns(parseInt(e.target.value, 10));
+    };
+
+    const handlePartitionChange = (e) => {
+        setPartition(parseInt(e.target.value, 10));
+    };
+    const handleSaveConfiguration = () => {
+        const seatsData = seatGrid.map((rowSeats, rowIndex) => 
+            rowSeats.map((seat, colIndex) => {
+                const seatKey = `${rowIndex}-${colIndex}`;
+                const isFilled = couchOccupied[seatKey] ? true : false;
+                const isPartition = seat.isPartition;
+    
+                // Find label for the current seat based on exact row and column match
+                const filledSeat = filledSeats.find(s => s.row === rowIndex && s.col === colIndex);
+                const label = filledSeat && !isPartition ? filledSeat.label : ""; // Only assign label if not a partition
+    
+                let status = "available";
+                if (isPartition) {
+                    status = "partition";
+                } else if (isFilled) {
+                    status = "available";  
+                }
+    
+                return {
+                    row: rowIndex,    // Store row and column for reference
+                    col: colIndex,
+                    label: label,
+                    isFilled: isFilled,
+                    isPartition: isPartition,
+                    status: status
+                };
+            })
+        );
+    
+        const updatedTier = {
+            ...tier,
+            rows,
+            columns,
+            partition,
+            seatLayout: seatsData  // Store seatsData in seatLayout field
+        };
+    
+        console.log(updatedTier, "Updated Tier", filledSeats, "Filled Seats");
+    
+        saveTierConfig(updatedTier);
+    };
+    const navigate=useNavigate()
+    const saveTierConfig = async (tierData) => {
+        console.log(screens,"screens for in redux state");
+        
+        const screen = screens.find((screen) =>
+            screen.tiers.some((tier) => tier._id === tierData._id)
+        );
+    console.log(screen,"data screen");
+    
+        
+        const screenId = screen ? screen._id : null
+        console.log(screenId);
+        
+        dispatch(saveTierData({tierData,screenId}))
+        navigate(-1)
+    };
+        
+    
+    return (
+        <>
+            <TheatreHeader />
+            <div className="bg-orange-300 min-h-screen flex">
+                <div className="flex-col p-2 m-4 bg-indigo-950 w-full mx-20 rounded-lg justify-between text-white">
+                    <h1 className="p-2 justify-center text-center text-2xl">Seats Management</h1>
+                    <div className="flex justify-start flex-col text-lg font-mono gap-4 text-white">
+                        <span>Name: {tier.name}</span>
+                        <span>Ticket Rate: {tier.ticketRate}</span>
+                        <span>Seats: {tier.seats}</span>
+                       <div className='flex justify-start items-center'>
+                        <CouchLogo/>
+                       </div>
+                    </div>
+                    <form onSubmit={handleSubmit} className="mx-4 mt-12 items-end space-y-4">
+                        
+                        <div className="flex items-center gap-6">
+                            <div className="flex flex-1 items-center gap-4">
+                                <label className="text-md font-medium min-w-fit mb-4">No of Rows</label>
+                                <input
+                                    type="number"
+                                    value={rows}
+                                    onChange={handleRowsChange}
+                                    className="w-full p-3 mb-4 rounded-lg bg-black border border-amber-400 focus:border-amber-500 outline-none"
+                                />
+                            </div>
+                            {/* <div className="flex flex-1 items-center gap-4">
+                                <label className="text-md font-medium min-w-fit mb-4">No of Columns</label>
+                                <input
+                                    type="number"
+                                    value={columns}
+                                    onChange={handleColumnsChange}
+                                    className="w-full p-3 mb-4 rounded-lg bg-black border border-amber-400 focus:border-amber-500 outline-none"
+                                />
+                            </div> */}
+                            <div className="flex items-center gap-4">
+                                <label className="text-md min-w-fit font-medium mb-4">Horizontal Partition</label>
+                                <input
+                                    type="number"
+                                    value={partition}
+                                    onChange={handlePartitionChange}
+                                    className="w-full p-3 mb-4 rounded-lg bg-black border border-amber-400 focus:border-amber-500 outline-none"
+                                />
+                            </div>
+                        </div>
+
+                       
+
+<div className="mt-10 flex flex-col gap-[5px]">
+<div className="flex justify-start mt-8">
+                            <button
+                                type="button"
+                                onClick={openConfigModal}
+                                className="bg-amber-400 min-h-8 text-indigo-950 rounded p-2 hover:bg-yellow-500"
+                            >
+                                identifier configure
+                            </button>
+                        </div>
+                        {console.log(seatGrid,"seatGrid")
+                        }
+{/* {seatGrid.map((rowSeats, rowIndex) => {
+    
+    const rowLabel = generateLabels()[rowIndex]
+    return (
+    <>
+        
+    <div key={rowIndex} className="flex  justify-center items-center">
+        
+        {filledSeats.some(seat => seat.row === rowIndex) && (
+        <div className="text-white w-12 h-12 flex justify-center items-center">
+            {rowLabel} 
+        </div>)}
+        
+            <div
+                className="grid gap-[5px]  p-4 max-w-full overflow-auto"
+                style={{
+                    gridTemplateColumns: `repeat(${columns}, minmax(40px, 1fr))`, 
+                    // maxWidth: `${columns > 25 ? '100%' : }`, 
+                    // gridAutoRows: `minmax(40px, 1fr)` 
+                    
+                }}
+            >
+            {rowSeats.map((seat, colIndex) => (
+                <Seat
+                    key={`${rowIndex}-${colIndex}`}
+                    row={rowIndex}
+                    col={colIndex}
+                    filled={seat.filled}
+                    isPartition={seat.isPartition}
+                    
+                />
+            ))}
+        </div>
+    </div>
+    </>)})} */}
+
+{seatGrid.map((rowSeats, rowIndex) => {
+                    const rowLabel = generateLabels()[rowIndex];
+                    return (
+                        <div key={rowIndex} className="flex justify-center items-center mb-4">
+                            {filledSeats.some(seat => seat.row === rowIndex) && (
+                                <div className="text-white w-12 h-12 flex justify-center items-center">
+                                    {rowLabel}
+                                </div>
+                            )}
+                            <div className="flex gap-[5px]">
+                                {rowSeats.map((seat, colIndex) => (
+                                    <Seat
+                                        key={`${rowIndex}-${colIndex}`}
+                                        row={rowIndex}
+                                        col={colIndex}
+                                        filled={seat.filled}
+                                        isPartition={seat.isPartition}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    );
+                })}
+    
+</div>
+
+
+                        <div className="flex justify-center mt-8 p-4">
+                            <button
+                                type="submit"
+                                onClick={handleSaveConfiguration}
+                                className="items-center rounded min-w-fit p-2 min-h-8 bg-amber-400 text-base text-indigo-950 hover:text-sm hover:bg-yellow-500"
+                            >
+                                Save
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <Footer />
+            {isConfigModalOpen && (
+    <TierConfigModal
+        onSave={handleConfigSave}
+        onCancel={() => setIsConfigModalOpen(false)}
+        initialConfig={tierConfig}
+    />
+)}
+
+        </>
+    );
 };
 
+export default TierSeats;
 
 
+
+// const handleSeatClick = () => {
+    //     // Toggle couch occupied state on click
+    //     // let currentFill=fillSeat
+    //     //  setFillSeat(++currentFill)
+    //     //  console.log(currentFill,"fillSeat");
+       
+        
+    //         if (couchOccupied[`${row}-${col}`]) {
+    //            // Undo seat filling
+    //            setCouchOccupied((prev) => {
+    //               const updated = { ...prev };
+    //               delete updated[`${row}-${col}`]; // Remove the filled state
+    //               return updated;
+    //            });
+    //            setFillSeat((prev) => prev - 1); // Decrease the count
+    //            setFilledSeats((prev) => prev.filter((seat) => !(seat.row === row && seat.col === col)));
+    //         } else if (fillSeat < tier.seats) {
+    //            // Fill the seat
+    //            setCouchOccupied((prev) => ({ ...prev, [`${row}-${col}`]: true }));
+    //            setFillSeat((prev) => prev + 1);
+    //            const currentRowSeats = filledSeats.filter((seat) => seat.row === row).sort((a,b)=>a.col-b.col);
+    //            const nextSeatNumber = currentRowSeats.length + 1;
+    //            setFilledSeats((prev) => [...prev, { row, col, label: `${String.fromCharCode(65 + row)}${nextSeatNumber}` }]);
+    //             // updateSeatLabels(currentRowSeats)
+    //             console.log(filledSeats,"filledSeats after named label" ,...filledSeats);
+                
+    //             setFilledSeats((filledSeats)=>[...filledSeats, filledSeats.sort((a,b)=>a.label.split('')[1]-b.label.split('')[1])])
+    //         }
+
+
+
+    
     // Implement Drag and Drop functionality
     // const Seat = ({ row, col,filled, isPartition }) => {
     //     const [{ canDrop, isOver }, drop] = useDrop({
@@ -263,145 +630,6 @@ const Seat = ({ row, col, filled, isPartition }) => {
     //         </div>
     //     );
     // };
-
-    const CouchLogo = () => {
-        const [{isDragging}, dragRef] = useDrag({
-            type: ItemTypes.COUCH,
-            item: {}, // You can add additional data if needed
-        });
-
-        return (
-            fillSeat<tier.seats ?
-            <div
-            ref={dragRef}
-            className={`cursor-pointer p-2 border-4 border-yellow-400 rounded-md ${
-              isDragging ? "opacity-50" : "opacity-100"
-            }`}
-          >
-            <FontAwesomeIcon icon={faCouch} size="2x" color="#FFD700" />
-          </div>
-          :<></>
-        );
-    };
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Save or submit seat configuration here
-    };
-
-    const handleRowsChange = (e) => {
-        setRows(parseInt(e.target.value, 10));
-    };
-
-    const handleColumnsChange = (e) => {
-        setColumns(parseInt(e.target.value, 10));
-    };
-
-    const handlePartitionChange = (e) => {
-        setPartition(parseInt(e.target.value, 10));
-    };
-    const SeatLogo = () => {
-        const [, dragRef] = useDrag({
-            type: ItemTypes.SEAT,
-            item: {},
-        });
-
-        return (
-            <div
-                ref={dragRef}
-                className="w-12 h-12 bg-yellow-500 flex items-center justify-center border border-yellow-500 cursor-pointer"
-            >
-                Seat
-            </div>
-        );
-    };
-    return (
-        <>
-            <TheatreHeader />
-            <div className="bg-orange-300 min-h-screen flex">
-                <div className="flex-col p-2 m-4 bg-indigo-950 w-full mx-20 rounded-lg justify-between text-white">
-                    <h1 className="p-2 justify-center text-center text-2xl">Seats Management</h1>
-                    <div className="flex justify-start flex-col text-lg font-mono gap-4 text-white">
-                        <span>Name: {tier.name}</span>
-                        <span>Ticket Rate: {tier.ticketRate}</span>
-                        <span>Seats: {tier.seats}</span>
-                       <div className='flex justify-start items-center'>
-                        <CouchLogo/>
-                       </div>
-                    </div>
-                    <form onSubmit={handleSubmit} className="mx-4 mt-12 items-end space-y-4">
-                        <div className="flex justify-between gap-6">
-                            <div className="flex items-center gap-4">
-                                <label className="text-md min-w-fit font-medium mb-4">Horizontal Partition</label>
-                                <input
-                                    type="number"
-                                    value={partition}
-                                    onChange={handlePartitionChange}
-                                    className="w-full p-3 mb-4 rounded-lg bg-black border border-amber-400 focus:border-amber-500 outline-none"
-                                />
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-6">
-                            <div className="flex flex-1 items-center gap-4">
-                                <label className="text-md font-medium min-w-fit mb-4">No of Rows</label>
-                                <input
-                                    type="number"
-                                    value={rows}
-                                    onChange={handleRowsChange}
-                                    className="w-full p-3 mb-4 rounded-lg bg-black border border-amber-400 focus:border-amber-500 outline-none"
-                                />
-                            </div>
-                            <div className="flex flex-1 items-center gap-4">
-                                <label className="text-md font-medium min-w-fit mb-4">No of Columns</label>
-                                <input
-                                    type="number"
-                                    value={columns}
-                                    onChange={handleColumnsChange}
-                                    className="w-full p-3 mb-4 rounded-lg bg-black border border-amber-400 focus:border-amber-500 outline-none"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Seat Grid Rendering */}
-                   
-                        <div className="mt-10 grid w-full gap-[5px] items-center justify-center" 
-                        style={{
-    gridTemplateColumns: `repeat(${columns}, 50px)`, 
-    
-}}>
-    {seatGrid.map((rowSeats, rowIndex) => (
-        rowSeats.map((seat, colIndex) => (
-            <Seat
-                key={`${rowIndex}-${colIndex}`}
-                row={rowIndex}
-                col={colIndex}
-                filled={seat.filled}
-                isPartition={seat.isPartition}
-            />
-        ))
-    ))}
-</div>
-
-
-                        <div className="flex justify-center mt-8 p-4">
-                            <button
-                                type="submit"
-                                className="items-center rounded min-w-fit p-2 min-h-8 bg-amber-400 text-base text-indigo-950 hover:text-sm hover:bg-yellow-500"
-                            >
-                                Save
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <Footer />
-        </>
-    );
-};
-
-export default TierSeats;
-
-
-
 
 // const Seat = ({ row, col, filled ,isPartition}) => {
 //     // if(isPartition)
@@ -603,3 +831,149 @@ export default TierSeats;
 // };
 
 // export default TierSeats;
+
+
+ // setTimeout(() => {
+        //     if(fillSeat==tier.seats)
+        //         {
+        //     setSeatGrid((prevGrid) =>
+        //         prevGrid.map((rowSeats, rowIdx) =>
+        //             rowSeats.map((seat, colIdx) => {
+        //                 const seatKey = `${rowIdx}-${colIdx}`;
+        //                 return couchOccupied[seatKey]
+        //                     ? seat // Keep filled seats intact
+        //                     : { ...seat, isPartition: true }; // Mark remaining seats as partitions
+        //             })
+        //         )
+        //     );
+        // }
+        // },200);
+    
+        
+          // if(fillSeat>1){ updateSeatLabels(row)}
+         
+         
+        // if (!isPartition && !couchOccupied[`${row}-${col}`]) {
+        //     setCouchOccupied((prev) => ({ ...prev, [`${row}-${col}`]: true }));
+        
+
+        //  setFillSeat((prev)=>prev+1)
+        // console.log(fillSeat,"fillseat ");
+//        setFilledSeats((prev) => {
+//     console.log(prev, "previous \n",...prev,"including current"); // Log the previous state here
+//     //let nextcol=1
+//     let currentRowSeats=prev.filter((seat)=>seat.row==row)
+//     const filledCols = new Set(currentRowSeats.map(seat => seat.col));
+
+//     // Find the first empty column by checking from 1 upward
+//     let nextCol = 1;
+//     while (filledCols.has(nextCol)) {
+//         nextCol++; // Keep incrementing until you find an empty column
+//     }
+//     console.log(nextCol,"col value");
+    
+//     const newSeats = [...prev, { row, col: nextCol, label: `${String.fromCharCode(65 + row)}${nextCol}` }];
+
+//     // Now, we need to update the labels for the current row to ensure they are ordered sequentially
+//     const updatedSeats = newSeats.map((seat) => {
+//         // If the seat is in the current row, sort them by column and update the label
+//         if (seat.row === row) {
+//             const sortedSeats = currentRowSeats
+//             .sort((a, b) => a.col - b.col)
+//             .map((seat, index) => {
+//                 return {
+//                     ...seat,
+//                     label: `${String.fromCharCode(65 + seat.row)}${index + 1}` // Assign sequential label
+//                 };
+//             });
+//         return sortedSeats;
+//         }
+//         return seat;
+//     }) // Sort the seats by column number for sequential labeling
+//   console.log(updatedSeats,"updatedSeats");
+  
+//     return updatedSeats
+// });
+//     }
+//     };
+// setFilledSeats((prev) => {
+//     console.log(prev, "prev"); // Log the previous state here
+//     return [
+//         ...prev,
+//         { row, col, label: `${String.fromCharCode(65 + row)}${col + 1}` }
+//     ];
+    
+// });
+        
+
+
+// useEffect(() => {
+//     const updateSeatLabels = () => {
+//         // Group seats by rows and sort each row by column
+//         const updatedSeats = filledSeats.reduce((acc, seat) => {
+//             const { row } = seat;
+//             if (!acc[row]) acc[row] = [];
+//             acc[row].push(seat);
+//             return acc;
+//         }, {});
+
+//         // Update the labels sequentially for each row
+//         const newFilledSeats = filledSeats.map((seat) => {
+//             const currentRowSeats = updatedSeats[seat.row].sort((a, b) => a.col - b.col);
+//             const seatIndex = currentRowSeats.findIndex((s) => s.col === seat.col);
+//             return {
+//                 ...seat,
+//                 label: `${String.fromCharCode(65 + seat.row)}${seatIndex + 1}`,
+//             };
+//         });
+
+//         // Set the updated seats with correct labels
+//         setFilledSeats(newFilledSeats);
+//     };
+
+//     if (filledSeats.length > 0) {
+//         updateSeatLabels();
+//     }
+// }, [filledSeats]);
+// const updateSeatLabels=(row)=>{
+//     const currentRow=filledSeats.filter((seat)=>seat.row==row).sort((a,b)=>a.col-b.col)
+//    currentRow.forEach((seat,index)=>{
+//       seat.label=`${String.fromCharCode(65 + row)}${index + 1}` // Row label + sequential number
+      
+//    })
+//    setFilledSeats([...filledSeats])
+//   }
+
+
+
+ {/* Seat Grid Rendering */}
+                   
+                        {/* <div className="mt-10 grid w-full gap-[5px] items-center justify-center" 
+                        style={{
+    gridTemplateColumns: `repeat(${columns}, 50px)`, 
+    
+}}>
+    {seatGrid.map((rowSeats, rowIndex) => (
+          <React.Fragment key="rowIndex">
+        {console.log(rowIndex,"rowindex")}
+      
+         {filledSeats.some(seat => seat.row === rowIndex) && (
+           
+            
+           <div className="text-white flex justify-center items-center">
+           {String.fromCharCode(65 + rowIndex)} {/* Convert rowIndex to letter A, B, C, etc. */}
+        {/* </div>
+       
+        )} */}
+        {/* {rowSeats.map((seat, colIndex) => (
+            <Seat
+                key={`${rowIndex}-${colIndex}`}
+                row={rowIndex}
+                col={colIndex}
+                filled={seat.filled}
+                isPartition={seat.isPartition}
+            />
+        ))}
+        </React.Fragment>
+    ))}
+// </div>   */}

@@ -1,8 +1,10 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
-import { BiBell, BiSearch, BiMap } from "react-icons/bi"
+import { BiBell, BiSearch, BiMap  } from "react-icons/bi"
 import { logout } from '../../redux/theatre/theatreSlice'
+import { FaUserCircle } from "react-icons/fa"
+import { Link } from 'react-router-dom'
 
 const TheatreHeader = () => {
     const navigate=useNavigate()
@@ -29,19 +31,19 @@ const TheatreHeader = () => {
             
             <div className="flex space-x-6">
               <a
-                href="#"
+                href="/theatre/movies"
                 className="hover:bg-gray-700 p-4 rounded transition"
               >
                 Movies
               </a>
               <a
-                href="/screens"
+                href="/theatre/screens"
                 className="hover:bg-gray-700 p-4 rounded transition"
               >
                 Screens
               </a>
               <a
-                href="/profile"
+                href="/theatre/profile"
                 className="hover:bg-gray-700 p-4 rounded transition"
               >
                 Snacks
@@ -62,7 +64,9 @@ const TheatreHeader = () => {
 
              
               <div className="text-sm text-gray-200"><BiMap size={24} className="text-white" />kochi</div>
-
+              <Link to="/theatre/profile" className="flex items-center">
+                        <FaUserCircle size={28} className="text-white" />
+                     </Link>
               <button
                 className="bg-transparent min-h-8 text-white rounded p-2 hover:bg-red-600 transition"
                 onClick={handleLogout}

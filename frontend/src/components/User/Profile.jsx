@@ -297,10 +297,11 @@ const UserProfile = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                disabled={!isEditing || (isEditing && showOtpInput)}
-                className={`w-full p-2 border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent border ${!isEditing ? 'bg-gray-200' : 'bg-white'}`}
+                disabled
+                // disabled={!isEditing || (isEditing && showOtpInput)}
+                className={`w-full p-2 border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent border ${!isEditing ? 'bg-gray-200' : 'bg-slate-200'}`}
               />
-              {isEditing && (
+              {/* {isEditing && (
                 <button
                   onClick={handleEmailVerifyClick}
                   className={`px-4 py-2 bg-blue-500 min-h-8 text-white rounded hover:bg-blue-600 ${!emailChanged ? 'cursor-not-allowed opacity-50' : ''}`}
@@ -308,7 +309,7 @@ const UserProfile = () => {
                 >
                   {verifyButtonLabel}
                 </button>
-              )}
+              )} */}
             </div>
 
             {showOtpInput && (
@@ -383,9 +384,9 @@ const UserProfile = () => {
                 <>
                   <button
                     onClick={handleChangePasswordClick}
-                    className="px-4 py-2 min-h-8 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                    className="px-4 py-2 min-h-8 w-fit bg-yellow-500 text-white rounded hover:bg-yellow-600"
                   >
-                    {showPasswordFields ? 'Close Password' : 'Change Password'}
+                    {showPasswordFields ? 'Close ' : 'Change Password'}
                   </button>
                   <button
                     onClick={handleSave}

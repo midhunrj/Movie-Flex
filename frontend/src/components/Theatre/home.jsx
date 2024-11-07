@@ -5,9 +5,10 @@ import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
 import { logout } from "../../redux/theatre/theatreSlice";
 import { BiBell, BiSearch, BiMap } from "react-icons/bi"
-
+import { FaUserCircle } from "react-icons/fa"
 import Footer from "../User/footer";
 import usePreviousPath from "../../utils/hooks/previousPath";
+import { Link } from "react-router-dom";
 
 const TheatreHome = () => {
    const navigate=useNavigate()
@@ -35,24 +36,24 @@ const TheatreHome = () => {
 
             
             <div className="flex space-x-6">
-              <a
-                href="#"
+              <Link
+                to="theatre/movies"
                 className="hover:bg-gray-700 p-4 rounded transition"
               >
                 Movies
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                to="theatre/screens"
                 className="hover:bg-gray-700 p-4 rounded transition"
               >
                 Screens
-              </a>
-              <a
-                href="/theatre/profile"
+              </Link>
+              <Link
+                to="/theatre/profile"
                 className="hover:bg-gray-700 p-4 rounded transition"
               >
                 Snacks
-              </a>
+              </Link>
             </div>
 
            
@@ -69,7 +70,9 @@ const TheatreHome = () => {
 
              
               <div className="text-sm text-gray-200"><BiMap size={24} className="text-white" />kochi</div>
-
+              <Link to="/theatre/profile" className="flex items-center">
+                        <FaUserCircle size={28} className="text-white" />
+                     </Link>
               <button
                 className="bg-transparent min-h-8 text-white rounded p-2 hover:bg-red-600 transition"
                 onClick={handleLogout}

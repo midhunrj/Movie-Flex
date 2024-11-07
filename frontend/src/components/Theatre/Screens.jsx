@@ -13,9 +13,12 @@ import { StaticTimePicker } from '@mui/x-date-pickers/StaticTimePicker';
 import TextField from '@mui/material/TextField';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
+import { useDispatch, useSelector } from 'react-redux';
+import { AddScreen } from '../../redux/theatre/theatreThunk';
+import EnrollMovieModal from './enrollMovieModal';
 
 
-const Screens = () => {
+const ScreensForm = () => {
   const [screens, setScreens] = useState([]);
   const [tiers, setTiers] = useState([]);
   const[showtimes,setShowtimes]=useState([])
@@ -24,19 +27,25 @@ const Screens = () => {
   const [tierData, setTierData] = useState({
     name: '',
     ticketRate: '',
-    seats: 0,
+    Seats: 0,
     rows: 0,
     columns: 0,
-    partition: ''
+    partition: 0
   });
+  const {theatre,isSuccess,isLoading}=useSelector((state)=>state.theatre)
   const [screenData, setScreenData] = useState({
     screenName: '',
+    screenType:'',
     movie: '',
     showtime: '',
     seats: '',
-    speakers: [] // Changed to an array for multiple speaker configurations
+    tierDatas:tiers,
+    speakers: [],
+    screenImage:null ,
+    enrolledMovies:[]// Changed to an array for multiple speaker configurations
   });
 
+  const dispatch=useDispatch()
   // Handle form input change
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,23 +59,31 @@ const Screens = () => {
     if (location.state?.selectedMovie) {
       setScreenData((prev) => ({
         ...prev,
-        movie: location.state.selectedMovie  // Set the movie from passed state
+        movie: location.state.selectedMovie  
       }));
     }
   }, [location.state]);
 
   const handleEnrollMovie = () => {
-    navigate('/movies'); // Assuming '/movies' is the movie selection page
-  };
+    navigate('/theatre/movies',{state:{enrolledMovies:screenData.enrolledMovies}})
+    }
 
 
   const handleTierChange = (e) => {
     const tierCount = parseInt(e.target.value, 10);
     if (!isNaN(tierCount)) {
-      setTiers(Array(tierCount).fill(tierData));
+      const newTiers=Array(tierCount).fill(tierData)
+      setTiers(newTiers);
+      setScreenData(prev => ({
+        ...prev,
+        tierDatas: [...prev.tierDatas, ...newTiers] // Combine old tiers with new ones
+      }));
     }
+    
   }
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
+  const [isModalOpenMo, setIsModalOpenMo] = useState(false)
+  // const [isModalOpen, setIsModalOpen] = useState(false)
   const [manualTime, setManualTime] = useState(''); // State for manual time input
  // const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
 
@@ -76,11 +93,11 @@ const Screens = () => {
 
     // Validate screen data fields
     if (!screenData.screenName) {
-      validationErrors.screenName = 'Screen Name is required';
+      validationErrors.screenName = 'Screen Name is  ';
     }
 
     // if (!screenData.movie) {
-    //   validationErrors.movie = 'Movie name is required';
+    //   validationErrors.movie = 'Movie name is  ';
     // }
 
     if (!screenData.seats || isNaN(screenData.seats) || screenData.seats <= 0) {
@@ -89,18 +106,18 @@ const Screens = () => {
 
     // Validate speakers
     if (!screenData.speakers || screenData.speakers.length === 0) {
-      validationErrors.speakers = 'At least one speaker is required';
+      validationErrors.speakers = 'At least one speaker is  ';
     } else {
       screenData.speakers.forEach((speaker, index) => {
         if (!speaker.type) {
-          validationErrors[`speakerType_${index}`] = `Speaker type is required for speaker ${index + 1}`;
+          validationErrors[`speakerType_${index}`] = `Speaker type is   for speaker ${index + 1}`;
         }
         if (!speaker.count || isNaN(speaker.count) || speaker.count <= 0) {
           validationErrors[`speakerCount_${index}`] = `Please enter a valid count for speaker ${index + 1}`;
         }
-        if (!speaker.location) {
-          validationErrors[`speakerLocation_${index}`] = `Speaker location is required for speaker ${index + 1}`;
-        }
+        // if (!speaker.location) {
+        //   validationErrors[`speakerLocation_${index}`] = `Speaker location is   for speaker ${index + 1}`;
+        // }
       });
     }
 
@@ -118,14 +135,32 @@ const Screens = () => {
       });
       return;
     }
+    console.log(theatre,"theatre data");
+    
+const ScreenFormData={
+  screenName:screenData.screenName,
+  Movie:screenData.movie,
+  screenType:screenData.screenType,
+  totalSeats:parseInt(screenData.seats),
+  tiers:screenData.tierDatas,
+  showtimes:showtimes,
+  speakers:screenData.speakers,
+  theatreImage:screenData.screenImage,
+  theatreId:theatre._id,
+  enrolledMovies:screenData.enrolledMovies
+}
+    dispatch(AddScreen(ScreenFormData))
     setScreens([...screens, screenData]);
-    // Clear the form after submission
+    
     setScreenData({
       screenName: '',
       movie: '',
       showtime: '',
       seats: '',
-      speakers: []
+      speakers: [],
+      tierDatas:[],
+      screenImage:null,
+      enrolledMovies:[]
     });
   };
 
@@ -134,6 +169,8 @@ const Screens = () => {
       i === index ? { ...tier, [field]: value } : tier
     );
     setTiers(updatedTiers);
+    setScreenData((prev)=>({
+    ...prev,tierDatas:updatedTiers}))
   }
 
   const navigate = useNavigate();
@@ -146,33 +183,13 @@ const Screens = () => {
   const handleRemoveTier = (index) => {
     const updatedTiers = tiers.filter((_, i) => i !== index);
     setTiers(updatedTiers);
+    setScreenData(prev => ({
+      ...prev,
+      tierDatas: updatedTiers
+    }));
   };
 
-  // const handleAddSpeaker = () => {
-  //   setScreenData(prev => ({
-  //     ...prev,
-  //     speakers: [...prev.speakers, { type: '', count: 1, location: '', features: '' }]
-  //   }));
-  // }
-
-  // const handleSpeakerChange = (index, field, value) => {
-  //   const updatedSpeakers = screenData.speakers.map((speaker, i) =>
-  //     i === index ? { ...speaker, [field]: value } : speaker
-  //   );
-  //   setScreenData(prev => ({
-  //     ...prev,
-  //     speakers: updatedSpeakers
-  //   }));
-  // }
-
-  // const handleRemoveSpeaker = (index) => {
-  //   const updatedSpeakers = screenData.speakers.filter((_, i) => i !== index);
-  //   setScreenData(prev => ({
-  //     ...prev,
-  //     speakers: updatedSpeakers
-  //   }));
-  // }
-
+  
   const handleAddSpeaker = () => {
     setScreenData((prev) => ({
       ...prev,
@@ -212,7 +229,7 @@ const Screens = () => {
   const handleAddShowtime = () => {
     const formattedTime = timeValue.format('HH:mm'); // Use desired format like 'HH:mm' or 'h:mm A'
     console.log('Selected Showtime:', formattedTime);
-    setShowtimes([...showtimes, { time: formattedTime }]);
+    setShowtimes([...showtimes, { time: formattedTime ,movie:'' }]);
     closeModal(); // Close the modal after adding the time
   };
 
@@ -220,7 +237,38 @@ const Screens = () => {
   const handleRemoveShowtime = (index) => {
     setShowtimes(showtimes.filter((_, i) => i !== index)); // Remove showtime by index
   };
+  const handleFileChange = (e) => {
+    setScreenData({ ...screenData, screenImage: e.target.files[0] });
+  };
+  const handleChangeShows = (movie, index) => {
+    setShowtimes(showtimes.map((show, i) => 
+        i === index ? { ...show, movie: movie } : show
+    ));
+};
 
+
+const [enrolledMovies, setEnrolledMovies] = useState([
+  { id: 1, title: 'Movie 1' },
+  { id: 2, title: 'Movie 2' },
+]); // Example enrolled movies data
+//const [isModalOpen, setIsModalOpen] = useState(false);
+const [selectedShowtimeIndex, setSelectedShowtimeIndex] = useState(null);
+
+
+const openModalMovie = (index) => {
+  setSelectedShowtimeIndex(index);
+  setIsModalOpen(true);
+};
+
+const closeModalMovie = () => {
+  setIsModalOpen(false);
+};
+
+const handleAddMovieToShowtime = (movie, index) => {
+  setShowtimes(showtimes.map((show, i) => 
+    i === index ? { ...show, movie: movie.title } : show
+  ));
+};
   return (
     <>
       <TheatreHeader />
@@ -240,7 +288,7 @@ const Screens = () => {
   </h1>
   </div>
           {/* Form for adding screen configuration */}
-          <form className="mx-4 space-y-4 mt-4" onSubmit={handleSubmit}>
+          <form className="mx-4 space-y-4 mt-4" onSubmit={handleSubmit} encType='multipart/form-data'>
             <div className='flex justify-between gap-12'>
               <div className='flex-1 flex items-center gap-4'>
                 <label htmlFor="screenName" className="text-md min-w-fit mb-2 font-medium">Screen Name</label>
@@ -250,18 +298,19 @@ const Screens = () => {
                   value={screenData.screenName}
                   onChange={handleChange}
                   className="w-full p-3 mb-4 rounded-lg bg-black border border-amber-400 focus:border-amber-500 outline-none"
-                  required
+                   
                 />
               </div>
+              
              
             
 
             {/* <div className='flex justify-between gap-6'> */}
               <div className='flex-1 flex items-center gap-4'>
                 <label className='block mb-4 text-md font-medium min-w-fit'>Screen Type</label>
-                <select name="screenType" placeholder='select screen type' className='w-full p-3 mb-4 rounded-lg bg-black border border-amber-400 focus:border-amber-500 outline-none' onChange={handleTierChange}>
+                <select name="screenType" placeholder='select screen type' className='w-full p-3 mb-4 rounded-lg bg-black border border-amber-400 focus:border-amber-500 outline-none' onChange={handleChange}>
                   <option value="" disabled>Select screen type</option>
-                  <option value="Standard">Standard(2D)</option>
+                  <option value="Standard(2D)">Standard(2D)</option>
                   <option value="IMax">IMax</option>
                   <option value="4dx">4DX</option>
                   <option value="3D">3D</option>
@@ -277,7 +326,7 @@ const Screens = () => {
                 value={screenData.showtime}
                 onChange={handleChange}
                 className="w-full p-3 mb-4 rounded-lg bg-black border border-amber-400 focus:border-amber-500 outline-none"
-                required
+                 
               />
             </div> */}
    <h3 className="text-2xl text-left p-2">Showtimes Configuration</h3>
@@ -285,7 +334,7 @@ const Screens = () => {
               <button
                 type="button"
                 onClick={openModal}
-                className="w-fit min-h-10 bg-blue-500 p-3 rounded-lg text-white"
+                className="w-fit min-h-10 bg-green-600 p-3  text-base rounded-lg text-white hover:bg-lime-600 transition-all"
               >
                 Add Showtime
               </button>
@@ -301,20 +350,42 @@ const Screens = () => {
           <label className="text-md font-medium">Showtime</label>
           <span>{showtime.time}</span>
         </div>
+        <div className="flex">
+        <button
+                            type="button"
+                            onClick={() => {
+                                // const movie = prompt("Enter the movie name:"); // Simple prompt for movie input, replace with modal for better UX
+                                // if (movie) handleChangeShows(movie, index);
+                                openModalMovie(index)
+                            }}
+                            className="text-white  w-fit px-4 py-2 min-h-8 mt-2 bg-blue-500 hover:text-indigo-700 ml-2"
+                        >
+                            {showtime.movie ? 'Edit Movie' : 'Add Movie'}
+                        </button>
+
         <button
           type="button"
           onClick={() => handleRemoveShowtime(index)}
-          className="text-white mt-2 bg-red-600 hover:text-zinc-400 ml-2"
+          className="text-white mt-2 px-4 py-2 min-h-8 bg-red-600 hover:text-zinc-400 ml-2"
         >
           Remove
         </button>
+        </div>
       </div>
+      
     ))}
   </div>
+  {/* <EnrollMovieModal
+        isOpen={isModalOpenMo}
+        onRequestClose={closeModalMovie}
+        movies={enrolledMovies}
+        onAddMovie={handleAddMovieToShowtime}
+        selectedShowtimeIndex={selectedShowtimeIndex}
+      /> */}
               
               </>
             )}
-
+``
 
 
 
@@ -338,13 +409,13 @@ const Screens = () => {
                   value={screenData.seats}
                   onChange={handleChange}
                   className="w-full p-3 mb-4 rounded-lg bg-black border border-amber-400 focus:border-amber-500 outline-none"
-                  required
+                   
                   placeholder="e.g., 50 seats"
                 />
               </div>
             </div>
-           {tiers.length>0?
-              (tiers.map((tier,index)=>(<><div  key={index} className='flex justify-between gap-6'>
+           {screenData.tierDatas.length>0?
+              (screenData.tierDatas.map((tier,index)=>(<><div  key={index} className='flex justify-between gap-6'>
               
                 <div  className='flex  flex-1 items-center gap-4'>
                     <label className='text-md font-medium min-w-fit mb-4'>Name of Tier</label>
@@ -376,7 +447,7 @@ const Screens = () => {
 
             <h3 className='text-2xl text-left p-2'>Speakers Configuration</h3>
             <div className=' flex justify-start  p-2 mx-2 gap-2'>
-            <button type="button" onClick={handleAddSpeaker} className="w-fit min-h-10  bg-blue-500 p-3 rounded-lg text-white">
+            <button type="button" onClick={handleAddSpeaker} className="px-4 py-2 z-30  w-fit h-fit min-h-8 bg-green-600 text-white relative font-semibold after:-z-20 after:absolute after:h-1 after:w-1 after:bg-lime-600 after:left-5 overflow-hidden after:bottom-0 after:translate-y-full after:rounded-md after:hover:scale-[300] after:hover:transition-all after:hover:duration-700 after:transition-all after:duration-700 transition-all duration-700  hover:[text-shadow:2px_2px_2px_#fda4af] text-base rounded-lg">
               Add Speaker
             </button>
             </div>
@@ -413,6 +484,10 @@ const Screens = () => {
               </div>
             ))):(<p className=' text-center  text-yellow-500 text-xl font-sans'>No speakers configured yet</p>)}
             
+            {/* <div className="flex items-center gap-4">
+              <label htmlFor="screenImage" className="text-md min-w-fit mb-2 font-medium">Upload Screen Image</label>
+              <input type="file" name="screenImage" onChange={handleFileChange} className="w-fit  p-3 mb-4 rounded-lg bg-black border border-amber-400 focus:border-amber-500 outline-none" />
+            </div> */}
             
             <div className=' flex justify-center gap-2'>    
             <button
@@ -426,66 +501,75 @@ const Screens = () => {
             </div>
           </form>
 
-          {/* List of configured screens */}
-          <div className="mt-8">
-            <h2 className="text-xl mb-4">Configured Screens</h2>
-            <ul>
-              {screens.map((screen, index) => (
-                <li key={index} className="p-2 border border-white rounded-lg mb-2">
-                  <h3 className="font-semibold">Screen Name: {screen.screenName}</h3>
-                  <p>Movie: {screen.movie}</p>
-                  <p>Showtime: {screen.showtime}</p>
-                  <p>Seats: {screen.seats}</p>
-                  <h4 className="font-semibold">Speakers:</h4>
-                  <ul>
-                    {screen.speakers.map((speaker, sIndex) => (
-                      <li key={sIndex}>
-                        {speaker.count} x {speaker.type}
-                      </li>
-                    ))}
-                  </ul>
-                </li>
+          
+          {/* <div className="mt-8">
+  <h2 className="text-xl mb-4">Configured Screens</h2>
+  <div>
+    {console.log(screens,"screens data")}
+    
+    {screens.map((screen, index) => (
+      <div key={index} className="my-10 p-4 border rounded-lg">
+        <h3 className="text-xl font-bold">Screen: {screen.screenName}</h3>
+        <p>Movie: {screen.movie}</p>
+
+        
+        {screen.tierDatas && screen.tierDatas.map((tier, tierIndex) => (
+          <div key={tierIndex} className="mt-6">
+            <h4 className="font-bold">Tier: {tier.name}</h4>
+            <p>Seats per Row: {tier.columns}</p>
+            <p>Number of Rows: {tier.rows}</p>
+            <p>Ticket Rate: ${tier.ticketRate}</p>
+
+            
+            <div className="grid" style={{ gridTemplateColumns: `repeat(${tier.columns}, minmax(0, 1fr))`, gap: '10px' }}>
+              {[...Array(tier.rows * tier.columns)].map((_, seatIndex) => (
+                <div key={seatIndex} className={`w-10 h-10 flex items-center justify-center border ${seatIndex < tier.seats ? 'bg-gray-300' : 'bg-red-500'}`}>
+                  {seatIndex + 1}
+                </div>
               ))}
-            </ul>
+            </div>
+
+            
+            <button
+              onClick={() => handleConfigSeat(tier)}
+              className="mt-4 bg-amber-500 min-h-8 text-white px-4 py-2 rounded-lg"
+            >
+              Configure Seats for {tier.name}
+            </button>
+
+            
+            <button
+              onClick={() => handleRemoveTier(tierIndex)}
+              className="ml-4 bg-red-500 text-white px-4 py-2 rounded-lg"
+            >
+              Remove Tier
+            </button>
+          </div>
+        ))}
+
+        
+        <div className="relative mt-10">
+          <div className="grid grid-cols-10 gap-2 mx-auto">
+            {screen.speakers.map((speaker, idx) => (
+              <div key={idx} className={`absolute ${speaker.location === 'front' ? 'top-0 left-1/2 transform -translate-x-1/2' : ''} ${speaker.location === 'back' ? 'bottom-0 left-1/2 transform -translate-x-1/2' : ''} ${speaker.location === 'left' ? 'top-1/2 left-0 transform -translate-y-1/2' : ''} ${speaker.location === 'right' ? 'top-1/2 right-0 transform -translate-y-1/2' : ''}`}>
+                <div className="bg-blue-500 p-2 rounded-lg">
+                  Speaker {speaker.location}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="bg-black text-white w-full text-center py-2 mt-4">
+            SCREEN
           </div>
         </div>
       </div>
-      {/* <Modal
-        isOpen={isModalOpen}
-        onRequestClose={closeModal}
-        style={customModalStyles}
-        contentLabel="Select Showtime"
-      >
-        <h2>Select Showtime</h2>
+    ))}
+  </div>
+</div> */}
 
-        {/* Manual Time Input */}
-        {/* <div className="my-4">
-          <label className="font-medium">Enter Time Manually:</label>
-          <input
-            type="time"
-            className="p-2 rounded border border-gray-400"
-            value={manualTime}
-            onChange={(e) => setManualTime(e.target.value)} // Update manual time state
-          />
         </div>
-
-        <div className="my-4">OR</div> */}
-
-        {/* Clock for time selection */}
-        {/* <Clock
-          value={timeValue} // Use state value for time
-          onChange={setTimeValue} // Set new time on selection
-          renderNumbers={true} // Render numbers on the clock face
-        />
-        <div className="flex justify-center mt-4">
-          <button
-            onClick={handleAddShowtime}
-            className="bg-blue-500 text-white p-2 rounded-lg"
-          >
-            Confirm Showtime
-          </button>
-        </div>
-      </Modal> */}
+      </div>
+     
 <Modal
         show={isModalOpen}
         onClose={closeModal}
@@ -496,29 +580,7 @@ const Screens = () => {
           Select Showtime
         </Modal.Header>
 
-        {/* <Modal.Body className="p-6 flex flex-col items-center">
-        {/* <TimePicker
-              onChange={setTimeValue}
-              value={timeValue}
-              clockClassName="custom-clock"
-              clearIcon={null}
-              className="border border-gray-300 rounded-lg w-full p-2"
-            /> */}
-{/* <TimePicker
-            onChange={setTimeValue}
-            value={timeValue}
-            className="border  border-gray-300 rounded-lg p-2"
-          />
-          {/* Show current selected time */}
-
-{/*           
-          <input 
-            type="text"
-            value={timeValue} 
-            readOnly 
-            className="mt-4 p-2 border border-gray-300 rounded-lg text-center"
-          />
-        </Modal.Body> */} 
+       
         <Modal.Body className="p-6 flex flex-col items-center">
           {/* StaticTimePicker Component from MUI */}
           <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -554,11 +616,33 @@ const Screens = () => {
   );
 };
 
-export default Screens;
+export default ScreensForm;
 
 
 
+ {/* <Modal.Body className="p-6 flex flex-col items-center">
+        {/* <TimePicker
+              onChange={setTimeValue}
+              value={timeValue}
+              clockClassName="custom-clock"
+              clearIcon={null}
+              className="border border-gray-300 rounded-lg w-full p-2"
+            /> */}
+{/* <TimePicker
+            onChange={setTimeValue}
+            value={timeValue}
+            className="border  border-gray-300 rounded-lg p-2"
+          />
+          {/* Show current selected time */}
 
+{/*           
+          <input 
+            type="text"
+            value={timeValue} 
+            readOnly 
+            className="mt-4 p-2 border border-gray-300 rounded-lg text-center"
+          />
+        </Modal.Body> */} 
 
 
 
@@ -674,3 +758,67 @@ export default Screens;
   //   closeModal(); // Close the modal after adding the time
   //   setManualTime(''); // Clear manual input after adding
   // };
+
+   {/* <Modal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        style={customModalStyles}
+        contentLabel="Select Showtime"
+      >
+        <h2>Select Showtime</h2>
+
+        {/* Manual Time Input */}
+        {/* <div className="my-4">
+          <label className="font-medium">Enter Time Manually:</label>
+          <input
+            type="time"
+            className="p-2 rounded border border-gray-400"
+            value={manualTime}
+            onChange={(e) => setManualTime(e.target.value)} // Update manual time state
+          />
+        </div>
+
+        <div className="my-4">OR</div> */}
+
+        {/* Clock for time selection */}
+        {/* <Clock
+          value={timeValue} // Use state value for time
+          onChange={setTimeValue} // Set new time on selection
+          renderNumbers={true} // Render numbers on the clock face
+        />
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={handleAddShowtime}
+            className="bg-blue-500 text-white p-2 rounded-lg"
+          >
+            Confirm Showtime
+          </button>
+        </div>
+      </Modal> */}
+
+
+ 
+      // const handleAddSpeaker = () => {
+  //   setScreenData(prev => ({
+  //     ...prev,
+  //     speakers: [...prev.speakers, { type: '', count: 1, location: '', features: '' }]
+  //   }));
+  // }
+
+  // const handleSpeakerChange = (index, field, value) => {
+  //   const updatedSpeakers = screenData.speakers.map((speaker, i) =>
+  //     i === index ? { ...speaker, [field]: value } : speaker
+  //   );
+  //   setScreenData(prev => ({
+  //     ...prev,
+  //     speakers: updatedSpeakers
+  //   }));
+  // }
+
+  // const handleRemoveSpeaker = (index) => {
+  //   const updatedSpeakers = screenData.speakers.filter((_, i) => i !== index);
+  //   setScreenData(prev => ({
+  //     ...prev,
+  //     speakers: updatedSpeakers
+  //   }));
+  // }

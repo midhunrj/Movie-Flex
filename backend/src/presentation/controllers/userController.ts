@@ -223,10 +223,25 @@ async updateUserProfile(req: Request, res: Response,next:NextFunction): Promise<
 
 async upcomingMovies(req:Request,res:Response,next:NextFunction){
     try {
-        console.log("hello i am here in upcoming movie backend");
-        
-        const upcomingMovieData=await this.userUseCases.upcomingMovies()
-        res.status(200).json({message:"here are the upcoming movies ready for release",upcomingMovieData})
+        const { page = 1, limit = 10, search = '', genre = '', language = '' } = req.query;
+
+        // Filters based on query parameters
+        let filters: any = {};
+        if (genre) filters.genre = genre;
+        if (language) filters.language = language;
+        if (search) filters.title = { $regex: search, $options: "i" }; // Case-insensitive search
+
+        // Pagination
+        const totalMovies = await this.userUseCases.upcomingMoviesCount(filters); // Get total count for pagination
+        const upcomingMovieData = await this.userUseCases.upcomingMovies(filters, Number(page), Number(limit)); // Fetch data
+
+        res.status(200).json({
+            message: "Here are the upcoming movies",
+            upcomingMovies: upcomingMovieData,
+            totalMovies,
+            totalPages: Math.ceil(totalMovies / Number(limit)),
+            currentPage: Number(page)
+        });
     } catch (error) {
         console.log(error);
             
@@ -236,10 +251,25 @@ async upcomingMovies(req:Request,res:Response,next:NextFunction){
 
 async nowShowingMovies(req:Request,res:Response,next:NextFunction){
     try {
-        console.log("hello i am here in now showing movie backend");
-        
-        const runningMovies=await this.userUseCases.nowShowingMovies()
-        res.status(200).json({message:"These are the movies running in cinemas",runningMovies})
+        const { page = 1, limit = 10, search = '', genre = '', language = '' } = req.query;
+
+        // Filters based on query parameters
+        let filters: any = {};
+        if (genre) filters.genre = genre;
+        if (language) filters.language = language;
+        if (search) filters.title = { $regex: search, $options: "i" }; // Case-insensitive search
+
+        // Pagination
+        const totalMovies = await this.userUseCases.nowShowingMoviesCount(filters); // Get total count for pagination
+        const nowShowingMovieData = await this.userUseCases.nowShowingMovies(filters, Number(page), Number(limit)); // Fetch data
+
+        res.status(200).json({
+            message: "These are the movies running in cinemas",
+            runningMovies: nowShowingMovieData,
+            totalMovies,
+            totalPages: Math.ceil(totalMovies / Number(limit)),
+            currentPage: Number(page)
+        });
     } catch (error) {
         console.log(error);
             

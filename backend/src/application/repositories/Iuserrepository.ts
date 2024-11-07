@@ -8,6 +8,8 @@ export interface IuserRepository{
     updatePassword(email:string,password:string):Promise<any>
     findById(id:string):Promise<User|null>
     updateUser(user:User):Promise<User|null>
-    ComingSoon():Promise<Movie[]|null>
-    RollingNow():Promise<Movie[]|null>
+    ComingSoon(filters:any,page:number,limit:number):Promise<Movie[]|null>
+    RollingNow(filters:any,page:number,limit:number):Promise<Movie[]|null>
+    getComingSoonCount(filters:any):Promise<number>
+    getRollingNowCount(filters:any):Promise<number>
 }

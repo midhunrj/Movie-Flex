@@ -71,25 +71,140 @@ export class UserRepository implements IuserRepository {
     return updatedUser;
   }
 
-  async ComingSoon(): Promise<Movie[] | null> {
-    const readyForReRelease = moment().subtract(2, "years");
-    const movieData = await MovieModel.find({
-      $or: [
-        { releaseDate: { $lt: readyForReRelease } },
-        { releaseDate: { $gt: new Date() } },
-      ],
-    });
-    return movieData.map(this.mapToMovie);
-  }
+  // async ComingSoon(): Promise<Movie[] | null> {
+  //   const readyForReRelease = moment().subtract(2, "years");
+  //   const movieData = await MovieModel.find({
+  //     $or: [
+  //       { releaseDate: { $lt: readyForReRelease } },
+  //       { releaseDate: { $gt: new Date() } },
+  //     ],
+  //   });
+  //   return movieData.map(this.mapToMovie);
+  // }
 
-  async RollingNow(): Promise<Movie[] | null> {
-    const sixMonthsAgo = moment().subtract(6, "months");
-    const movieData = await MovieModel.find({
-      $and: [
-        { releaseDate: { $lt: new Date() } },
-        { releaseDate: { $gt: sixMonthsAgo } },
-      ],
-    });
-    return movieData.map(this.mapToMovie);
-  }
+  // async RollingNow(): Promise<Movie[] | null> {
+  //   const sixMonthsAgo = moment().subtract(6, "months");
+  //   const movieData = await MovieModel.find({
+  //     $and: [
+  //       { releaseDate: { $lt: new Date() } },
+  //       { releaseDate: { $gt: sixMonthsAgo } },
+  //     ],
+  //   });
+  //   return movieData.map(this.mapToMovie);
+  // }
+
+  
+    // Existing methods...
+  
+    async ComingSoon(filters: any, page: number, limit: number): Promise<Movie[]> {
+      const readyForReRelease = moment().subtract(2, "years");
+  
+      const query: any = {
+        $or: [
+          { releaseDate: { $lt: readyForReRelease } },
+          { releaseDate: { $gt: new Date() } }
+        ]
+      };
+  
+      if (filters.search) {
+        query.title = { $regex: filters.search, $options: 'i' }; // Case-insensitive search on title
+      }
+  
+      if (filters.genre) {
+        query.genre = filters.genre; // Filter by genre
+      }
+  
+      if (filters.language) {
+        query.language = filters.language; // Filter by language
+      }
+  
+      const movieData=await MovieModel.find(query)
+        .sort({ releaseDate: 1 })
+        .skip((page - 1) * limit)  // Pagination
+        .limit(limit);  // Limit per page
+
+        return movieData.map(this.mapToMovie)
+    }
+  
+    async RollingNow(filters: any, page: number, limit: number): Promise<Movie[]> {
+      const sixMonthsAgo = moment().subtract(6, "months");
+  
+      const query: any = {
+        $and: [
+          { releaseDate: { $lt: new Date() } },
+          { releaseDate: { $gt: sixMonthsAgo } }
+        ]
+      };
+  
+      if (filters.search) {
+        query.title = { $regex: filters.search, $options: 'i' }; // Case-insensitive search on title
+      }
+  
+      if (filters.genre) {
+        query.genre = filters.genre; // Filter by genre
+      }
+  
+      if (filters.language) {
+        query.language = filters.language; // Filter by language
+      }
+  
+      const movieData= await MovieModel.find(query)
+        .sort({ releaseDate: -1 })
+        .skip((page - 1) * limit)  // Pagination
+        .limit(limit);  // Limit per page
+
+        return movieData.map(this.mapToMovie)
+    }
+  
+    async getComingSoonCount(filters: any): Promise<number> {
+      const readyForReRelease = moment().subtract(2, "years");
+  
+      const query: any = {
+        $or: [
+          { releaseDate: { $lt: readyForReRelease } },
+          { releaseDate: { $gt: new Date() } }
+        ]
+      };
+  
+      if (filters.search) {
+        query.title = { $regex: filters.search, $options: 'i' };
+      }
+  
+      if (filters.genre) {
+        query.genre = filters.genre;
+      }
+  
+      if (filters.language) {
+        query.language = filters.language;
+      }
+  
+      return await MovieModel.countDocuments(query);  // Return total count
+    }
+  
+    async getRollingNowCount(filters: any): Promise<number> {
+      const sixMonthsAgo = moment().subtract(6, "months");
+  
+      const query: any = {
+        $and: [
+          { releaseDate: { $lt: new Date() } },
+          { releaseDate: { $gt: sixMonthsAgo } }
+        ]
+      };
+  
+      if (filters.search) {
+        query.title = { $regex: filters.search, $options: 'i' };
+      }
+  
+      if (filters.genre) {
+        query.genre = filters.genre;
+      }
+  
+      if (filters.language) {
+        query.language = filters.language;
+      }
+  
+      return await MovieModel.countDocuments(query);  // Return total count
+    }
+  
+  
 }

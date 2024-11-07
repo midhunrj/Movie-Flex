@@ -468,51 +468,168 @@ import Footer from "./footer";
 import { BiBell, BiSearch, BiMap } from "react-icons/bi";
 import { fetchMovies } from "../../redux/user/userThunk";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css"
+import BannerCarousel from "./bannerCarousel";
 //import {refreshPage} from '../../redux/user/userThunk'
 // import {toas}
 
 const HomePage = () => {
-  const { user,isSuccess,isError,nowShowingMovies,upcomingMovies } = useSelector((state) => state.user);
+  const { user,isSuccess,isError,isLoading,nowShowingMovies=[],upcomingMovies=[] } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
   const [location, setLocation] = useState(null);
   const [searchQuery,setSearchQuery]=useState("")
+  const [citysearchQuery,setcitySearchQuery]=useState("")
   // const [upcomingMovies,setUpcomingMovies]=useState([])
   // const [nowShowingMovies,setNowShowingMovies]=useState([])
+  const [suggestedCities, setSuggestedCities] = useState(["Kochi","Bangalore","Chennai","Mumbai","Delhi"]);
+  const [selectedLocation, setSelectedLocation] = useState("");
   const handleLogout = async () => {
     dispatch(logout());
     console.log("ok bye bye i am going see you soon");
     navigate("/");
   };
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+const [currentLocation, setCurrentLocation] = useState(null);
 
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500'
   
-  const getUserLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          
-         
-          let geoApiKey='dfd10cf75e1e42ac8410797d0be42cf2'
-          const response = await fetch(
-            `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${geoApiKey}`
-          );
-          const data = await response.json();
-          const userLocation = data.results[0].formatted; // Adjust based on the API response
-          
-          setLocation(userLocation);
-        },
-        (error) => {
-          console.error(error);
-          setLocation("Unable to retrieve location");
-        }
-      );
-    } else {
-      setLocation("Geolocation not supported");
+
+const handleCitySelection = async(city) => {
+  if(city==currentLocation)
+  {
+    await getUserLocation()
+
+    setLocation(currentLocation)
+  }
+  else{
+  setSelectedLocation(city);
+  setLocation(city);
+  }
+  setIsOpen(false);
+};
+
+// const handleSearchCityChange = async (e) => {
+//   const query = e.target.value;
+//   setcitySearchQuery(query);
+
+//   if (query.length > 2) {
+//     try {
+//       const response = await fetch(`https://api.teleport.org/api/cities/?search=${query}`);
+//       const data = await response.json();
+//       const cities = data._embedded['city:search-results'].map(result => result._embedded['city:item'].name);
+//       setSuggestedCities(cities);
+//     } catch (error) {
+//       console.error("Error fetching city suggestions:", error);
+//     }
+//   } else {
+//     setSuggestedCities([]);
+//   }
+// };
+const MAPBOX_ACCESS_TOKEN="pk.eyJ1IjoiYXNoaW5qb3kiLCJhIjoiY2x6aWE4YnNkMDY0ejJxcjBlZmpid2VoYyJ9.Etsb6UwNacChll6vPVQ_1g"
+
+const handleSearchCityChange = async (e) => {
+  const query = e.target.value;
+  setcitySearchQuery(query);
+
+  if (query.length > 2) {
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_ACCESS_TOKEN}&autocomplete=true&types=place&limit=5`;
+    try {
+      const response = await fetch(url)
+      const data = await response.json()
+      const cityNames = data.features.map((feature) => feature.place_name);
+      setSuggestedCities(["Current Location", ...cityNames]);
+    } catch (error) {
+      console.error("Error fetching city suggestions:", error);
     }
-  };
+  } else {
+    setSuggestedCities(["Current Location"]);
+  }
+};
+
+// const getUserLocation = () => {
+//   if (navigator.geolocation) {
+//     navigator.geolocation.getCurrentPosition(
+//       async (position) => {
+//         const { latitude, longitude } = position.coords;
+//         const geoApiKey = "dfd10cf75e1e42ac8410797d0be42cf2";
+//         const response = await fetch(
+//           `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${geoApiKey}`
+//         );
+//         const data = await response.json();
+
+//         let userLocation;
+//         const components = data.results[0].components;
+//         // More precise location check
+//         if (components.suburb) {
+//           userLocation = components.suburb;
+//         } else if (components.town) {
+//           userLocation = components.town;
+//         } else if (components.village) {
+//           userLocation = components.village;
+//         } else if (components.city) {
+//           userLocation = components.city;
+//         } else {
+//           userLocation = "Location not available";
+//         }
+
+//         setLocation(userLocation);
+//       },
+//       (error) => {
+//         console.error(error);
+//         setLocation("Unable to retrieve location");
+//       }
+//     );
+//   } else {
+//     setLocation("Geolocation not supported");
+//   }
+// };
+const bannerImages = [
+  "banner ide.jpeg",
+  "banner ide 2.jpeg",
+  "banner img 2.jpeg",
+  "banner img.jpeg",
+];
+const getUserLocation = () => {
+  if (navigator.geolocation) {
+    setIsLoadingLocation(true); // Set loading to true when fetching starts
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_ACCESS_TOKEN}&types=place&limit=1`;
+
+        try {
+          const response = await fetch(url);
+          const data = await response.json();
+          if (data.features && data.features.length > 0) {
+            const userLocation = data.features[0].place_name;
+            setCurrentLocation(userLocation); 
+            setIsLoadingLocation(false); 
+          } else {
+            setCurrentLocation("Location not found");
+            setIsLoadingLocation(false);
+          }
+        } catch (error) {
+          console.error("Error fetching current location:", error);
+          setCurrentLocation("Unable to retrieve location");
+          setIsLoadingLocation(false);
+        }
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        setCurrentLocation("Unable to retrieve location");
+        setIsLoadingLocation(false);
+      }
+    );
+  } else {
+    setCurrentLocation("Geolocation not supported");
+  }
+};
+
 
   const sanitizeString = (str) => {
     return str.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
@@ -533,17 +650,96 @@ const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500'
     return sanitizedMovieTitle.includes(santizedSearchQuery)
   }
   );
+  const filterMovies = (movies) => {
+    return movies.filter(movie => movie.title.toLowerCase().includes(searchQuery.toLowerCase()));
+  };
 
   useEffect(() => {
     if (!user) {
       navigate("/");
     }
     dispatch(fetchMovies())
-    getUserLocation();
+   // getUserLocation();
   }, [user]);
+
+  const MovieCarousel = ({ movies }) => (
+    <motion.div className="flex overflow-x-auto  scrollbar-hide space-x-4 p-4" drag="x" dragConstraints={{ right: 0, left: -300 }}>
+      {movies.slice(0, 8).map((movie) => (
+        <motion.div key={movie._id} className="flex-none w-80">
+          <img
+            src={movie.poster_path ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}` : "/path/to/fallback-image.jpg"}
+            alt={movie.title}
+            className="w-full cursor-pointer rounded-lg hover:scale-105 transition-transform"
+          />
+          <p className="mt-2 text-lg font-semibold">{movie.title}</p>
+          <p className="text-sm text-gray-600">Rating: {movie.rating || "Popular"}</p>
+        </motion.div>
+      ))}
+    </motion.div>
+  )
 
   return (
     <>
+   {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="relative bg-white rounded-lg shadow-lg w-full max-w-md mx-auto">
+            <div className="flex justify-between items-center bg-blue-600 text-white p-4 rounded-t-lg">
+              <h3 className="text-lg font-semibold">Select Your Location</h3>
+              <button
+                className="text-white hover:text-gray-200"
+                onClick={() => setIsOpen(false)}
+              >
+                &times;
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+  <input
+    type="text"
+    placeholder="Enter your location..."
+    value={citysearchQuery}
+    onChange={handleSearchCityChange}
+    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+  />
+  {suggestedCities.length > 0 && (
+    <div className="max-h-48 overflow-y-auto border border-gray-300 rounded-lg mt-2">
+      <div
+        className="p-3 cursor-pointer hover:bg-gray-100 transition flex items-center"
+        onClick={getUserLocation}
+      >
+        {isLoadingLocation ? (
+          <span>Loading location...</span>
+        ) : currentLocation ? (
+          <span onClick={()=>handleCitySelection(currentLocation)}>{currentLocation}</span>
+        ) : (
+          <span>Detect My Location</span>
+        )}
+      </div>
+      {suggestedCities.map((city) => (
+        <div
+          key={city}
+          className="p-3 cursor-pointer hover:bg-gray-100 transition"
+          onClick={() => handleCitySelection(city)}
+        >
+          {city}
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+            <div className="flex justify-end p-4 border-t border-gray-200 rounded-b-lg">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg min-h-8 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+  
+
       <div className="pt-2 mx-auto p-4">
         <header className="flex items-center justify-between w-full text-white bg-blue-950 p-4">
           <div className="flex items-center">
@@ -579,8 +775,8 @@ const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500'
 
             
             <div className="flex items-center">
-              <BiMap size={24} className="text-white" />
-              <span className="ml-1">{location ? location : "Fetching Location..."}</span>
+              <BiMap size={24} className="text-white" onClick={(e)=>setIsOpen(true)}/>
+              <span className="ml-1" > {location ? location : "Fetching Location..."}</span>
             </div>
 
             
@@ -597,61 +793,57 @@ const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500'
         </header>
 
         {/* Banner Section */}
-        <div className=" flex-wrap gap-4 my-1 mb-4">
+        {/* <div className=" flex-wrap gap-4 my-1 mb-4">
           <img
             src="banner hd mv.jpeg"
             alt="Banner"
             className="h-screen w-screen  object-fill rounded-lg"
           />
-        </div>
+        </div> */}
+        <BannerCarousel images={bannerImages} />
 
-        {/* Movies List Section */}
-        <div className="space-y-12">
-          {/* Upcoming Movies */}
-          <div className="flex justify-between">
-          <h2 className=" justify-start text-2xl font-bold text-indigo-900 mb-4">
-            Upcoming Movies  &nbsp; &gt;&gt;&gt;</h2>
-            <a href="/upcoming-movies" className="justify-end  cursor-pointer  text-blue-800 hover:text-base hover:font-medium mr-4">See All  &gt;</a>
-            </div>
-                    <div className="flex">
-            <div className="grid grid-cols-4 gap-4">
-            {filteredUpcoming.slice(0,4).map((movie) => (
-              <div className="text-center gap-4" key={movie._id}>
-                <img
-                  src={movie.poster_path ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}` : 'banner img brand.jpeg'}  
-                    alt={movie.title}
-                  className="w-fit cursor-pointer rounded-lg hover:scale-105 transition-transform"
-                />
-                <p className="mt-2 text-lg font-semibold">{movie.title}</p>
-                <p className="text-sm text-gray-600"> Rating: {movie.rating > 0 ? movie.rating : "Popular"}</p>
-              </div>
-            ))}
-            </div>
-          </div>
-
-          {/* Now Showing */}
-          <div className="flex justify-between">
-          <h2 className="justify-start text-2xl font-bold text-indigo-900 mb-4">
-            Now Showing &nbsp; &gt;&gt;&gt;</h2>
-            <a href="/now-showing" className=" justify-end text-blue-800 hover:font-medium hover:text-base mr-4">See All &gt;</a>
-           
-          </div>
-                   <div className="flex ">
-            <div className="grid grid-cols-4 gap-4">
-            {filteredNowShowing.slice(0,4).map((movie) => (
-              <div className="text-center" key={movie._id}>
-                <img
-                  src={movie.poster_path ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}` : 'banner img brand.jpeg'}
-                  alt={movie.title}
-                  className="w-fit cursor-pointer rounded-lg hover:scale-105 transition-transform"
-                />
-                <p className="mt-2 text-lg font-semibold">{movie.title}</p>
-                <p className="text-sm text-gray-600">Rating: {movie.rating}</p>
-              </div>
-            ))}
-            </div>
-          </div>
+       {/* Upcoming Movies */}
+       {/* Upcoming Movies */}
+       <section className="mb-8">
+       <div className="flex justify-between items-center">
+      <h2 className="text-2xl font-bold text-indigo-900">
+        Upcoming Movies &nbsp; &gt;&gt;&gt;
+      </h2>
+      <a href="/upcoming-movies" className="text-blue-800 hover:text-base hover:font-medium">
+        See All &gt;
+      </a>
+      </div>
+        {isLoading ? (
+          <div className="flex  justify-evenly space-x-4 mt-4">
+          {[...Array(4)].map((_, index) => (
+            <Skeleton key={index} height={300} width={300} />
+          ))}
         </div>
+        ) : (
+          <MovieCarousel movies={filterMovies(upcomingMovies)} />
+        )}
+      </section>
+
+      {/* Now Showing */}
+      <section className="mb-8">
+      <div className="flex justify-between items-center">
+      <h2 className="text-2xl font-bold text-indigo-900">
+        Now Showing &nbsp; &gt;&gt;&gt;
+      </h2>
+      <a href="/now-showing" className="text-blue-800 hover:text-base hover:font-medium">
+        See All &gt;
+      </a>
+    </div>
+        {isLoading ? (
+           <div className="flex  justify-evenly space-x-4 mt-4">
+           {[...Array(4)].map((_, index) => (
+             <Skeleton key={index} height={300} width={300} />
+           ))}
+         </div>
+        ) : (
+          <MovieCarousel movies={filterMovies(nowShowingMovies)} />
+        )}
+      </section>
 
         {/* Footer */}
         <Footer />

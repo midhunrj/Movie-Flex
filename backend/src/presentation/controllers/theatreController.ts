@@ -1,18 +1,18 @@
 import {NextFunction, Request,Response} from 'express'
 import { TheatreUseCase } from '../../application/usecases/theatre';
 import { FileUploadService } from '../../infrastructure/services/fileService';
+import { CloudinaryService } from '../../infrastructure/services/cloudinaryService';
 
 export class TheatreController{
-    constructor(private theatreUseCase:TheatreUseCase,private fileUploadService:FileUploadService){}
+    constructor(private theatreUseCase:TheatreUseCase,private fileUploadService:FileUploadService,private CloudinaryService:CloudinaryService){}
 
     async register(req:Request,res:Response)
     {
         try{
 
-            console.log("lksksl",req.body,req.file);
             let theatreLicensePath = '';
             if (req.file) {
-                theatreLicensePath = this.fileUploadService.saveFile(req.file); 
+                theatreLicensePath =await this.fileUploadService.saveFile(req.file) 
                 console.log("Theatre license uploaded at: ", theatreLicensePath);
             }
       const theatre=await this.theatreUseCase.register(req.body,theatreLicensePath)
@@ -173,7 +173,7 @@ export class TheatreController{
 
     async completeProfile(req: Request, res: Response,next:NextFunction): Promise<void> {
         try {
-           const theatreId = req.theatre?.id; // Assuming JWT middleware sets user in req
+           const theatreId = req.theatre?.id as string
            console.log(theatreId,"theatreid");
            
             const addressData = req.body.addressData;
@@ -187,5 +187,19 @@ export class TheatreController{
             res.status(500).json({ message: "failed to complete theatre profile"});
         }
     }
+
+    // async fetchRunningMovies(req: Request, res: Response,next:NextFunction): Promise<void> {
+    //     try {
+    //        const theatreId = req.theatre?.id; // Assuming JWT middleware sets user in req
+    //        console.log(theatreId,"theatreid");
+           
+    //         const movieData = await this.theatreUseCase.rollingMovies();
+    //         console.log(movieData,"MovieData ");
+            
+    //         res.status(200).json({movieData,message:"Movies has been loaded from backend successfully"});
+    //     } catch (error) {
+    //         res.status(500).json({ message: "failed to complete theatre profile"});
+    //     }
+    // }
 
 }

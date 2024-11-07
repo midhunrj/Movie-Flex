@@ -10,7 +10,13 @@ import {
   Logout,
   resendOtpAgain,
   addMoviesViaTheatre,
-  completeTheatreProfileData
+  completeTheatreProfileData,
+  addScreenData,
+  ScreensListData,
+  StoreTierData,
+  RollingMoviesData,
+  updateScreenData,
+  moviesRollinShowtime
 } from './theatreService';
 
 export const register = createAsyncThunk(
@@ -121,9 +127,9 @@ export const resendOtp = createAsyncThunk(
 )
 
 export const addMoviesToScreen=createAsyncThunk('theatre/addMovies',
-  async(movieId,thunkAPI)=>{
+  async({movie,screenId},thunkAPI)=>{
     try{
-      return await addMoviesViaTheatre()
+      return await addMoviesViaTheatre({movie,screenId})
 
     }
     catch(error)
@@ -145,6 +151,77 @@ export const addMoviesToScreen=createAsyncThunk('theatre/addMovies',
         return thunkAPI.rejectWithValue(error.message||"adding movies have been failed")
    
       }
-    }
-  )
+    })
+
+    export const AddScreen=createAsyncThunk('theatre/AddingScreen',
+      async(screenData,thunkAPI)=>{
+        try {
+          console.log(screenData,"screen data in thunk");
+          
+          return await addScreenData(screenData)
+        } catch (error) {
+          return thunkAPI.rejectWithValue(error.message||"adding movies have been failed")
+     
+        }
+      })
+
+      export const listScreen=createAsyncThunk('theatre/listingScreen',
+        async(theatreId,thunkAPI)=>{
+          try{
+            console.log(theatreId,"theatreId in thunk");
+            
+          return await ScreensListData(theatreId)
+          }
+          catch(error)
+          {
+            return thunkAPI.rejectWithValue(error.message||"listing screens to the movie have failed")
+          }
+        }
+      )
+        export const saveTierData=createAsyncThunk('theatre/savingTierData',
+        async({tierData,screenId},thunkAPI)=>{
+          try {
+            return await StoreTierData({tierData,screenId})
+          } catch (error) {
+            return thunkAPI.rejectWithValue(error.message||"saving tier data to the screen has failed")
+        
+          }
+        }
+        )
+
+        export const fetchMovies=createAsyncThunk('theatre/RollingMovies',
+          async(thunkAPI)=>{
+            try{
+              return await RollingMoviesData()
+            }
+            catch(error){
+              return thunkAPI.rejectWithValue(error.message||"fetching movies  to the screen has failed")
+        
+            }
+          }
+        )
+          export const updateScreen=createAsyncThunk('theatre/updateScreen',
+            async(screenData,thunkAPI)=>{
+              try {
+                return await updateScreenData(screenData)
+              } catch (error) {
+                return thunkAPI.rejectWithValue(error.message||"updating screen data has failed")
+        
+              }
+            }
+          )
+
+          export const saveMoviesToShowtime=createAsyncThunk('theatre/moviesToShowtime',
+            async(showData,thunkAPI)=>{
+              try {
+                return await moviesRollinShowtime(showData)
+              } catch (error) {
+                return thunkAPI.rejectWithValue(error.message||"adding movie to showtime has failed")
+        
+              }
+            }
+          )
+        
+      
+  
 

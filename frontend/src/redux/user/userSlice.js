@@ -243,7 +243,7 @@ const userSlice = createSlice({
         state.isSuccess=true;
         state.isError=false;
         state.message=action.payload.message
-        state.upcomingMovies=action.payload.upcomingMovies.upcomingMovieData
+        state.upcomingMovies=action.payload.upcomingMovies.upcomingMovies
         state.nowShowingMovies=action.payload.nowShowingMovies.runningMovies
       })
       .addCase(fetchMovies.rejected, (state, action) => {

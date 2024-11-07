@@ -4,7 +4,20 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        '.scrollbar-hide': {
+          /* Hide scrollbar for Webkit browsers */
+          '-webkit-overflow-scrolling': 'touch',
+          'scrollbar-width': 'none', // Firefox
+          '&::-webkit-scrollbar': {
+            display: 'none', // Safari and Chrome
+          },
+        },
+      });
+    },
+  ],
 }
 
 // /** @type {import('tailwindcss').Config} */

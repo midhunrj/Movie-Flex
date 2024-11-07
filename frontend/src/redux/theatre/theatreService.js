@@ -21,6 +21,8 @@ export const registerUser = async (name, email, mobile, password,file) => {
                 }
       
         });
+        console.log(response,"response from theater register");
+        
         localStorage.setItem("otpThetToken", response.data);
         return response.data;
         
@@ -143,9 +145,9 @@ export const resendOtpAgain = async () => {
     }
 };
 
-export const addMoviesViaTheatre=async(movieId)=>{
+export const addMoviesViaTheatre=async({movie,screenId})=>{
     try {
-       const response=await theatreAuthenticate.post("/add-movies",{movieId}) 
+       const response=await theatreAuthenticate.post("/add-movies-screen",{movie,screenId}) 
        console.log(response.data,"response from backend");
        return response.data
     } catch (error) {
@@ -177,6 +179,109 @@ export const completeTheatreProfileData=async(addressData)=>{
 }
 
 
+export const addScreenData=async(screenData)=>{
+    try {
+        //const location = await getCoordinatesFromAddress(addressData);
+       const response=await theatreAuthenticate.post("/AddScreen",{screenData}) 
+       console.log(response.data,"response from backend");
+       return response.data
+    } catch (error) {
+        console.log(error,"error in service");
+        
+        if (error.response && error.response.data && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error(error.response.data.error || "Something went wrong");
+        }   
+    }
+}
+
+export const ScreensListData=async(theatreId)=>{
+    try{
+        console.log(theatreId,"theatreid from frontend");
+        
+     const response=await theatreAuthenticate.get('/showscreens',{params:
+       {theatreId: theatreId}})
+     console.log(response.data,"response from backend");
+       return response.data
+    }
+    catch(error)
+    {
+        console.log(error,"error in service");
+        
+        if (error.response && error.response.data && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error(error.response.data.error || "Something went wrong");
+        }    
+    }
+}
+
+export const StoreTierData=async({tierData,screenId})=>{
+    try {
+        console.log(screenId,"screen id in serivce");
+        
+        const response=await theatreAuthenticate.post('/update-tier',{tierData,screenId})
+        console.log(response.data,"response from backend");
+        return response.data
+    } catch (error) {
+        console.log(error,"error in service");
+        
+        if (error.response && error.response.data && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error(error.response.data.error || "Something went wrong");
+        }    
+    }
+}
+
+export const RollingMoviesData=async()=>{
+    try {
+        const response=await theatreAuthenticate.get('/RollingMovies',{})
+        console.log(response.data,"response from backend");
+         return response.data
+    } catch (error) {
+        console.log(error,"error in service");
+        
+        if (error.response && error.response.data && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error(error.response.data.error || "Something went wrong");
+        }    
+    }
+}
+
+export const updateScreenData=async(screenData)=>{
+    try {
+        const response=await theatreAuthenticate.put('/update-screen',{screenData})
+        console.log(response.data,"response from backend");
+         return response.data
+    } catch (error) {
+        console.log(error,"error in service");
+        
+        if (error.response && error.response.data && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error(error.response.data.error || "Something went wrong");
+        }    
+    }
+}
+
+export const moviesRollinShowtime=async(showData)=>{
+    try {
+        const response=await theatreAuthenticate.post('/shows-rollin-movies',{showData})
+        console.log(response.data,"response from backend");
+         return response.data
+    } catch (error) {
+        console.log(error,"error in service");
+        
+        if (error.response && error.response.data && error.response.data.message) {
+            throw new Error(error.response.data.message);
+        } else {
+            throw new Error(error.response.data.error || "Something went wrong");
+        }    
+    }
+}
 
 
 

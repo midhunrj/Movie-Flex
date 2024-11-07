@@ -22,17 +22,22 @@ const VerifyTheatre=()=>{
         if (otp === "") {
           toast.error("Please enter OTP");
         } else {
-          await dispatch(theatreVerify(otp)).unwrap();
-          if (isSuccess) {
-            navigate('/theatre');
-          }
+           dispatch(theatreVerify(otp)).unwrap();
+          // if (isSuccess) {
+          //   navigate('/theatre');
+          // }
         }
       } catch (error) {
         console.error("OTP verify failed:", error);
        // toast.error("Failed to verify OTP");
       }
     };
-  
+   useEffect(()=>{
+  if(isSuccess)
+  {
+    navigate('/theatre')
+  }
+   },[isSuccess])
     
     useEffect(() => {
       if (timer > 0) {

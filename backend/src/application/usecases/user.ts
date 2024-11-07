@@ -180,17 +180,31 @@ async updateProfile(userId: string | undefined, profileData: any): Promise<User 
     return updatedUser;
   }
 
-    async upcomingMovies():Promise<Movie[]|null>{
-        const upcomingMovieData=await this.userRepository.ComingSoon()
-        return upcomingMovieData
-    }
-    async nowShowingMovies():Promise<Movie[]|null>
-    {
-       const nowShowingMovieData=await this.userRepository.RollingNow()
-       return nowShowingMovieData
-    }
+    // async upcomingMovies():Promise<Movie[]|null>{
+    //     const upcomingMovieData=await this.userRepository.ComingSoon()
+    //     return upcomingMovieData
+    // }
+    // async nowShowingMovies():Promise<Movie[]|null>
+    // {
+    //    const nowShowingMovieData=await this.userRepository.RollingNow()
+    //    return nowShowingMovieData
+    // }
 
-
+    async upcomingMovies(filters: any, page: number, limit: number): Promise<Movie[] | null> {
+        return await this.userRepository.ComingSoon(filters, page, limit);
+      }
+    
+      async nowShowingMovies(filters: any, page: number, limit: number): Promise<Movie[] | null> {
+        return await this.userRepository.RollingNow(filters, page, limit);
+      }
+    
+      async upcomingMoviesCount(filters: any): Promise<number> {
+        return await this.userRepository.getComingSoonCount(filters);
+      }
+    
+      async nowShowingMoviesCount(filters: any): Promise<number> {
+        return await this.userRepository.getRollingNowCount(filters);
+      }
 }
 
 

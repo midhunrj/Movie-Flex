@@ -1,37 +1,93 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Types } from 'mongoose';
+
+export interface EnrolledMovie {
+  movieId: Types.ObjectId; 
+  title: string;
+  duration: number; 
+  genre: string[];
+  movie_id:string;
+  language: string;
+  rating: number;
+  backdrop_path: string;  
+  poster_path: string; 
+  startDate?: Date; 
+  cast: string[];  
+  endDate?: Date;    
+  valid?: boolean;   
+}
 
 export interface Screen extends Document {
   theatreId: string;
-  screenNumber: number;
+  screenName: string;
+  screenType: string;
+  speakers: {
+    type: string;
+    count: number;
+    location: string;
+  }[];
   totalSeats: number;
   tiers: {
-    tierName: string;
-    price: number;
-    availableSeats: number;
+    name: string;
+    ticketRate: number;
+    seats: number;
+    rows:number;
+    partition:number;
+    seatLayout:[]; 
   }[];
-  moviePlaying: {
-    movieId: string;
-    showtimes: string[];
-  }[];
+  enrolledMovies: EnrolledMovie[]; 
+  showtimes: { movieId: string; time: string; }[]
 }
+
+
+
+const speakerSchema = new Schema({
+  type: { type: String, required: true }, 
+  count: { type: Number, required: true },
+  location: { type: String }
+});
+
+const tierSchema = new Schema({
+  name: { type: String, required: true }, 
+  ticketRate: { type: Number, required: true },
+  seats: { type: Number, required: true },
+  partition:{type:Number,default:0},
+  rows:{type:Number,default:0},
+  seatLayout:[]
+});
+const enrolledMovieSchema = new Schema({
+  movieId: { type: Schema.Types.ObjectId, ref: 'Movie', required: true },
+  title: { type: String, required: true },
+  duration: { type: Number, required: true },
+  genre: { type: [String], required: true },
+  movie_id:{type:String,required:true},
+  language: { type: String, required: true },
+  rating: { type: Number, required: true },
+  poster_path:{type:String,required:true},
+  backdrop_path:{type:String,required:true},
+  cast: [{ type: String, required: true }],  
+  startDate: { type: Date, required: false }, 
+  endDate: { type: Date, required: false },   
+  valid: { type: Boolean, default: true }     
+});
+
+
+// const moviePlayingSchema = new Schema({
+//   movieId: { type: Schema.Types.ObjectId, ref: 'Movie', required: true },
+//   showtimes: [{ type: String, required: true }] // e.g., ['10:00 AM', '2:00 PM']
+// });
+
 
 const screenSchema = new Schema<Screen>({
   theatreId: { type: String, ref: 'Theatre', required: true },
-  screenNumber: { type: Number, required: true },
+  screenName: { type: String, required: true },
+  screenType: { type: String, required: true }, 
+  speakers: [speakerSchema], 
   totalSeats: { type: Number, required: true },
-  tiers: [
-    {
-      tierName: { type: String, required: true },
-      price: { type: Number, required: true },
-      availableSeats: { type: Number, required: true },
-    },
-  ],
-  moviePlaying: [
-    {
-      movieId: { type: Schema.Types.ObjectId, ref: 'Movie', required: true },
-      showtimes: [{ type: String, required: true }],
-    },
-  ],
+  tiers: [tierSchema], 
+  enrolledMovies: [enrolledMovieSchema],
+  showtimes: [
+    { movieId: { type: String, ref: 'Movie' }, time: { type: String, required: true } }
+  ] 
 });
 
 export const ScreenModel = mongoose.model<Screen>('Screen', screenSchema);
