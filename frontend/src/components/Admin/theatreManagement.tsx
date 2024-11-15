@@ -1,169 +1,3 @@
-// import React,{useState,useEffect} from 'react'
-// import SidebarMenu from './sidebarMenu'
-// import { fetchTheatres,blockTheatre,unblockTheatre,approveTheatre,declineTheatre } from '../../redux/admin/adminThunk'
-// import { useNavigate } from 'react-router'
-// import { useDispatch,useSelector } from 'react-redux'
-// import { toast } from 'react-toastify'
-
-// const TheatreList = () => {
-//   const [theatres,setTheatres]=useState([])
-//   const{isLoading,isError,theatreData,message}=useSelector((state)=>state.admin)
-//   const navigate=useNavigate()
-//   const dispatch=useDispatch()
-
-//   const handleBlockUnblock = (theatreId,isBlocked) => {
-//     console.log(isBlocked,"isblocked in theatre");
-    
-//     if (isBlocked) {
-//       dispatch(unblockTheatre(theatreId)); // Dispatch unblock action
-//     } else {
-//       dispatch(blockTheatre(theatreId)); // Dispatch block action
-//     }
-//   }; 
-// //   useEffect(()=>{
-// //     if (!theatreData || !Array.isArray(theatreData))
-// //     {
-// //       console.log("ffsfsdf");
-// //       // if(isError)
-// //       // {
-// //       //   toast.error(message)
-// //       // }
-// //    dispatch(fetchTheatres())
-// //   setTheatres(theatreData)
-// //     }
-// // },[theatreData,theatres,dispatch])
-
-// const handleApprove = (theatreId) => {
-//   dispatch(approveTheatre(theatreId)); // Dispatch approve action
-// };
-
-// const handleDecline = (theatreId) => {
-//   dispatch(declineTheatre(theatreId)); // Dispatch decline action
-// };
-// useEffect(() => {
-//   //if (!theatreData || theatreData.length === 0) {
-//     dispatch(fetchTheatres());
-//   // }
-// }, [])
-//   return (
-//     <>
-//     {/* <div className='container'> */}
-//     <div className='mx-4 my-8'>
-//         <SidebarMenu>
-//     <div>
-//         <h1 className='text-wrap font-bold text-blue-500'>TheatreList</h1></div>
-//         <table className="min-w-full border-collapse border border-gray-300 mt-4">
-//             <thead>
-//               <tr>
-//                 <th className="border border-gray-300 p-2">No</th>
-//                 <th className="border border-gray-300 p-2">Name</th>
-//                 <th className="border border-gray-300 p-2">Email</th>
-//                 <th className="border border-gray-300 p-2">Mobile</th>
-//                 <th className="border border-gray-300 p-2">Status</th>
-//                 <th className="border border-gray-300 p-2">view details</th>
-//                 <th className="border border-gray-300 p-2 col-span-2">Action</th>
-//               </tr>
-//             </thead>
-//             <tbody>
-//                 {/* {theatreData?.length>0?(
-//                 theatreData.map((theatre)=>{
-//                   return(
-//               <tr key={theatre._id}>
-//                 <td className="border border-gray-300 p-2">1</td>
-//                 <td className="border border-gray-300 p-2">{theatre.name}</td>
-//                 <td className="border border-gray-300 p-2">{theatre.email}</td>
-//                 <td className="border border-gray-300 p-2">{theatre.mobile}</td>
-//                 <td
-//                       className={`border border-gray-300 p-2 ${
-//                         theatre.is_blocked ? 'text-red-500' : 'text-green-500'
-//                       }`}
-//                     >
-//                       {theatre.is_blocked ? 'Blocked' : 'Active'}
-//                     </td>
-//                     <td className="border border-gray-300 p-2 col-span-2">
-//                       <button
-//                         className={`px-6 py-2 min-h-8 ${
-//                           theatre.is_blocked ? 'bg-green-500' : 'bg-red-500'
-//                         } text-white rounded`}
-//                         onClick={() => handleBlockUnblock(theatre._id,theatre.is_blocked)}
-//                       >
-//                         {theatre.is_blocked ? 'Unblock' : 'Block'}
-//                       </button>
-//                       </td>
-//               </tr>
-//                 )})
-             
-//               ):(
-//                 <tr>
-//                     <td colSpan="4">No theatres found</td>
-//                 </tr>)
-//                 } */}
-//                  {theatreData?.length > 0 ? (
-//                 theatreData.map((theatre, index) => (
-//                   <tr key={theatre._id} className="border-t">
-//                     <td className="p-3 text-center">{index + 1}</td>
-//                     <td className="p-3">{theatre.name}</td>
-//                     <td className="p-3">{theatre.email}</td>
-//                     <td className="p-3">{theatre.mobile}</td>
-//                     <td className="p-3">
-//                       {theatre.is_approved=="Approved" ? (
-//                         theatre.is_blocked ? (
-//                           <span className="text-red-500">Blocked</span>
-//                         ) : (
-//                           <span className="text-green-500">Active</span>
-//                         )
-//                       ) : (
-//                         <span className="text-yellow-500">Pending Approval</span>
-//                       )}
-//                     </td>
-//                     <td className='p-3 '><img src={`/uploads/${theatre.licenseImage}`}/></td>
-//                     <td className="p-3 flex items-center  gap-2 ">
-//                       {theatre.is_approved=="Pending" ? (
-//                         <>
-//                           <button
-//                             className="min-w-min px-2 min-h-8 py-2 bg-green-500 text-white rounded-lg  flex  items-center justify-center gap-1 "
-//                             onClick={() => handleApprove(theatre._id)}
-//                           >
-//                            <span>Approve </span> 
-//                             <span className="text-white">&#10004;</span>
-//                           </button>
-//                           <button
-//                             className="min-w-min px-2 min-h-8 py-2 bg-red-500 text-white rounded-lg flex items-center justify-center gap-1"
-//                             onClick={() => handleDecline(theatre._id)}
-//                           > 
-//                           <span>  Decline</span>
-//                           <span className="text-white"> &#10006;</span>
-//                           </button>
-//                         </>
-//                       ) : (
-//                         <button
-//                           className={`min-h-8 mx-8 px-6 py-2 ${
-//                             theatre.is_blocked ? 'bg-green-500' : 'bg-red-500'
-//                           } text-white rounded-lg`}
-//                           onClick={() => handleBlockUnblock(theatre._id, theatre.is_blocked)}
-//                         >
-//                           {theatre.is_blocked ? 'Unblock' : 'Block'}
-//                         </button>
-//                       )}
-//                     </td>
-//                   </tr>
-//                 ))
-//               ) : (
-//                 <tr>
-//                   <td colSpan="6" className="p-3 text-center">
-//                     No theatres found
-//                   </td>
-//                 </tr>
-//               )}
-//             </tbody>
-//           </table>
-//         </SidebarMenu>
-//     </div>
-//     </>
-//   )
-// }
-
-// export default TheatreList
 
 import React, { useState, useEffect } from 'react';
 import SidebarMenu from './sidebarMenu';
@@ -171,16 +5,18 @@ import { fetchTheatres, blockTheatre, unblockTheatre, approveTheatre, declineThe
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import { AppDispatch, RootState } from '@/redux/store/store';
+import { TheatreType } from '@/types/theatreTypes';
 
 const TheatreList = () => {
-  const [theatres, setTheatres] = useState([]);
-  const [selectedTheatre, setSelectedTheatre] = useState(null); // For modal
-  const [showModal, setShowModal] = useState(false); // Modal state
+  const [theatres, setTheatres] = useState<TheatreType[]>([]);
+  const [selectedTheatre, setSelectedTheatre] = useState<TheatreType|null>(null); // For modal
+  const [showModal, setShowModal] = useState<boolean>(false); // Modal state
 
-  const { isLoading, isError, theatreData, message } = useSelector((state) => state.admin);
+  const { isLoading, isError, theatreData, message } = useSelector((state:RootState) => state.admin);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [currentPage, setCurrentPage] = useState(1); 
+  const dispatch = useDispatch<AppDispatch>();
+  const [currentPage, setCurrentPage] = useState<number>(1); 
   const usersPerPage=10
 
   const indexOfLastUser = currentPage * usersPerPage;
@@ -200,7 +36,7 @@ const handlePreviousPage = () => {
   }
 };
   // Block/Unblock theatre
-  const handleBlockUnblock = (theatreId, isBlocked) => {
+  const handleBlockUnblock = (theatreId:string, isBlocked:boolean) => {
     if (isBlocked) {
       dispatch(unblockTheatre(theatreId));
     } else {
@@ -209,12 +45,12 @@ const handlePreviousPage = () => {
   };
 
   // Approve theatre
-  const handleApprove = (theatreId) => {
+  const handleApprove = (theatreId:string) => {
     dispatch(approveTheatre(theatreId));
   };
 
   // Decline theatre
-  const handleDecline = (theatreId) => {
+  const handleDecline = (theatreId:string) => {
     dispatch(declineTheatre(theatreId));
   };
 
@@ -224,7 +60,7 @@ const handlePreviousPage = () => {
   }, [dispatch]);
 
   // Open modal to show details
-  const openModal = (theatre) => {
+  const openModal = (theatre:TheatreType) => {
     setSelectedTheatre(theatre);
     setShowModal(true);
   };
@@ -308,7 +144,7 @@ const handlePreviousPage = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="p-3 text-center">No theatres found</td>
+                  <td colSpan={6} className="p-3 text-center">No theatres found</td>
                 </tr>
               )}
             </tbody>

@@ -4,14 +4,15 @@ import { useNavigate } from 'react-router'
 import { useDispatch ,useSelector} from 'react-redux'
 import { fetchUsers } from '../../redux/admin/adminThunk'
 import { blockUser,unblockUser } from '../../redux/admin/adminThunk'
+import { AppDispatch, RootState } from '@/redux/store/store'
 const UserList = () => {
 const[users,setUsers]=useState([])
-const dispatch=useDispatch()
+const dispatch=useDispatch<AppDispatch>()
 const [currentPage, setCurrentPage] = useState(1); 
 const usersPerPage=10
-const {admin,isLoading,isSuccess,userData}=useSelector((state)=>state.admin)
+const {admin,isLoading,isSuccess,userData}=useSelector((state:RootState)=>state.admin)
 
-const handleBlockUnblock = (userId,isBlocked) => {
+const handleBlockUnblock = (userId:string,isBlocked:boolean) => {
   if (isBlocked) {
     dispatch(unblockUser(userId)); // Dispatch unblock action
   } else {
@@ -92,7 +93,7 @@ useEffect(()=>{
                 ))
               ) :(
                 <tr>
-                    <td colSpan="4">No users found</td>
+                    <td colSpan={4}>No users found</td>
                 </tr>)
                 }
             </tbody>

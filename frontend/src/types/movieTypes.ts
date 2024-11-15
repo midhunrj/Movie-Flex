@@ -7,7 +7,7 @@ export interface MovieType {
        releaseDate: Date,
        duration: number,
        genre: string[],  
-       posterUrl: string,  
+       posterUrl?: string,  
        isApproved: boolean   
        movie_id: string,  
        language: string,  
@@ -21,7 +21,8 @@ export interface MovieType {
        cast: string[],  
        crew: Record<string, string>,   
        createdAt: Date ,
-       is_blocked:Boolean 
+       is_blocked:boolean ,
+       vote_average:Float32Array
      
   }
 

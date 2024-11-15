@@ -7,15 +7,17 @@ import { blockMovie, deleteMovie, fetchMovies } from '../../redux/admin/adminThu
 import {ToastContainer, toast } from 'react-toastify';
 import Swal from 'sweetalert2'
 import './css/login.css'
+import { AppDispatch, RootState } from '@/redux/store/store';
+import { MovieType } from '@/types/movieTypes';
 
 const RunningMovies = () => {
   
-  const dispatch = useDispatch();
-  const { movies, isError, isSuccess, isLoading } = useSelector((state) => state.admin);
+  const dispatch = useDispatch<AppDispatch>();
+  const { movies, isError, isSuccess, isLoading } = useSelector((state:RootState) => state.admin);
 
   const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500'; // Base URL for images
- const [selectedMovie,setSelectedMovie]=useState(null)
-  const getYouTubeEmbedUrl = (videoLink) => {
+ const [selectedMovie,setSelectedMovie]=useState<MovieType|null>(null)
+  const getYouTubeEmbedUrl = (videoLink:string) => {
     const videoId = videoLink.split('v=')[1];
     return `https://www.youtube.com/embed/${videoId}`;
   };
@@ -24,7 +26,7 @@ const RunningMovies = () => {
     dispatch(fetchMovies());
   }, [dispatch]);
 
-  const handleDelete = (movieId) => {
+  const handleDelete = (movieId:string) => {
     Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -51,7 +53,7 @@ const RunningMovies = () => {
     }});
   };
   
-  const handleBlock = (movieId, isBlocked) => {
+  const handleBlock = (movieId:string, isBlocked:boolean) => {
     const confirmMessage = isBlocked ? 'Unblock this movie?' : 'Block this movie?';
     Swal.fire({
       title: confirmMessage,
@@ -95,7 +97,7 @@ const RunningMovies = () => {
           ) : isError ? (
             <p className="text-red-500">Error loading movies</p>
           ) : movies.length > 0 ? (
-            movies.map((movie,index) => (
+            movies.map((movie:MovieType,index:number) => (
               <div key={movie.id||index} className="bg-white shadow-md rounded-lg p-4 flex flex-col justify-between">
                 <div>
                   {/* Movie Poster */}
@@ -151,13 +153,13 @@ const RunningMovies = () => {
                     Edit
                   </Link> */}
                   <button
-                    onClick={() => handleBlock(movie.movie_id, movie.is_blocked)}
+                    onClick={() => handleBlock(movie.movie_id, movie?.is_blocked)}
                     className="bg-blue-500  text-slate-200 hover:underline text-sm min-h-8 hover:text-white hover:scale-105 hover:bg-blue-800 transition-all   p-2"
                   >
                     {movie.is_blocked ? 'Unblock' : 'Block'}
                   </button>
                   <button
-                    onClick={() => handleDelete(movie.id)}
+                    onClick={() => handleDelete(movie.id??'')}
                     className="bg-red-500 hover:underline text-sm text-slate-200 min-h-8  hover:text-white hover:scale-105 hover:bg-red-700 transition-all p-2"
                   >
                     Delete

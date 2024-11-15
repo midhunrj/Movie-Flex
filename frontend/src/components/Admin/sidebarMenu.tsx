@@ -35,13 +35,16 @@
 // export default SidebarMenu
 
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { logout } from '../../redux/admin/adminSlice';
 import { Link } from 'react-router-dom';
+type SidebarMenuProps = {
+  children: ReactNode
+};
 
-const SidebarMenu = ({ children }) => {
+const SidebarMenu:React.FC<SidebarMenuProps> = ({ children }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 

@@ -15,7 +15,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { AddScreen } from '../../redux/theatre/theatreThunk';
-import EnrollMovieModal from './enrollMovieModal';
+// import EnrollMovieModal from './enrollMovieModal';
 import { AppDispatch, RootState } from '@/redux/store/store';
 import { MovieType } from '@/types/movieTypes';
 import { EnrolledMovie, Showtime } from '@/types/theatreTypes';

@@ -16,13 +16,13 @@ const dispatch=useDispatch<AppDispatch>()
         e.preventDefault();
         try {
             const response = await dispatch(login({email, password}));
-            console.log("Login successful:", response.data);
+           
             if(isSuccess)
                 {
                 navigate('/admin/home')
                 }
             
-        } catch (error) {
+        } catch (error:any) {
             console.error("Login failed:", error.response.data.error);
         }
     };

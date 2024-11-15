@@ -172,7 +172,7 @@ async(_,thunkAPI)=>{
   {return thunkAPI.rejectWithValue(error.message||"something went wrong")
 }
 })
-export const blockUser=createAsyncThunk<BlockUserResponse, string, { rejectValue: string }>('admin/blockuser',async(userId,thunkAPI)=>{
+export const blockUser=createAsyncThunk<BlockUserResponse, string, { rejectValue: string }>('admin/blockuser',async(userId:string,thunkAPI)=>{
   try{
      console.log("in admin tunk block user");
      return await blockUserActive(userId)
@@ -183,7 +183,7 @@ export const blockUser=createAsyncThunk<BlockUserResponse, string, { rejectValue
   }
 })
 
-export const unblockUser=createAsyncThunk<BlockUserResponse, string, { rejectValue: string }>('admin/unblockuser',async(userId,thunkAPI)=>{
+export const unblockUser=createAsyncThunk<BlockUserResponse, string, { rejectValue: string }>('admin/unblockuser',async(userId:string,thunkAPI)=>{
   try{
      console.log("in admin tunk unblock user");
      return await unblockUserActive(userId)
@@ -194,7 +194,7 @@ export const unblockUser=createAsyncThunk<BlockUserResponse, string, { rejectVal
   }
 })
 
-export const blockTheatre=createAsyncThunk<BlockTheatreResponse, string, { rejectValue: string }>('admin/blocktheatre',async(theatreId,thunkAPI)=>{
+export const blockTheatre=createAsyncThunk<BlockTheatreResponse, string, { rejectValue: string }>('admin/blocktheatre',async(theatreId:string,thunkAPI)=>{
   try{
      console.log("in admin tunk block theatre");
      return await blockTheatreActive(theatreId)
@@ -215,7 +215,7 @@ export const unblockTheatre=createAsyncThunk<BlockTheatreResponse, string, { rej
     return thunkAPI.rejectWithValue(error.message||"something went wrong")
   }
 })
-  export const approveTheatre = createAsyncThunk('admin/approveTheatre', async (theatreId, thunkAPI) => {
+  export const approveTheatre = createAsyncThunk('admin/approveTheatre', async (theatreId:string, thunkAPI) => {
     try {
       return await approveTheatreAction(theatreId);
     } catch (error:any) {
@@ -224,7 +224,7 @@ export const unblockTheatre=createAsyncThunk<BlockTheatreResponse, string, { rej
   });
   
   
-  export const declineTheatre = createAsyncThunk('admin/declineTheatre', async (theatreId, thunkAPI) => {
+  export const declineTheatre = createAsyncThunk('admin/declineTheatre', async (theatreId:string, thunkAPI) => {
     try {
       return await declineTheatreAction(theatreId);
     } catch (error:any) {

@@ -11,7 +11,7 @@ import { Modal } from 'flowbite-react';
 import { TextField } from '@mui/material';
 import { format, set } from 'date-fns'
 import ScreenLayout from './screenLayout';
-import EnrollMovieModal from './enrollMovieModal';
+// import EnrollMovieModal from './enrollMovieModal';
 import EnrolledMovies from './enrolledMovies';
 import { updateScreen } from '../../redux/theatre/theatreThunk';
 import { toast } from 'react-toastify';

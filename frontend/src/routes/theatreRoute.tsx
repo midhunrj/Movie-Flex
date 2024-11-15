@@ -19,7 +19,7 @@ import ScreensList from "../components/Theatre/ScreensList";
 import ScreensForm from "../components/Theatre/Screens";
 import { IdentifierProvider } from "../utils/context/identifierContext";
 import EditScreen from "../components/Theatre/EditScreen";
-import Parentcomp from "../components/Theatre/parentcomp";
+
 
 export const TheatreRoute=()=>{
     return(
@@ -40,7 +40,7 @@ export const TheatreRoute=()=>{
             <Route path='/new-screen' element={<TheatreProtected><ScreensForm/></TheatreProtected>}/>
             <Route path='/tier-seats' element={<TheatreProtected><TierSeats/></TheatreProtected>}/>
             <Route path='/edit-screen/:id'element={<TheatreProtected><EditScreen/></TheatreProtected>}/>
-            <Route path='/parent-comp' element={<Parentcomp/>}/>
+            
             
         </Routes>
         </IdentifierProvider>
