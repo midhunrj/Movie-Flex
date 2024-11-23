@@ -5,11 +5,12 @@ import SidebarMenu from './sidebarMenu';
 import { useDispatch } from 'react-redux';
 import { addMovie } from '../../redux/admin/adminThunk';
 import { toast } from 'react-toastify';
-import { MovieType } from '@/types/movieTypes';
+import { MovieTMdb, MovieType } from '@/types/movieTypes';
 import { AppDispatch } from '@/redux/store/store';
+import { Link } from 'react-router-dom';
 //axiosRetry(axios,{retries:3,retryDelay:axiosRetry.exponentialDelay})
 const MovieList:React.FC = () => {
-  const [movies, setMovies] = useState<MovieType[]>([]);
+  const [movies, setMovies] = useState<MovieTMdb[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
@@ -94,7 +95,7 @@ const handleSortChange=(e:React.ChangeEvent<HTMLSelectElement>)=>{
 //   }
   
 
-  const handleAddMovie = async (movie:MovieType) => {
+  const handleAddMovie = async (movie:MovieTMdb) => {
     try {
       
       let movieDetailsUrl=`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${apiKey}&append_to_response=credits,videos`;
@@ -109,7 +110,8 @@ const handleSortChange=(e:React.ChangeEvent<HTMLSelectElement>)=>{
     const cinematographer = movieDetails.credits.crew.find((crew:any) => crew.job === 'Director of Photography')?.name || 'N/A';
     const editor = movieDetails.credits.crew.find((crew:any) => crew.job === 'Editor')?.name || 'N/A';
     const musicComposer = movieDetails.credits.crew.find((crew:any) => crew.job === 'Original Music Composer')?.name || 'N/A';
-
+      
+    
     // Extract the trailer video link (if available) or set a fallback
     let videoLink = movieDetails.videos.results.find((video:any) => video.type === 'Trailer')?.key || '';
     if (!videoLink) {
@@ -163,7 +165,7 @@ const handleSortChange=(e:React.ChangeEvent<HTMLSelectElement>)=>{
           <h1 className="text-blue-500 text-nowrap font-bold">Movie List</h1>
         </div>
         <div className='flex justify-end '>
-          <a href='/admin/running-movies' className='bg-orange-400 rounded text-sm p-2  text-slate-1000 hover:bg-green-700 hover:text-white hover:text-md transition-all  border-collapse '>New releases</a>
+          <Link to='/admin/running-movies' className='bg-orange-400 rounded text-sm p-2  text-slate-1000 hover:bg-green-700 hover:text-white hover:text-md transition-all  border-collapse '>New releases</Link>
         </div>
         <div className="mt-4 flex justify-between">
           <div className='flex-grow'>
@@ -297,10 +299,11 @@ const handleSortChange=(e:React.ChangeEvent<HTMLSelectElement>)=>{
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
           {movies.length > 0 ? (
             movies.map((movie) => (
+             
               <div
                 key={movie.id}
                 className="border border-gray-300 rounded-lg p-4 shadow hover:shadow-lg"
-              >
+              > 
                 <img
                   src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
                   alt={movie.title}
@@ -311,7 +314,7 @@ const handleSortChange=(e:React.ChangeEvent<HTMLSelectElement>)=>{
                   {movie.overview.substring(0, 100)}...
                 </p>
                 <p className="text-gray-600 mt-2">
-                  Release Date: {movie?.releaseDate.toLocaleDateString()}
+                  Release Date:{ movie?.release_date ? new Date(movie.release_date).toLocaleDateString() : 'N/A'}
                 </p>
                 <p className="text-gray-600 mt-2">
                   Rating: {movie?.vote_average}

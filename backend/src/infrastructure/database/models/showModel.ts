@@ -1,4 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { Movie } from '../../../Domain/entities/movies';
+import { Theatre } from '../../../Domain/entities/theatre';
+import { Screen } from '../../../Domain/entities/screens';
 
 interface ISeatInfo {
   seatLabel: string;
@@ -10,22 +13,22 @@ interface ISeatInfo {
 }
 
 
-interface IRow {
+export interface IRow {
   seats: ISeatInfo[];
 }
 
 
-interface ITier {
+export interface ITier {
   tierName: string;
   ticketRate: number;
   rows: IRow[];
 }
 
 export interface IShowtime extends Document {
-  movieId: mongoose.Types.ObjectId;
-  theatreId: mongoose.Types.ObjectId;
+  movieId: mongoose.Types.ObjectId 
+  theatreId: mongoose.Types.ObjectId 
   showtime: string;
-  screenId: mongoose.Types.ObjectId;
+  screenId: mongoose.Types.ObjectId|Screen
   totalSeats: number;
   date: Date;
   seatLayout: ITier[];
@@ -63,5 +66,6 @@ const ShowtimeSchema = new Schema<IShowtime>({
   totalSeats: { type: Number, required: true },
   seatLayout: { type: [TierSchema], required: true },
 });
+
 
 export default mongoose.model<IShowtime>('Showtime', ShowtimeSchema);

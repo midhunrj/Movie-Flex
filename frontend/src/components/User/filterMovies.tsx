@@ -1,13 +1,15 @@
 import React, { useState, useEffect, ChangeEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchMovies } from "../../redux/user/userThunk"; // Adjust your path for fetching movies
-import Footer from "./footer";
+
 import { BiSearch } from "react-icons/bi";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css"
 import { AppDispatch, RootState } from "@/redux/store/store";
 import { MovieType } from "@/types/movieTypes";
+import Footer from "./footer";
+
 interface FullMoviesListProps {
   movieType: string;
 }
@@ -79,17 +81,17 @@ const FullMoviesList:React.FC<FullMoviesListProps> = ({ movieType }) => {
   return (
     <>
       {/* Header */}
-      <header className="flex items-center justify-between bg-blue-950 p-4 text-white">
+      <header className="flex items-center justify-between bg-blue-950  p-4 text-white">
         <div className="flex items-center">
           <img src="movielogo 2.jpeg" alt="Movie Site Logo" className="h-12 w-12 mr-4" />
           <h1 className="text-2xl font-bold">Movie Flex</h1>
         </div>
         <div className="flex space-x-8">
-          <a href="/" className="hover:bg-amber-400 px-4 py-2 rounded">Home</a>
-          <a href="/profile" className="hover:bg-gray-700 px-4 py-2 rounded">Profile</a>
-          <a href="#" className="hover:bg-gray-700 px-4 py-2 rounded">Your Orders</a>
-          <a href="#" className="hover:bg-gray-700 px-4 py-2 rounded">Favourites</a>
-          <a href="#" className="hover:bg-gray-700 px-4 py-2 rounded">Shows</a>
+          <Link to="/" className="hover:bg-amber-400 px-4 py-2 rounded">Home</Link>
+          <Link to="/profile" className="hover:bg-gray-700 px-4 py-2 rounded">Profile</Link>
+          <Link to="#" className="hover:bg-gray-700 px-4 py-2 rounded">Your Orders</Link>
+          <Link to="#" className="hover:bg-gray-700 px-4 py-2 rounded">Favourites</Link>
+          <Link to="#" className="hover:bg-gray-700 px-4 py-2 rounded">Shows</Link>
         </div>
         <div className="relative">
           <input type="text" placeholder="Search" value={searchQuery} className="p-2 rounded bg-gray-700 text-white pl-10"  onChange={handleSearchChange}/>

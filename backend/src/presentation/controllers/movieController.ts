@@ -71,12 +71,12 @@ async createMovie(req: Request, res: Response) {
     //   new Date(createdAt)
     // );
     const {
-      title, language, overview, release_date, popularity, rating, genres,
+      title, language, overview, releaseDate, popularity, rating, genres,
       movie_id, video_link, runtime, backdrop_path, poster_path, cast, crew, createdAt,is_blocked
     } = req.body.movieData;
     
    
-    const releaseDate = release_date ? new Date(release_date) : null;
+    // const releaseData = releaseDate ? new Date(releaseDate) : null;
     const createdDate = createdAt ? new Date(createdAt) : new Date();
        console.log(releaseDate,"release date");
        

@@ -1,14 +1,14 @@
 
 import React, { useState, useEffect, ChangeEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router";
-import { logout } from "../../redux/user/userSlice";
+import { useLocation, useNavigate } from "react-router";
+import { logout, setUserCoordinates, setUserLocation } from "../../redux/user/userSlice";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { Button, Modal } from "flowbite-react";
 import { toast } from "react-toastify";
 import Footer from "./footer";
-import { BiBell, BiSearch, BiMap } from "react-icons/bi";
-import { fetchMovies } from "../../redux/user/userThunk";
+import { BiBell, BiSearch, BiMap, BiArrowFromTop, BiArrowBack, BiAlignRight, BiArrowToBottom, BiChevronDown } from "react-icons/bi";
+import { fetchMovies, fetchTheatres } from "../../redux/user/userThunk";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Skeleton from "react-loading-skeleton";
@@ -16,11 +16,41 @@ import "react-loading-skeleton/dist/skeleton.css"
 import BannerCarousel from "./bannerCarousel";
 import { AppDispatch, RootState } from "@/redux/store/store";
 import { MovieType } from "@/types/movieTypes";
+import { useLocalizationContext } from "@mui/x-date-pickers/internals";
+// import { Theatre } from "@/types/admintypes";
 //import {refreshPage} from '../../redux/user/userThunk'
 // import {toas}
+interface Address {
+  place: string;
+  city: string;
+  district: string;
+  state: string;
+  pincode: number;
+}
+
+interface Screen {
+  screenName: string;
+  screenType: string;
+  totalSeats: number;
+}
+
+export interface TheatreLocate {
+  _id: string;
+  name: string;
+  address: Address;
+  distance: number;
+  screens: Screen;
+}
+
+interface Props {
+  theatres: TheatreLocate[];
+  handleTheatreSelection: (theatre: TheatreLocate) => void;
+  browseMode: string;
+  setBrowseMode: (mode: string) => void;
+}
 
 const HomePage = () => {
-  const { user,isSuccess,isError,isLoading,nowShowingMovies=[],upcomingMovies=[] } = useSelector((state:RootState) => state.user);
+  const { user,isSuccess,isError,isLoading,nowShowingMovies=[],upcomingMovies=[],userCoordinates,theatres,userCurrentLocation } = useSelector((state:RootState) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -29,6 +59,9 @@ const HomePage = () => {
   const [citysearchQuery,setcitySearchQuery]=useState<string>("")
   // const [upcomingMovies,setUpcomingMovies]=useState([])
   // const [nowShowingMovies,setNowShowingMovies]=useState([])
+  const [browseMode, setBrowseMode] = useState<"movies" | "theatres">("movies");
+  const [selectedTheatre, setSelectedTheatre] = useState<string>("");
+
   const [suggestedCities, setSuggestedCities] = useState<string[]>(["Kochi","Bangalore","Chennai","Mumbai","Delhi"]);
   const [selectedLocation, setSelectedLocation] = useState<string>("");
   const handleLogout = async () => {
@@ -50,10 +83,28 @@ const handleCitySelection = async(city:string) => {
     setLocation(currentLocation)
   }
   else{
+   await  fetchCityCoordinates(city)
   setSelectedLocation(city);
   setLocation(city);
+  dispatch(setUserLocation(city))
   }
   setIsOpen(false);
+};
+
+const fetchCityCoordinates = async (city:string) => {
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(city)}.json?access_token=${MAPBOX_ACCESS_TOKEN}&limit=1`;
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.features && data.features.length > 0) {
+      const [longitude, latitude] = data.features[0].center;
+      
+      // Dispatch the coordinates to Redux state
+      dispatch(setUserCoordinates({ latitude, longitude }));
+    }
+  } catch (error) {
+    console.error('Error fetching city coordinates:', error);
+  }
 };
 
 // const handleSearchCityChange = async (e) => {
@@ -62,7 +113,7 @@ const handleCitySelection = async(city:string) => {
 
 //   if (query.length > 2) {
 //     try {
-//       const response = await fetch(`https://api.teleport.org/api/cities/?search=${query}`);
+//       const response = await fetch(`https://Linkpi.teleport.org/Linkpi/cities/?search=${query}`);
 //       const data = await response.json();
 //       const cities = data._embedded['city:search-results'].map(result => result._embedded['city:item'].name);
 //       setSuggestedCities(cities);
@@ -75,6 +126,10 @@ const handleCitySelection = async(city:string) => {
 // };
 const MAPBOX_ACCESS_TOKEN="pk.eyJ1IjoiYXNoaW5qb3kiLCJhIjoiY2x6aWE4YnNkMDY0ejJxcjBlZmpid2VoYyJ9.Etsb6UwNacChll6vPVQ_1g"
 
+const handleTheatreSelection = (theatreId: string) => {
+  setSelectedTheatre(theatreId);
+  navigate('/theatre-Shows', { state: { theatreId } });
+};
 const handleSearchCityChange = async (e:ChangeEvent<HTMLInputElement>) => {
   const query = e.target.value;
   setcitySearchQuery(query);
@@ -83,6 +138,8 @@ const handleSearchCityChange = async (e:ChangeEvent<HTMLInputElement>) => {
     const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_ACCESS_TOKEN}&autocomplete=true&types=place&limit=5`;
     try {
       const response = await fetch(url)
+      console.log(response);
+      
       const data = await response.json()
       const cityNames = data.features.map((feature:any) => feature.place_name);
       setSuggestedCities(["Current Location", ...cityNames]);
@@ -101,7 +158,7 @@ const handleSearchCityChange = async (e:ChangeEvent<HTMLInputElement>) => {
 //         const { latitude, longitude } = position.coords;
 //         const geoApiKey = "dfd10cf75e1e42ac8410797d0be42cf2";
 //         const response = await fetch(
-//           `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${geoApiKey}`
+//           `https://Linkpi.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${geoApiKey}`
 //         );
 //         const data = await response.json();
 
@@ -144,14 +201,17 @@ const getUserLocation = () => {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
+        dispatch(setUserCoordinates({ latitude, longitude }));
+        dispatch(fetchTheatres({latitude,longitude}))
         const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_ACCESS_TOKEN}&types=place&limit=1`;
-
+            
         try {
           const response = await fetch(url);
           const data = await response.json();
           if (data.features && data.features.length > 0) {
             const userLocation = data.features[0].place_name;
             setCurrentLocation(userLocation); 
+            dispatch(setUserLocation(userLocation))
             setIsLoadingLocation(false); 
           } else {
             setCurrentLocation("Location not found");
@@ -199,7 +259,8 @@ const getUserLocation = () => {
   const filterMovies = (movies:MovieType[]):MovieType[] => {
     return movies.filter(movie => movie?.title?.toLowerCase().includes(searchQuery.toLowerCase()));
   };
-
+const locationTab=useLocation()
+  const isActive = (path: string) => locationTab?.pathname === path;
   useEffect(() => {
     if (!user) {
       navigate("/");
@@ -223,7 +284,6 @@ const getUserLocation = () => {
       ))}
     </motion.div>
   )
-
   return (
     <>
    {isOpen && (
@@ -286,7 +346,7 @@ const getUserLocation = () => {
       )}
   
 
-      <div className="pt-2 mx-auto p-4 bg-gray-100">
+      <div className=" bg-gray-100">
         <header className="flex items-center justify-between w-full text-white bg-[#091057] p-4">
           <div className="flex items-center">
             <img
@@ -299,11 +359,15 @@ const getUserLocation = () => {
 
           {/* Center: Navbar Links */}
           <div className="flex space-x-8">
-            <a href="/" className="hover:bg-amber-400 px-4 py-2 rounded">Home</a>
-            <Link to="/profile" className="hover:bg-gray-700 px-4 py-2 rounded">Profile</Link>
-            <a href="#" className="hover:bg-gray-700 px-4 py-2 rounded">Your Orders</a>
-            <a href="#" className="hover:bg-gray-700 px-4 py-2 rounded">Favourites</a>
-            <a href="#" className="hover:bg-gray-700 px-4 py-2 rounded">Shows</a>
+            <Link to="/" className={`hover:bg-amber-400 px-4 py-2 rounded ${
+                isActive('/home') ? 'bg-yellow-500 text-blue-950' : 'hover:bg-gray-700 hover:text-white'
+              }`}>Home</Link>
+            <Link to="/profile" className={`hover:bg-gray-700 px-4 py-2 rounded ${
+                isActive('/profile') ? 'bg-yellow-500 text-blue-950' : 'hover:bg-gray-700 hover:text-white'
+              }`}>Profile</Link>
+            <Link to="#" className="hover:bg-gray-700 px-4 py-2 rounded">Your Orders</Link>
+            <Link to="#" className="hover:bg-gray-700 px-4 py-2 rounded">Favourites</Link>
+            <Link to="#" className="hover:bg-gray-700 px-4 py-2 rounded">Shows</Link>
           </div>
 
           <div className="flex items-center space-x-4">
@@ -320,10 +384,13 @@ const getUserLocation = () => {
             </div>
 
             
-            <div className="flex items-center">
-              <BiMap size={24} className="text-white" onClick={(e)=>setIsOpen(true)}/>
-              <span className="ml-1" > {location ? location : "Fetching Location..."}</span>
-            </div>
+            <div className="flex items-center bg-white w-fit rounded p-2 text-black">
+  <BiMap size={24} onClick={() => setIsOpen(true)} />
+  <span className="ml-1 flex items-center cursor-pointer" onClick={() => setIsOpen(true)}>
+    {location ? location :userCurrentLocation?userCurrentLocation: "Fetching Location..."}
+    <BiChevronDown size={20} className="ml-1" />
+  </span>
+</div>
 
             
             <BiBell size={24} className="text-white cursor-pointer" />
@@ -338,26 +405,19 @@ const getUserLocation = () => {
           </div>
         </header>
 
-        {/* Banner Section */}
-        {/* <div className=" flex-wrap gap-4 my-1 mb-4">
-          <img
-            src="banner hd mv.jpeg"
-            alt="Banner"
-            className="h-screen w-screen  object-fill rounded-lg"
-          />
-        </div> */}
-        <BannerCarousel images={bannerImages} />
+       
+       { browseMode === "movies"? ( <><BannerCarousel images={bannerImages} />
 
        {/* Upcoming Movies */}
        {/* Upcoming Movies */}
        <section className="mb-8">
        <div className="flex justify-between items-center">
-      <h2 className="text-2xl font-bold text-indigo-900">
+      <h2 className="text-2xl ml-4 font-bold text-indigo-900">
         Upcoming Movies &nbsp; &gt;&gt;&gt;
       </h2>
-      <a href="/upcoming-movies" className="text-blue-800 hover:text-base hover:font-medium">
+      <Link to="/upcoming-movies" className="text-blue-800 hover:text-base hover:font-medium mr-2">
         See All &gt;
-      </a>
+      </Link>
       </div>
         {isLoading ? (
           <div className="flex  justify-evenly space-x-4 mt-4">
@@ -373,12 +433,12 @@ const getUserLocation = () => {
       {/* Now Showing */}
       <section className="mb-8">
       <div className="flex justify-between items-center">
-      <h2 className="text-2xl font-bold text-indigo-900">
+      <h2 className="text-2xl ml-4 font-bold text-indigo-900">
         Now Showing &nbsp; &gt;&gt;&gt;
       </h2>
-      <a href="/now-showing" className="text-blue-800 hover:text-base hover:font-medium">
+      <Link to="/now-showing" className="text-blue-800 hover:text-base hover:font-medium mr-2">
         See All &gt;
-      </a>
+      </Link>
     </div>
         {isLoading ? (
            <div className="flex  justify-evenly space-x-4 mt-4">
@@ -390,7 +450,53 @@ const getUserLocation = () => {
           <MovieCarousel movies={filterMovies(nowShowingMovies)} />
         )}
       </section>
-
+      
+       </> ): (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 m-4">
+        {theatres?.map((theatre: TheatreLocate, index: number) => (
+          <div
+            key={theatre?._id || index} // Fallback to index if _id is missing
+            className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer"
+            onClick={() => handleTheatreSelection(theatre._id)}
+          >
+            <span className="w-full h-40 px-4 py-2 object-cover bg-yellow-200 text-red-500 rounded-md mb-4">
+              {theatre.screens.screenType}
+             
+              
+            </span>
+            <h3 className="text-lg mt-4 font-bold text-gray-700 mb-2">{theatre.name}</h3>
+            <p className="text-sm text-gray-600">
+              {theatre.address.place}, {theatre.address.city}
+            </p>
+            <p className="text-sm text-gray-600">
+              Distance: {(theatre.distance / 1000).toFixed(1)} km
+            </p>
+            <p className="mt-4 text-sm text-gray-500">
+              <strong>Screen:</strong> {theatre.screens.screenName} - {theatre.screens.screenType}
+            </p>
+            <p className="text-sm text-gray-500">
+              <strong>Total Seats:</strong> {theatre.screens.totalSeats}
+            </p>
+          </div>
+        ))}
+      </div>
+      
+          )}
+      <div className="flex justify-center space-x-4 my-4">
+        <button
+          onClick={() => setBrowseMode("movies")}
+          className={`px-4 py-2 w-fit min-h-12 mb-4 rounded ${browseMode === "movies" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+        >
+          Browse by Movies
+        </button>
+        <button
+          onClick={() => setBrowseMode("theatres")}
+          className={`px-4 py-2 w-fit min-h-12 mb-4rounded ${browseMode === "theatres" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+        >
+          Browse by Theatres
+        </button>
+      </div>
+    
         {/* Footer */}
         <Footer />
       </div>
@@ -425,7 +531,7 @@ export default HomePage;
 //   const fetchLocationSuggestions = async (query) => {
 //     try {
 //       const response = await axios.get(
-//         `https://api.opencagedata.com/geocode/v1/json?q=${query}&key=${geoApiKey}`
+//         `https://Linkpi.opencagedata.com/geocode/v1/json?q=${query}&key=${geoApiKey}`
 //       );
 //       const data = response.data.results.map((item) => item.formatted);
 //       setSuggestions(data);
@@ -472,7 +578,7 @@ export default HomePage;
 //   const fetchLocationFromCoords = async (lat, lon) => {
 //     try {
 //       const response = await axios.get(
-//         `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lon}&key=${geoApiKey}`
+//         `https://Linkpi.opencagedata.com/geocode/v1/json?q=${lat}+${lon}&key=${geoApiKey}`
 //       );
 //       const locationName = response.data.results[0].formatted;
 //       setUserLocation(locationName); // Set user's current location
@@ -489,7 +595,7 @@ export default HomePage;
 //   const fetchMoviesForLocation = async (location) => {
 //     try {
 //       const response = await axios.get(
-//         `https://api.themoviedb.org/3/movie/now_playing?api_key=${tmdbApiKey}&language=en-US&page=1&region=IN` // Adjust region as necessary
+//         `https://Linkpi.themoviedb.org/3/movie/now_playing?api_key=${tmdbApiKey}&language=en-US&page=1&region=IN` // Adjust region as necessary
 //       );
 //       setMovies(response.data.results); // Set movie data
 //     } catch (error) {
@@ -594,11 +700,11 @@ export default HomePage;
       <h1 className="text-xl">Movie Ticket Booking</h1>
     </div>
     <div className="col-span-4 flex justify-end space-x-4">
-      <a href="/" className="hover:bg-amber-400 py-2 px-4 rounded">Home</a>
-      <a href="#" className="hover:bg-gray-700 py-2 px-4 rounded">Profile</a>
-      <a href="#" className="hover:bg-gray-700 py-2 px-4 rounded">Your Orders</a>
-      <a href="#" className="hover:bg-gray-700 py-2 px-4 rounded">Favourites</a>
-      <a href="#" className="hover:bg-gray-700 py-2 px-4 rounded">Shows</a>
+      <Link to="/" className="hover:bg-amber-400 py-2 px-4 rounded">Home</Link>
+      <Link to="#" className="hover:bg-gray-700 py-2 px-4 rounded">Profile</Link>
+      <Link to="#" className="hover:bg-gray-700 py-2 px-4 rounded">Your Orders</Link>
+      <Link to="#" className="hover:bg-gray-700 py-2 px-4 rounded">Favourites</Link>
+      <Link to="#" className="hover:bg-gray-700 py-2 px-4 rounded">Shows</Link>
     </div>
   </div>
 </header>

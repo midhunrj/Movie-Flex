@@ -17,8 +17,8 @@ export class Movie {
       public runtime: number,  
       public backdrop_path: string,  
       public poster_path: string,  
-      public cast: string[],  
-      public crew: Record<string, string>,   
+      public cast: Array<{ name: string; character: string; image: string }>, 
+      public crew: Array<{ name: string; job: string; image: string }>,          
       public createdAt: Date ,
       public is_blocked:Boolean 
      ) {}

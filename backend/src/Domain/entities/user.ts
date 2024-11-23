@@ -9,4 +9,8 @@ export interface User{
     wallet?:string;
     
 }
+export interface UserCoordinates{
+    latitude?:number,
+    longitude?:number
+}
 export type GoogleLoginUser = Omit<User, 'password' | 'mobile'> & { uid: string };

@@ -137,7 +137,7 @@ const LoginForm:React.FC = () => {
             <span onClick={getSignup} className="text-pretty text-opacity-80 text-white cursor-pointer">New user?Signup</span>
 
             {/* <span>signin using google</span>
-            <a href></a> */}
+            <Link to></a> */}
             <GoogleLogin/>
         </form>
         </div>

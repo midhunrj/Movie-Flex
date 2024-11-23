@@ -10,15 +10,22 @@ import {
   //resenOtp,
   resendOtp,
   fetchMovies,
+  fetchTheatres,
   //logout
 } from './userThunk';
 import { MovieType } from '@/types/movieTypes';
+import { Theatre } from '@/types/admintypes';
+import { TheatreLocate } from '@/components/User/home';
 
 interface User {
   name?: string;
   email?: string;
   mobile?: string;
   is_verified?: boolean;
+}
+interface Coordinates{
+  latitude?:number;
+  longitude?:number;
 }
 interface UserState {
   user: User | null;
@@ -27,8 +34,11 @@ interface UserState {
   isSuccess: boolean;
   isLoading: boolean;
   message: string;
-  nowShowingMovies: MovieType[];
+  nowShowingMovies: MovieType[]
   upcomingMovies: MovieType[];
+  userCoordinates?:Coordinates
+  theatres:TheatreLocate[]
+  userCurrentLocation?:string|null
 }
 // let user = null;
 
@@ -45,6 +55,9 @@ const loginUser=(localStorage.getItem('user'))
 const user:User|null=loginUser?JSON.parse(loginUser):null
 console.log(user,"SLICEEEEEEEE");
 
+
+const releasedMovies=localStorage.getItem('nowShowingMovies')
+const runningMovies:MovieType[]|null=releasedMovies?JSON.parse(releasedMovies):null
 const accessToken=localStorage.getItem('accessToken')
 const initialState:UserState = {
     user:user?user:null,
@@ -53,8 +66,11 @@ const initialState:UserState = {
     isSuccess:false,
     isLoading:false,
     message:'',
-    nowShowingMovies:[],
-    upcomingMovies:[]
+    nowShowingMovies:runningMovies?runningMovies:[],
+    upcomingMovies:[],
+    userCoordinates:{},
+    theatres:[],
+    userCurrentLocation:null
 };
 
 
@@ -89,6 +105,16 @@ const userSlice = createSlice({
     },
     setNowShowingMovies: (state, action: PayloadAction<{ runningMovies: any[] }>) => {
       state.nowShowingMovies = action.payload.runningMovies;
+    },
+    setUserCoordinates: (state, action: PayloadAction<Coordinates>) => {
+      console.log(action,"action payload");
+      
+      state.userCoordinates = action.payload;
+      console.log(state.userCoordinates,"state usercoordinates");
+      
+    },
+    setUserLocation(state, action: PayloadAction<string>) {
+      state.userCurrentLocation = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -267,11 +293,28 @@ const userSlice = createSlice({
         state.isSuccess = false;
         state.isError = true;
         state.message = action.payload || "Failed to load movies";
+      })
+      .addCase(fetchTheatres.pending, (state) => {
+        state.isLoading=true;
+        state.isSuccess=false;
+        state.isError=false;
+        
+      })
+      .addCase(fetchTheatres.fulfilled, (state, action) => {
+        
+        state.isLoading=false;
+        state.isSuccess=true;
+        state.isError=false;
+        state.theatres = action.payload.theatres;
+      })
+      .addCase(fetchTheatres.rejected, (state, action) => {
+        state.isLoading=true;
+        state.isSuccess=false;
+        state.isError=false;
       });
-      
       
   },
 });
 
-export const { logout, clearState,setUpcomingMovies,setNowShowingMovies } = userSlice.actions;
+export const { logout, clearState,setUpcomingMovies,setNowShowingMovies,setUserCoordinates,setUserLocation } = userSlice.actions;
 export default userSlice.reducer;

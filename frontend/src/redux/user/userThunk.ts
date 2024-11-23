@@ -9,7 +9,8 @@ import {
   verifyNewPassword,
   resendOtpAgain,
   getUpcomingMovies,
-  getNowShowingMovies
+  getNowShowingMovies,
+  fetchTheatreData
 } from './userService';
 
 // Define types for user payloads
@@ -131,3 +132,15 @@ export const fetchMovies = createAsyncThunk<
     return thunkAPI.rejectWithValue(error.message || 'Fetching movies failed');
   }
 });
+
+export const fetchTheatres = createAsyncThunk(
+  "user/fetchTheatres",
+  async ({ latitude, longitude }: { latitude: number | null; longitude: number | null }, { rejectWithValue }) => {
+    try {
+      const theatres = await fetchTheatreData(latitude, longitude);
+      return theatres;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);

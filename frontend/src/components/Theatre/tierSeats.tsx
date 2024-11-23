@@ -10,10 +10,10 @@ import { saveTierData } from '../../redux/theatre/theatreThunk';
 import TierConfigModal from './configModal';
 import { useLastIdentifier } from '../../utils/context/identifierContext';
 import { AppDispatch, RootState } from '@/redux/store/store';
-interface TierConfig {
+export interface TierConfig {
     startLetter: string;
     order: string;
-    manualLabels: string[];
+    manualLabels?: string[];
   }
   
   interface Seat {
@@ -22,6 +22,7 @@ interface TierConfig {
     isFilled?: boolean;
     isPartition?: boolean;
     label?: string;
+    className?:string
   }
   
   interface Tier {
@@ -227,7 +228,7 @@ useEffect(()=>{
 const openConfigModal = () => setIsConfigModalOpen(true);
     const closeConfigModal = () => setIsConfigModalOpen(false);
 
-const Seat = React.memo(({ row, col, isFilled, isPartition }:Seat) => {
+const Seat = React.memo(({ row, col, isFilled, isPartition,className }:Seat) => {
     const [, drop] = useDrop({
         accept: ItemTypes.COUCH,
         drop: () => {
@@ -319,7 +320,8 @@ const Seat = React.memo(({ row, col, isFilled, isPartition }:Seat) => {
         className={`
             cursor-pointer flex items-center justify-center 
             bg-transparent border border-yellow-500 
-            ${couchOccupied[`${row}-${col}`] ? 'bg-indigo-950' : ''} 
+            ${couchOccupied[`${row}-${col}`] ? 'bg-indigo-950' : ''}
+            ${className} 
             md:w-8 md:h-8 sm:w-6 sm:h-6  lg:w-12 lg:h-12  // Adjust seat size based on viewport
             `}  
         onClick={() => handleSeatClick(row, col)}
@@ -527,6 +529,9 @@ const Seat = React.memo(({ row, col, isFilled, isPartition }:Seat) => {
                                         col={colIndex}
                                         isFilled={seat.isFilled}
                                         isPartition={seat.isPartition}
+                                        className={` ${
+                                            seat.isFilled ? 'bg-gray-200' : ''
+                                          }`} 
                                     />
                                 ))}
                             </div>

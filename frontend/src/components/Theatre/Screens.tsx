@@ -15,7 +15,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { AddScreen } from '../../redux/theatre/theatreThunk';
-// import EnrollMovieModal from './enrollMovieModal';
+
 import { AppDispatch, RootState } from '@/redux/store/store';
 import { MovieType } from '@/types/movieTypes';
 import { EnrolledMovie, Showtime } from '@/types/theatreTypes';
@@ -126,7 +126,7 @@ const ScreensForm = () => {
   const [manualTime, setManualTime] = useState(''); // State for manual time input
  // const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
 
-  // Handle form submit to add new screen
+
   const validateFields = ():Record<string,string> => {
     let validationErrors:Record<string,string> = {};
 
@@ -190,7 +190,7 @@ const ScreenFormData={
 }
     dispatch(AddScreen(ScreenFormData))
     setScreens([...screens, screenData]);
-    
+  navigate('/theatre/screens')    
     resetForm()
   };
 
@@ -320,40 +320,41 @@ const closeModalMovie = () => {
 // };
 return (
   <>
-    <Modal show={isModalOpen} onClose={closeModal} size="md" aria-hidden="true">
-      <Modal.Header className="bg-gray-100 text-center rounded-t-lg">
-        Select Showtime
-      </Modal.Header>
+   <Modal show={isModalOpen} onClose={closeModal} size="lg" aria-hidden="true">
+  {/* Modal Header */}
+  <Modal.Header className="bg-gray-100 text-center rounded-t-lg">
+    Select Showtime
+  </Modal.Header>
 
-      <Modal.Body className="p-6 flex flex-col items-center">
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <StaticTimePicker
-            displayStaticWrapperAs="mobile"
-            orientation="landscape"
-            value={timeValue}
-            onChange={(newValue) => {
-              if (newValue) {
-                setTimeValue(newValue);
-              }
-            }}
-          />
-        </LocalizationProvider>
-        <TextField
-          value={timeValue ? timeValue.format('HH:mm') : ''}
-          InputProps={{ readOnly: true }}
-          className="mt-4 p-2 border border-gray-300 rounded-lg text-center"
-        />
-      </Modal.Body>
+  {/* Modal Body */}
+  <Modal.Body className="p-6 flex flex-col items-center space-y-6 scrollbar-hide">
+    {/* Time Picker */}
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <StaticTimePicker
+        displayStaticWrapperAs="mobile"
+        orientation="landscape"
+        value={timeValue}
+        onChange={(newValue) => {
+          if (newValue) {
+            setTimeValue(newValue);
+          }
+        }}
+        onAccept={() => {
+          handleAddShowtime(); // Add selected time
+          closeModal(); // Close modal on OK
+        }}
+        onClose={closeModal} // Close modal on Cancel
+      />
+    </LocalizationProvider>
 
-      <Modal.Footer className="flex bg-gray-100 rounded-b-lg justify-center">
-        <button
-          onClick={handleAddShowtime}
-          className="bg-green-500 min-h-8 text-white p-2 rounded-lg"
-        >
-          Confirm
-        </button>
-      </Modal.Footer>
-    </Modal>
+    {/* Display Selected Time */}
+    {timeValue && (
+      <div className="w-full text-center text-lg font-semibold text-gray-700">
+        Selected Time: {timeValue.format('HH:mm')}
+      </div>
+    )}
+  </Modal.Body>
+</Modal>
 
     <TheatreHeader />
 

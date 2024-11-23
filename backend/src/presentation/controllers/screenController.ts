@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { ScreenUseCase } from '../../application/usecases/screens';
 import { NextFunction } from 'express-serve-static-core';
 import { log } from 'node:console';
+import { UserCoordinates } from '../../Domain/entities/user';
 
 export class ScreenController {
   constructor(
@@ -104,12 +105,12 @@ export class ScreenController {
       console.log(req.query,"query values");
       console.log(req.body,"body");
       
-      const {showData}  = req.body
+      const {showtimeData}  = req.body
       
       
       
       //const tierId=tierData._id
-      const showTimeData = await this.screenUseCase.addMoviesToShow(showData)
+      const showTimeData = await this.screenUseCase.addMoviesToShow(showtimeData)
       
       
       res.status(200).json({message:'movie has been added to the show',showData:showTimeData});
@@ -118,5 +119,43 @@ export class ScreenController {
       res.status(500).json({ message: "failed to add movies to screen "});
     }
   }
+  async removeShowtime(req: Request, res: Response): Promise<void> {
+    try {
+      console.log(req.query,"query values");
+      console.log(req.body,"body");
+      
+      const {showtimeId,screenId}  = req.query
+      
+      
+      
+      //const tierId=tierData._id
+      const screenData = await this.screenUseCase.removeShowFromScreen(showtimeId as string,screenId as string)
+      
+      
+      res.status(200).json({message:'show has been removed from the screen',screenData});
+      
+    } catch (error) {
+      res.status(500).json({ message: "failed to remove showtime "});
+    }
+  }
 
+  async fetchUserTheatres(req:Request,res:Response,next:NextFunction){
+    try {
+        const { latitude, longitude } = req.query;
+    
+        if (!latitude || !longitude) {
+          return res.status(400).json({ error: 'Latitude and Longitude are required' });
+        }
+        const userCoords: UserCoordinates = {
+            latitude: parseFloat(req.query.latitude as string),
+            longitude: parseFloat(req.query.longitude as string),
+          };
+        const theatres = await this.screenUseCase.getTheatresWithScreens(userCoords)
+    
+        return res.status(200).json({ theatres });
+      } catch (error) {
+        console.error('Error in getting theatres with screens:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
+    }
 }

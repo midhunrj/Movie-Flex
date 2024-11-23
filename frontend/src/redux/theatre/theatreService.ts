@@ -46,7 +46,7 @@ interface TierDataParams {
 }
 
 interface ShowData {
-  showData: any; // Adjust type based on your show data
+  showtimeData: any; // Adjust type based on your show data
 }
 
 export const registerUser = async ({ name, email, mobile, password, file }: RegisterUserParams) => {
@@ -251,7 +251,10 @@ export const RollingMoviesData = async () => {
 
 export const updateScreenData = async (screenData: ScreenDatas) => {
   try {
+    console.log(screenData,"in service update")
+    
     const response = await theatreAuthenticate.put('/update-screen', { screenData });
+    console.log(response,"response")
     return response.data;
   }catch (error: unknown) {
     console.error("Error in service", error);
@@ -262,11 +265,34 @@ export const updateScreenData = async (screenData: ScreenDatas) => {
       throw new Error("An unknown error occurred");
     }
   }
-};
+}
 
-export const moviesRollinShowtime = async ({ showData }: ShowData) => {
+export const moviesRollinShowtime = async (showtimeData : any) => {
   try {
-    const response = await theatreAuthenticate.post('/shows-rollin-movies', { showData });
+    console.log(showtimeData,"showdata in service");
+    
+    const response = await theatreAuthenticate.post('/shows-rollin-movies', { showtimeData });
+    return response.data;
+  }catch (error: unknown) {
+    console.error("Error in service", error);
+    if (axios.isAxiosError(error) && error.response) {
+      const message = error.response?.data?.message || error.response?.data?.error || "Something went wrong";
+      throw new Error(message);
+    } else {
+      throw new Error("An unknown error occurred");
+    }
+  }
+}
+
+export const removeShow = async (screenId:string,showtimeId:string) => {
+  try {
+    
+    
+    const response = await theatreAuthenticate.delete('/remove-shows', {
+      params: {
+        screenId,
+        showtimeId,
+      },});
     return response.data;
   }catch (error: unknown) {
     console.error("Error in service", error);

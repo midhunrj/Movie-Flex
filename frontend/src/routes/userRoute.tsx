@@ -13,6 +13,10 @@ import UserProtected from "./protected/userProtected";
 import UserProfile from "../components/User/Profile";
 import FullMoviesList from "../components/User/filterMovies";
 import MovieDetails from "../components/User/movieDetails";
+import DateShows from "@/components/User/dateShows";
+import TheatreBooking from "@/components/User/theatreBooking";
+import TheatreShows from "@/components/User/theatreShows";
+
 
 export const UserRoute = () => {
   return (
@@ -28,6 +32,9 @@ export const UserRoute = () => {
             <Route path="/profile" element={<UserProtected><UserProfile/></UserProtected>}/>
             <Route path="/now-showing" element={<FullMoviesList movieType="now-showing" />} />
             <Route path="/movies/:id" element={<MovieDetails />} />
+            <Route path='/date-shows' element={<DateShows/>}/>
+            <Route path='/seat-booking' element={<TheatreBooking/>}/>
+            <Route path='/theatre-shows' element={<TheatreShows/>}/>
 
       <Route
         path="/upcoming-movies"

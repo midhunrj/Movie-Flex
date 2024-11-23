@@ -14,7 +14,8 @@ import {
   StoreTierData,
   RollingMoviesData,
   updateScreenData,
-  moviesRollinShowtime
+  moviesRollinShowtime,
+  removeShow
 } from './theatreService';
 
 // Types for input and output data
@@ -228,11 +229,26 @@ any, // Type of the argument (adjust as necessary)
 { rejectValue: string } // Type of the value used with rejectWithValue
 >(
   'theatre/moviesToShowtime',
-  async (showData: any, thunkAPI) => {
+  async (showtimeData: any, thunkAPI) => {
     try {
-      return await moviesRollinShowtime(showData);
+      console.log(showtimeData,"showdata in thunk");
+      
+      return await moviesRollinShowtime(showtimeData);
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message || "adding movie to showtime has failed");
+    }
+  }
+);
+
+export const removeShowtime = createAsyncThunk <{ message: string; screenData: any }, // Type of the resolved value (success case)
+{ screenId: string; showtimeId: string }, // Type of the argument passed to the thunk
+{ rejectValue: string } >(
+  'screen/removeShowtime',
+  async ({ screenId, showtimeId }: { screenId: string; showtimeId: string }, { rejectWithValue }) => {
+    try {
+      return await removeShow(screenId, showtimeId);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Failed to remove showtime');
     }
   }
 );

@@ -73,8 +73,9 @@ const EnrolledMovies: React.FC<EnrolledMoviesProps> = ({
         totalSeats: screen?.totalSeats,
         seatLayout: seatLayoutByTier,
       };
-
-      dispatch(saveMoviesToShowtime(showtimeData)).unwrap();
+     console.log(showtimeData,'showData in component');
+     
+      dispatch(saveMoviesToShowtime(showtimeData));
       console.log('Showtime added successfully');
       toggleModal();
     }

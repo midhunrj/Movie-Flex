@@ -13,7 +13,7 @@ import { format, set } from 'date-fns'
 import ScreenLayout from './screenLayout';
 // import EnrollMovieModal from './enrollMovieModal';
 import EnrolledMovies from './enrolledMovies';
-import { updateScreen } from '../../redux/theatre/theatreThunk';
+import { removeShowtime, updateScreen } from '../../redux/theatre/theatreThunk';
 import { toast } from 'react-toastify';
 import { AppDispatch, RootState } from '@/redux/store/store';
 import { EnrolledMovie } from '@/types/theatreTypes';
@@ -42,6 +42,7 @@ interface Speaker {
 }
 
 interface ShowTime {
+  _id?:string,
   time: string;
   movieId?: string;
 }
@@ -225,12 +226,15 @@ const EditScreen = () => {
   };
   
   
-  const handleRemoveShowtime = (index:number) => {
+  const handleRemoveShowtime = (showtimeId:string,index:number) => {
+    if (screen?._id&&screen.showtimes.length>0) {
+      dispatch(removeShowtime({ screenId: screen._id, showtimeId }));
+    }
     setScreenData({
       ...screenData,
       showtimes: screenData?.showtimes?.filter((_, i) => i !== index),
-    });
-  };
+    })
+  }
   
   const handleConfigSeat = (tier:Tier) => {
     console.log(tier, "a tier data before sending");
@@ -256,7 +260,7 @@ const EditScreen = () => {
       ...prev,
       speakers: updatedSpeakers,
     }));
-  };
+  }
 
   const [selectedShowtimeIndex, setSelectedShowtimeIndex] = useState<number|null>(null)
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -298,40 +302,42 @@ const EditScreen = () => {
   </h1>
   </div>
       
-  <Modal show={isModalOpen} onClose={closeModal} size="md" aria-hidden="true">
-      <Modal.Header className="bg-gray-100 text-center rounded-t-lg">
-        Select Showtime
-      </Modal.Header>
+  <Modal show={isModalOpen} onClose={closeModal} size="lg" aria-hidden="true">
+  {/* Modal Header */}
+  <Modal.Header className="bg-gray-100 text-center rounded-t-lg">
+    Select Showtime
+  </Modal.Header>
 
-      <Modal.Body className="p-6 flex flex-col items-center">
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <StaticTimePicker
-            displayStaticWrapperAs="mobile"
-            orientation="landscape"
-            value={timeValue}
-            onChange={(newValue) => {
-              if (newValue) {
-                setTimeValue(newValue);
-              }
-            }}
-          />
-        </LocalizationProvider>
-        <TextField
-          value={timeValue ? timeValue.format('HH:mm') : ''}
-          InputProps={{ readOnly: true }}
-          className="mt-4 p-2 border border-gray-300 rounded-lg text-center"
-        />
-      </Modal.Body>
+  {/* Modal Body */}
+  <Modal.Body className="p-6 flex flex-col items-center space-y-6 scrollbar-hide">
+    {/* Time Picker */}
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <StaticTimePicker
+        displayStaticWrapperAs="mobile"
+        orientation="landscape"
+        value={timeValue}
+        onChange={(newValue) => {
+          if (newValue) {
+            setTimeValue(newValue);
+          }
+        }}
+        onAccept={() => {
+          handleAddShowtime(); // Add selected time
+          closeModal(); // Close modal on OK
+        }}
+        onClose={closeModal} // Close modal on Cancel
+      />
+    </LocalizationProvider>
 
-      <Modal.Footer className="flex bg-gray-100 rounded-b-lg justify-center">
-        <button
-          onClick={handleAddShowtime}
-          className="bg-green-500 min-h-8 text-white p-2 rounded-lg"
-        >
-          Confirm
-        </button>
-      </Modal.Footer>
-    </Modal>          {/* Form for adding screen configuration */}
+    {/* Display Selected Time */}
+    {timeValue && (
+      <div className="w-full text-center text-lg font-semibold text-gray-700">
+        Selected Time: {timeValue.format('HH:mm')}
+      </div>
+    )}
+  </Modal.Body>
+</Modal>
+         {/* Form for adding screen configuration */}
           <form className="mx-4 space-y-4 mt-4" onSubmit={handleSubmit} encType='multipart/form-data'>
             <div className='flex justify-between gap-12'>
               <div className='flex-1 flex items-center gap-4'>
@@ -390,15 +396,15 @@ const EditScreen = () => {
                             onClick={() => {
                                 openModalMovie(index)
                             }}
-                            className="text-white  w-fit px-4 py-2 min-h-8 mt-2 bg-blue-500 hover:text-indigo-700  hover:bg-amber-400 ml-2"
+                            className={`hover:scale-105 transition w-fit px-4 py-2 min-h-8 mt-2 hover:text-blue-950  hover:bg-yellow-400 ml-2 ${showtime.movieId?  `text-slate-900 bg-yellow-200`:`bg-lime-600 text-white`}`}
                         >
-                            {showtime.movieId ? 'Edit Movie' : 'Add Movie'}
+                            {showtime.movieId ? 'Movie added' : 'Add Movie'}
                         </button>
 
         <button
           type="button"
-          onClick={() => handleRemoveShowtime(index)}
-          className="text-white mt-2 px-4 py-2 min-h-8 bg-red-600 hover:text-zinc-400 ml-2"
+          onClick={() => handleRemoveShowtime(showtime._id??'',index)}
+          className="transition text-slate-100 mt-2 px-4 py-2 min-h-8 bg-red-600 bg-opacity-100  hover:text-white hover:bg-[#FF0000] ml-2 hover:scale-105"
         >
           Remove
         </button>
@@ -551,7 +557,7 @@ default:return null
     <>
     <TheatreHeader/>
     
-    <div className="bg-orange-300 min-h-screen flex flex-col">
+    <div className="bg-[#FEE685] min-h-screen flex flex-col">
   {/* Sticky Tabs */}
   <div className="tabs sticky top-0 z-10 bg-neutral-700 shadow-lg mt-2">
     <div className="flex justify-around p-2">

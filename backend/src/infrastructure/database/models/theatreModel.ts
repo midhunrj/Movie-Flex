@@ -21,7 +21,7 @@ const addressSchema = new Schema({
     type: { type: String, required: true, default: 'Point' },
     coordinates: { type: [Number], required: true },
   });
-
+  locationSchema.index({ coordinates: '2dsphere' });
 const theatreSchema=new Schema<Theatre>({
     name:{type:String,required:true},
     email:{type:String,required:true,unique:true,trim:true},
@@ -36,7 +36,7 @@ const theatreSchema=new Schema<Theatre>({
     //wallet:{type:mongoose.Schema.Types.ObjectId,ref:'wallet'},
 },{timestamps:true
 })
-
+// theatreSchema.index({ location: '2dsphere' });
 
 
 

@@ -14,12 +14,12 @@ export const AdminRoute = () => {
   return (
     <Routes>
       <Route path="/" element={<AdminLoginForm />} />
-      {/* <Route path="/home" element={<AdminProtected><HomePage/></AdminProtected>}/>
+      <Route path="/home" element={<AdminProtected><HomePage/></AdminProtected>}/>
             <Route path="/users" element={<AdminProtected><UserList/></AdminProtected>}/>
             <Route path="/theatre" element={<AdminProtected><TheatreList/></AdminProtected>}/>
             <Route path="/movies" element={<AdminProtected><MovieList/></AdminProtected>}/>
             <Route path="/running-movies" element={<AdminProtected><RunningMovies/></AdminProtected>}/>
-             */}
+            
     </Routes>
   );
 };

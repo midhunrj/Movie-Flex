@@ -61,4 +61,5 @@ theatreRoute.post('/update-tier',authHandler.theatreLogin.bind(authHandler),(req
 theatreRoute.post('/add-movies-screen',authHandler.theatreLogin.bind(authHandler),(req,res)=>screenController.addMoviesToScreen(req,res))
 theatreRoute.put('/update-screen',authHandler.theatreLogin.bind(authHandler),(req,res)=>screenController.updateScreen(req,res))
 theatreRoute.post('/shows-rollin-movies',authHandler.theatreLogin.bind(authHandler),(req,res)=>screenController.addMoviesToShowtime(req,res))
+theatreRoute.delete('/remove-shows',authHandler.theatreLogin.bind(authHandler),(req,res)=>screenController.removeShowtime(req,res))
 export default theatreRoute

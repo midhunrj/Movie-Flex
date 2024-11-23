@@ -16,7 +16,8 @@ import {
   fetchMovies,
   saveTierData,
   updateScreen,
-  saveMoviesToShowtime
+  saveMoviesToShowtime,
+  removeShowtime
   
 } from './theatreThunk';
 import { toast } from 'react-toastify';
@@ -459,6 +460,33 @@ const theatreSlice = createSlice({
         state.message = action.payload||"an error occured";
         toast.error(state.message)
       })
+      .addCase(removeShowtime.pending, (state) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+        state.isError = false;
+        state.message = '';
+      })
+      .addCase(removeShowtime.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.message = action.payload.message || 'Showtime removed successfully';
+
+        const updatedScreen = action.payload.screenData;
+
+        // Update the screens state with the updated screen data
+        state.screens = state.screens.map((screen) =>
+          screen._id === updatedScreen._id ? updatedScreen : screen
+        );
+
+        toast.success(state.message);
+      })
+      .addCase(removeShowtime.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.message = action.payload || 'An error occurred';
+        toast.error(state.message);
+      });
   },
 });
 

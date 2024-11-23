@@ -53,13 +53,14 @@ interface EnrolledMovie {
 }
 
 interface Showtime {
+  _id?:string
   movieId: string;
   time: string;
 }
 
 export interface Screen {
   id?: string; 
-  theatreId: string;
+  theatreId: Types.ObjectId;
   screenName: string;
   screenType: string;
   speakers: Speaker[];

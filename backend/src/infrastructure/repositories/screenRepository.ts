@@ -1,6 +1,8 @@
 import { EnrolledMovie, ScreenModel } from "../database/models/screenModel";
 import { Screen } from '../../Domain/entities/screens';
 import { iScreenRepository } from "../../application/repositories/iScreenRepository";
+import { UserCoordinates } from "../../Domain/entities/user";
+import { theatreModel } from "../database/models/theatreModel";
 
 export class ScreenRepository implements iScreenRepository{
   async create(screen: Screen): Promise<Screen> {
@@ -81,6 +83,58 @@ async enrollMovieData(screenId:string,movie:any):Promise<Screen|null>
  }
  async RollinMoviesToShow(screenId: string, movieId: string, showtime: string): Promise<Screen | null> {
      
-  return await ScreenModel.findOneAndUpdate({_id:screenId,"showtimes.time":showtime},{$push:{"showtimes.$.movieId":movieId}})
+  return await ScreenModel.findOneAndUpdate({_id:screenId,"showtimes.time":showtime},{"showtimes.$.movieId":movieId},{new:true})
  }
+ async getShowtime(showtimeId: string, screenId: string): Promise<string> {
+     const screen= await ScreenModel.findById(screenId)
+
+    let show=screen?.showtimes.find((show)=>show._id==showtimeId)
+    return show?.time??''
+ }
+
+ async removeShowFromScreen(showtimeId: string, screenId: string): Promise<Screen | null> {
+  const updatedScreen = await ScreenModel.findByIdAndUpdate(
+    screenId,
+    {
+      $pull: { showtimes: { _id: showtimeId } },
+    },
+    { new: true }
+  );
+
+  return updatedScreen;
+ }
+
+ async fetchTheatresWithScreens(userCoords: UserCoordinates) {
+  const { longitude, latitude } = userCoords;
+
+  if (longitude === undefined || latitude === undefined) {
+    throw new Error('Longitude and Latitude must be defined');
+  }
+
+  const theatres = await theatreModel.aggregate([
+    {
+      $geoNear: {
+        near: { type: 'Point', coordinates: [longitude, latitude] },
+        distanceField: 'distance',
+        maxDistance: 25000, // Maximum distance in meters
+        spherical: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'screens',
+        localField: '_id',
+        foreignField: 'theatreId',
+        as: 'screens',
+      },
+    },
+    { $unwind: '$screens' },
+  ]);
+
+
+  console.log(theatres,"theatre s");
+  
+  return theatres;
 }
+ }
+

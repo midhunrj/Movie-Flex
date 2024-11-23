@@ -1,6 +1,8 @@
 import {NextFunction, Request,Response} from 'express'
 import { UserUseCases } from '../../application/usecases/user'
 import { log } from 'node:console';
+import { UserCoordinates } from '../../Domain/entities/user';
+import { Types } from 'mongoose';
 
 export class UserController{
     constructor(private userUseCases:UserUseCases){}
@@ -276,4 +278,47 @@ async nowShowingMovies(req:Request,res:Response,next:NextFunction){
             res.status(500).json({message:'failed to load now Showing movies'})
     }
 }
+
+async listShowtimes(req:Request,res:Response,next:NextFunction){
+    const { movieId, date,userCoords } = req.query;
+  try {
+    console.log(req.query,"jhjjk");
+    const userCoords: UserCoordinates = {
+        latitude: parseFloat(req.query.latitude as string),
+        longitude: parseFloat(req.query.longitude as string),
+      };
+    const objectIdMovieId = new Types.ObjectId(movieId as string);
+
+    const showtimes = await this.userUseCases.getShowtimes(objectIdMovieId, date as string,userCoords as UserCoordinates);
+    console.log(showtimes,"showtimes");
+    
+    res.status(200).json({message:"available showtimes for movie in this region",showtimes});
+  } catch (error:any) {
+    console.log(error,"error");
+    
+    res.status(500).json({ error: 'Error fetching showtimes' });
+  }
+}
+async listTheatreShowtimes(req:Request,res:Response,next:NextFunction){
+    const { theatreId,date } = req.query;
+  try {
+    console.log(req.query,"jhjjk");
+    // const userCoords: UserCoordinates = {
+    //     latitude: parseFloat(req.query.latitude as string),
+    //     longitude: parseFloat(req.query.longitude as string),
+    //   };
+    //const objectIdMovieId = new Types.ObjectId(movieId as string);
+
+    const showtimes = await this.userUseCases.getTheatreShowtimes(theatreId as string,date as string);
+    console.log(showtimes,"showtimes");
+    
+    res.status(200).json({message:"available showtimes for movie in this region",showtimes});
+  } catch (error:any) {
+    console.log(error,"error");
+    
+    res.status(500).json({ error: 'Error fetching showtimes' });
+  }
+}
+
+
 }

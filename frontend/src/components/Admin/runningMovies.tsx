@@ -88,7 +88,7 @@ const RunningMovies = () => {
           <h1 className="text-blue-500 font-bold text-wrap">Running Movies</h1>
         </div>
         <div className='flex justify-end '>
-          <a href='/admin/movies' className='bg-lime-500 rounded text-sm p-2  text-slate-100 hover:bg-green-700 hover:text-white hover:text-md transition-all  border-collapse '>Add Movie</a>
+          <Link to='/admin/movies' className='bg-lime-500 rounded text-sm p-2  text-slate-100 hover:bg-green-700 hover:text-white hover:text-md transition-all  border-collapse '>Add Movie</Link>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">

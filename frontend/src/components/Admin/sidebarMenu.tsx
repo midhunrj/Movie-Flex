@@ -40,6 +40,8 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { logout } from '../../redux/admin/adminSlice';
 import { Link } from 'react-router-dom';
+import { FaHome, FaUsers, FaTheaterMasks, FaFilm } from 'react-icons/fa'
+import { FiLogOut } from 'react-icons/fi';
 type SidebarMenuProps = {
   children: ReactNode
 };
@@ -53,36 +55,49 @@ const SidebarMenu:React.FC<SidebarMenuProps> = ({ children }) => {
     navigate('/admin');
   };
 
+  const isActive = (path: string) => location.pathname === path;
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <div className="w-1/4 bg-gradient-to-r from-slate-500 to-slate-900 text-white flex flex-col justify-between p-6">
+      <div className="w-1/5 bg-gradient-to-r  from-slate-900 to-indigo-800 text-white flex flex-col justify-between p-6">
         <div>
           <h1 className="text-2xl font-bold mb-8 text-center">Admin Panel</h1>
           <div className="space-y-6">
-            <Link
+          <Link
               to="/admin/home"
-              className="block px-4 py-2 rounded-lg transition duration-200 hover:bg-blue-600 focus:bg-blue-800"
+              className={` px-4 py-2 rounded-lg transition duration-200 flex items-center space-x-2 ${
+                isActive('/admin/home') ? 'bg-yellow-500 text-blue-950' : 'hover:bg-yellow-400 hover:text-blue-950'
+              }`}
             >
-              Dashboard
+              <FaHome className="text-lg" />
+              <span>Dashboard</span>
             </Link>
             <Link
               to="/admin/users"
-              className="block px-4 py-2 rounded-lg transition duration-200 hover:bg-blue-600 focus:bg-blue-800"
+              className={` px-4 py-2 rounded-lg transition duration-200 flex items-center space-x-2 ${
+                isActive('/admin/users') ? 'bg-yellow-500 text-blue-950' : 'hover:bg-yellow-400 hover:text-blue-950'
+              }`}
             >
-              Users
+              <FaUsers className="text-lg" />
+              <span>Users</span>
             </Link>
             <Link
               to="/admin/theatre"
-              className="block px-4 py-2 rounded-lg transition duration-200 hover:bg-blue-600 focus:bg-blue-800"
+              className={` px-4 py-2 rounded-lg transition duration-200 flex items-center space-x-2 ${
+                isActive('/admin/theatre') ? 'bg-yellow-500 text-blue-950' : 'hover:bg-yellow-400 hover:text-blue-950'
+              }`}
             >
-              Theatres
+              <FaTheaterMasks className="text-lg" />
+              <span>Theatres</span>
             </Link>
             <Link
               to="/admin/running-movies"
-              className="block px-4 py-2 rounded-lg transition duration-200 hover:bg-blue-600 focus:bg-blue-800"
+              className={` px-4 py-2 rounded-lg transition duration-200 flex items-center space-x-2 ${
+                isActive('/admin/running-movies')||isActive('/admin/movies') ? 'bg-yellow-500 text-blue-950' : 'hover:bg-yellow-400 hover:text-blue-950'
+              }`}
             >
-              Movie Management
+              <FaFilm className="text-lg" />
+              <span>Movie Management</span>
             </Link>
           </div>
         </div>
@@ -90,14 +105,14 @@ const SidebarMenu:React.FC<SidebarMenuProps> = ({ children }) => {
         {/* Logout Button */}
         <button
           onClick={handleLogout}
-          className="w-full px-4 py-2 min-h-8 bg-red-500 rounded-lg hover:bg-red-600 transition duration-200"
+          className=" block w-full px-4 py-2 min-h-8 bg-red-500 rounded-lg hover:bg-red-600 transition duration-200"
         >
-          Logout
-        </button>
+           
+           <span>Logout</span>        </button>
       </div>
 
       {/* Main Content */}
-      <div className="w-3/4 bg-gray-100 p-8 overflow-y-auto">
+      <div className="w-4/5 bg-gray-100 p-8 overflow-y-auto">
         {children}
       </div>
     </div>

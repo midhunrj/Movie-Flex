@@ -17,7 +17,7 @@ const TheatreHeader = () => {
         navigate('/theatre')
     }
   return (
-    <header className="bg-blue-950 text-white">
+    <header className="bg-[#091057] text-white">
           <div className="flex justify-between items-center p-4">
          
             <div className="flex items-center">

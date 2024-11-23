@@ -84,6 +84,8 @@ theatreAuthenticate.interceptors.request.use(
 // Response Interceptor for handling token expiration
 theatreAuthenticate.interceptors.response.use(
     (response) => {
+        console.log(response,"response got");
+        
         return response;
     },
     async (error) => {

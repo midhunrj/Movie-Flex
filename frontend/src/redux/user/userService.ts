@@ -150,6 +150,7 @@ export const resendOtpAgain = async () => {
 export const getUpcomingMovies=async()=>{
     try{
         const response=await userAuthenticate.get('/fetchUpcomingMovies')
+        localStorage.setItem("upcomingMovies", response.data);
         return response.data
     }
     catch(error)
@@ -168,6 +169,10 @@ export const getUpcomingMovies=async()=>{
 export const getNowShowingMovies=async()=>{
     try{
         const response=await userAuthenticate.get('/fetchNowShowingMovies')
+        localStorage.setItem("nowShowingMovies", JSON.stringify(response.data.runningMovies));
+        console.log(response.data,"console in now showing movies in return from backend");
+        console.log(response.data.runningMovies,"runningMovies these are the ");
+        
         return response.data
     }
     catch(error)
@@ -175,14 +180,24 @@ export const getNowShowingMovies=async()=>{
         console.log(error,"error in service");
         
        throw error
-    // if (error.response && error.response.data) {
-    //     throw new Error(error.response.data.message || error.response.data.error || "Failed to fetch now showing movies");
-    //   } else {
-    //     throw new Error("Something went wrong while fetching now showing movies");
-    //   }
+    
     }
 }
 
+export const fetchTheatreData = async (latitude: number | null, longitude: number | null) => {
+    try{
+        const response = await userAuthenticate.get("/theatres", {
+      params: { latitude, longitude },
+    });
+    return response.data;
+}
+catch(error)
+    {
+        console.log(error,"error in service");
+        
+       throw error
+  };
+}
 // const handleAxiosError = (error) => {
 //     if (error.response && error.response.data) {
 //         if (error.response.data.error) {

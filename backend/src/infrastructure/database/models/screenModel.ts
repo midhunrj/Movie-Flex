@@ -17,7 +17,7 @@ export interface EnrolledMovie {
 }
 
 export interface Screen extends Document {
-  theatreId: string;
+  theatreId: Types.ObjectId;
   screenName: string;
   screenType: string;
   speakers: {
@@ -35,7 +35,9 @@ export interface Screen extends Document {
     seatLayout:[]; 
   }[];
   enrolledMovies: EnrolledMovie[]; 
-  showtimes: { movieId: string; time: string; }[]
+  showtimes: {
+    _id: string; movieId: string; time: string; 
+}[]
 }
 
 
@@ -78,7 +80,7 @@ const enrolledMovieSchema = new Schema({
 
 
 const screenSchema = new Schema<Screen>({
-  theatreId: { type: String, ref: 'Theatre', required: true },
+  theatreId: { type: Schema.Types.ObjectId, ref: 'Theatre', required: true },
   screenName: { type: String, required: true },
   screenType: { type: String, required: true }, 
   speakers: [speakerSchema], 

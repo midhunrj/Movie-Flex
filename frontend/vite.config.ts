@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
@@ -9,7 +10,8 @@ export default defineConfig({
       '@redux': '/src/redux',
       '@services': '/src/services',
       '@utils': '/src/utils',
-      '@routes': '/src/routes'
+      '@routes': '/src/routes',
+      '@': path.resolve(__dirname, './src')
     }
   },
   server:{

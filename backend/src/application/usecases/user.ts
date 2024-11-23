@@ -1,12 +1,15 @@
 import { IuserRepository } from "../repositories/Iuserrepository";
-import { User } from "../../Domain/entities/user";
+import { User, UserCoordinates } from "../../Domain/entities/user";
  import { MailService } from "../../infrastructure/services/mailService";
  import { OtpService } from "../../infrastructure/services/otpService";
  import { HashService } from "../../infrastructure/services/hashService";
 import { JWTService } from "../../infrastructure/services/jwtService";
 import { Movie } from "../../Domain/entities/movies";
+import { IShowtime } from "../../infrastructure/database/models/showModel";
+import { iShowRepository } from "../repositories/iShowRepository";
+import { Types } from "mongoose";
 export class UserUseCases{
-    constructor(private userRepository:IuserRepository,private hashservice:HashService,private otpservice:OtpService,private mailService:MailService,private jwtService:JWTService,private verifyToken:string="",private verifyMail:string="", ){}
+    constructor(private userRepository:IuserRepository,private showRepository:iShowRepository,private hashservice:HashService,private otpservice:OtpService,private mailService:MailService,private jwtService:JWTService,private verifyToken:string="",private verifyMail:string="", ){}
 async register(user:User):Promise<String>
 {
     console.log(user.password,"before hash");
@@ -204,6 +207,18 @@ async updateProfile(userId: string | undefined, profileData: any): Promise<User 
     
       async nowShowingMoviesCount(filters: any): Promise<number> {
         return await this.userRepository.getRollingNowCount(filters);
+      }
+
+      async getShowtimes(movieId:Types.ObjectId,date:string,userCoords:UserCoordinates):Promise<IShowtime[]>
+      {
+        console.log(userCoords,"usercoordinates in usecase");
+        
+        return await this.showRepository.listShowtimes(movieId,date,userCoords)
+      }
+
+      async getTheatreShowtimes(theatreId:string,date:string):Promise<IShowtime[]>
+      {
+        return await this.showRepository.listTheatreShowtimes(theatreId,date)
       }
 }
 
