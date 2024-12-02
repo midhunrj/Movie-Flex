@@ -8,6 +8,7 @@ import { Tier } from '@/types/theatreTypes';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store/store';
 import { MovieType } from '@/types/movieTypes';
+import { FaAngleLeft } from 'react-icons/fa';
 
 interface IShowtime {
     movieId:string
@@ -26,7 +27,7 @@ const DateShows: React.FC = () => {
   });
  console.log(movieId,"movieID",typeof(movieId));
  
-  // State for dates, selected date, and showtimes
+  
   const [dates] = useState<string[]>(generateDates());
   const [selectedDate, setSelectedDate] = useState<string>(dates[0]);
   const [showtimes, setShowtimes] = useState<IShowtime[]>([]);
@@ -167,6 +168,7 @@ const DateShows: React.FC = () => {
       state: {
         movieId,
         movieName:movieDetails?.title,
+        showtimeId:show._id,
       theatreId: show.theatreId._id,
       theatreName: show.theatreId.name,
       screenId: show.screenId,
@@ -182,8 +184,13 @@ const DateShows: React.FC = () => {
   return (
     <div className="p-4">
       {/* Date Tabs */}
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-3xl font-bold text-slate-950">{movieDetails?.title}{' - '}{languageMap[movieDetails?.language??"N/A"]}</h3>
+      <div className="absolute top-5 left-4 z-50">
+        <button className="bg-opacity-40 min-h-8 text-opacity-100 text-slate-800 w-fit hover:text-black hover:bg-transparent rounded-md" onClick={() => navigate(-1)}>
+          <FaAngleLeft size={30} />
+        </button>
+      </div>
+      <div className="flex justify-between items-center mb-4 ml-12">
+        <h3 className="text-3xl font-bold text-slate-950 ">{movieDetails?.title}{' - '}{movieDetails?.language??"N/A"}</h3>
       
       </div>
 
@@ -242,7 +249,7 @@ const DateShows: React.FC = () => {
        
       <div className="mb-6 flex space-x-4">
         <span className='px-4 py-2 text-lg font-medium text-slate-950  shadow-lg border-collapse border-gray-600 w-fit bg-white rounded-sm'>
-            {languageMap[movieDetails?.language??"N/A"]  } {movieView!='3D'?'2D':'3D'}
+            {movieDetails?.language??"N/A"} {movieView!='3D'?'2D':'3D'}
         </span>
       <label className="text-slate-950 font-medium mt-3">Price: ₹{priceRange}</label>
 

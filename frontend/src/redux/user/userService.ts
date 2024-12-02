@@ -1,6 +1,7 @@
 import axios, { Axios } from 'axios';
 import  axiosUrl  from '../../utils/axios/baseUrl';
 import { userAuthenticate } from '../../utils/axios/userInterceptor';
+import { FavouritePayload } from './userThunk';
 
 const API_BASE_URL = "http://localhost:7486";
 
@@ -198,6 +199,49 @@ catch(error)
        throw error
   };
 }
+export const movieInWishList = async ({userId,movieId}:FavouritePayload) => {
+    try{
+        const response = await userAuthenticate.put("/add-favourite", {userId,movieId});
+    return response.data;
+}
+catch(error)
+    {
+        console.log(error,"error in service");
+        
+       throw error
+  };
+}
+
+export const removeMovieFromWishlist = async ({userId,movieId}:FavouritePayload) => {
+    try{
+        const response = await userAuthenticate.put('/remove-favourite', {
+            userId,movieId
+    });
+    return response.data;
+}
+catch(error)
+    {
+        console.log(error,"error in service");
+        
+       throw error
+  };
+}
+
+export const favouritesUserMovies = async (userId: string) => {
+    try{
+        const response = await userAuthenticate.get("/favourites", {
+      params: { userId },
+    });
+    return response.data;
+}
+catch(error)
+    {
+        console.log(error,"error in service");
+        
+       throw error
+  };
+}
+
 // const handleAxiosError = (error) => {
 //     if (error.response && error.response.data) {
 //         if (error.response.data.error) {

@@ -91,7 +91,7 @@ const handleCitySelection = async(city:string) => {
   setIsOpen(false);
 };
 
-const fetchCityCoordinates = async (city:string) => {
+const fetchCityCoordinates = async (city: string) => {
   const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(city)}.json?access_token=${MAPBOX_ACCESS_TOKEN}&limit=1`;
   try {
     const response = await fetch(url);
@@ -99,13 +99,16 @@ const fetchCityCoordinates = async (city:string) => {
     if (data.features && data.features.length > 0) {
       const [longitude, latitude] = data.features[0].center;
       
-      // Dispatch the coordinates to Redux state
       dispatch(setUserCoordinates({ latitude, longitude }));
+      console.log(`Coordinates for ${city}:`, { latitude, longitude });
+    } else {
+      console.error(`No coordinates found for ${city}`);
     }
   } catch (error) {
     console.error('Error fetching city coordinates:', error);
   }
 };
+
 
 // const handleSearchCityChange = async (e) => {
 //   const query = e.target.value;
@@ -130,6 +133,13 @@ const handleTheatreSelection = (theatreId: string) => {
   setSelectedTheatre(theatreId);
   navigate('/theatre-Shows', { state: { theatreId } });
 };
+
+useEffect(() => {
+  if (userCurrentLocation) {
+    console.log(`Location updated: ${userCurrentLocation}`);
+  }
+}, [userCurrentLocation]);
+
 const handleSearchCityChange = async (e:ChangeEvent<HTMLInputElement>) => {
   const query = e.target.value;
   setcitySearchQuery(query);
@@ -194,32 +204,31 @@ const bannerImages = [
   "banner img 2.jpeg",
   "banner img.jpeg",
 ];
-const getUserLocation = () => {
+const getUserLocation = async () => {
   if (navigator.geolocation) {
-    setIsLoadingLocation(true); // Set loading to true when fetching starts
-
+    setIsLoadingLocation(true);
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
         dispatch(setUserCoordinates({ latitude, longitude }));
-        dispatch(fetchTheatres({latitude,longitude}))
+        dispatch(fetchTheatres({ latitude, longitude }));
+
         const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_ACCESS_TOKEN}&types=place&limit=1`;
-            
         try {
           const response = await fetch(url);
           const data = await response.json();
           if (data.features && data.features.length > 0) {
             const userLocation = data.features[0].place_name;
-            setCurrentLocation(userLocation); 
-            dispatch(setUserLocation(userLocation))
-            setIsLoadingLocation(false); 
+            setCurrentLocation(userLocation);
+            dispatch(setUserLocation(userLocation));
           } else {
+            console.error("Unable to fetch user location details.");
             setCurrentLocation("Location not found");
-            setIsLoadingLocation(false);
           }
         } catch (error) {
           console.error("Error fetching current location:", error);
           setCurrentLocation("Unable to retrieve location");
+        } finally {
           setIsLoadingLocation(false);
         }
       },
@@ -230,6 +239,7 @@ const getUserLocation = () => {
       }
     );
   } else {
+    console.error("Geolocation is not supported by this browser.");
     setCurrentLocation("Geolocation not supported");
   }
 };

@@ -10,7 +10,9 @@ import { theatreModel } from "../database/models/theatreModel";
 export class ShowRepository implements iShowRepository {
   async createShowtimes(showData: any): Promise<void> {
     const { movieId, theatreId, screenId, showtime, startDate, totalSeats, endDate, seatLayout } = showData;
-
+    
+    console.log(seatLayout[0].rows[0].seats,"seatLyout in showtime creation");
+    
     const start = new Date(startDate);
     const end = new Date(endDate);
 
@@ -25,9 +27,29 @@ export class ShowRepository implements iShowRepository {
         totalSeats,
         seatLayout,
       });
+
+      //console.log(showtimeDocs[0].seatLayout[0].rows[0].seats,"showtimeDocs");
+      
       showtimeDocs.push(newShowtime);
     }
+     console.log(endDate,"endDate",end)
+     const screenData = await ScreenModel.findOne({ _id: screenId });
 
+
+     if (screenData) {
+      
+      screenData.showtimes.forEach((show) => {
+          if (show.time === showtime) {
+            if (!show.expiryDate) {
+              
+              show.expiryDate = endDate;
+                } 
+             }
+      });
+
+      
+      await screenData.save();
+  }
     await showModel.insertMany(showtimeDocs);
   }
 
@@ -135,7 +157,8 @@ export class ShowRepository implements iShowRepository {
     const radiusInKm = 25;
     const earthRadiusInKm = 6378.1;
     const radiusInRadians = radiusInKm / earthRadiusInKm;
-  
+          console.log(userCoords,"user coordinat");
+          
     // Find nearby theatres
     const nearbyTheatres = await theatreModel
       .find({
@@ -146,8 +169,10 @@ export class ShowRepository implements iShowRepository {
         },
       })
       .select('_id name address location')
-      .lean();
+      .lean()
   
+      console.log(nearbyTheatres,"hghgfghfgffhgf");
+      
     const nearbyTheatreIds = nearbyTheatres.map((theatre) => theatre._id);
   
     // Query for showtimes
@@ -160,7 +185,8 @@ export class ShowRepository implements iShowRepository {
       .populate<{ screenId: Screen }>('screenId', 'screenName screenType tiers')
       .populate('theatreId', 'name address location')
       .lean();
-  
+    console.log(showtimes,"showtimes of date");
+    
     
     const filteredShowtimes = showtimes.filter((show) => {
       if (date === today) {
@@ -222,6 +248,38 @@ export class ShowRepository implements iShowRepository {
     return filteredShowtimes;
     
    }
+
+   async getSeatlayout( showtimeId: string): Promise<TierData[]|null> {
+    const showtime=await showModel.findById(showtimeId)
+    if(showtime)
+    {
+    return showtime.seatLayout
+    
+    }
+    return null
+}
+
+async resetSeatValues(showtimeId: Types.ObjectId,selectedSeats:string[]): Promise<IShowtime> {
+
+  const showtime = await showModel.findById(showtimeId);
+  if(showtime)
+  {
+  showtime.seatLayout.forEach((tier) => {
+    tier.rows.forEach((row) => {
+      row.seats.forEach((seat) => {
+        if (selectedSeats.includes(seat.seatLabel!)) {
+          
+          seat.isReserved=false
+           // Assuming the booking confirms directly
+        }
+      });
+    });
+  });
+
+  await showtime?.save()
+  }
+  return showtime!
+}
 }
  
   // Function to calculate total number of seats in a screen

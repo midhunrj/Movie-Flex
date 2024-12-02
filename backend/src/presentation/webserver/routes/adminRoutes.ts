@@ -11,6 +11,7 @@ import { MailService } from '../../../infrastructure/services/mailService'
 import { MovieController } from '../../controllers/movieController'
 import { ManageMovies } from '../../../application/usecases/movies'
 import { MongoMovieRepository } from '../../../infrastructure/repositories/movieRepository'
+import { FavoriteRepository } from '../../../infrastructure/repositories/favouriteRepository'
 
 
 const adminRoute=Router()
@@ -29,7 +30,8 @@ const authHandler=new AuthHandler(jwtService,userRepository,adminRepository,thea
 const adminCase=new AdminUseCase(adminRepository,hashService,jwtService,mailService)
 const adminController=new AdminController(adminCase)
 const movieRepo=new MongoMovieRepository()
-const manageMovies=new ManageMovies(movieRepo)
+const favouriteRepository=new FavoriteRepository()
+const manageMovies=new ManageMovies(movieRepo,favouriteRepository)
 const movieController=new MovieController(manageMovies)
 
 adminRoute.post('/login', (req, res) => adminController.login(req, res));

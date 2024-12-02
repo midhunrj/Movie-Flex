@@ -44,8 +44,8 @@ const MovieSchema: Schema = new Schema({
   runtime: { type: Number, required: true },      
   backdrop_path: { type: String, required: true },    
   poster_path: { type: String, required: true },      
-  cast: [{ type: String, required: true }],           
-  crew: { type: Map, of: String, required: true },       
+  cast: Array<{ name: string; character: string; image: string }>, 
+  crew: Array<{ name: string; job: string; image: string }>,      
   createdAt: { type: Date, default: Date.now } ,
   is_blocked:{type:Boolean,default:false}         
 });
@@ -68,8 +68,8 @@ export interface IMovie extends Document {
   runtime: number;        
   backdrop_path: string;  
   poster_path: string;    
-  cast: string[];         
-  crew:Record<string, string>        
+  cast: Array<{ name: string; character: string; image: string }>, 
+  crew: Array<{ name: string; job: string; image: string }>,       
   createdAt: Date; 
   is_blocked:Boolean;       
 }

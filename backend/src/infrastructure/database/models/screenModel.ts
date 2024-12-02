@@ -11,7 +11,7 @@ export interface EnrolledMovie {
   backdrop_path: string;  
   poster_path: string; 
   startDate?: Date; 
-  cast: string[];  
+  cast: Array<{ name: string; character: string; image: string }>,   
   endDate?: Date;    
   valid?: boolean;   
 }
@@ -36,7 +36,7 @@ export interface Screen extends Document {
   }[];
   enrolledMovies: EnrolledMovie[]; 
   showtimes: {
-    _id: string; movieId: string; time: string; 
+    _id: string; movieId: string; time: string;expiryDate?:Date; 
 }[]
 }
 
@@ -66,18 +66,11 @@ const enrolledMovieSchema = new Schema({
   rating: { type: Number, required: true },
   poster_path:{type:String,required:true},
   backdrop_path:{type:String,required:true},
-  cast: [{ type: String, required: true }],  
+  cast: Array<{ name: string; character: string; image: string }>,  
   startDate: { type: Date, required: false }, 
   endDate: { type: Date, required: false },   
   valid: { type: Boolean, default: true }     
 });
-
-
-// const moviePlayingSchema = new Schema({
-//   movieId: { type: Schema.Types.ObjectId, ref: 'Movie', required: true },
-//   showtimes: [{ type: String, required: true }] // e.g., ['10:00 AM', '2:00 PM']
-// });
-
 
 const screenSchema = new Schema<Screen>({
   theatreId: { type: Schema.Types.ObjectId, ref: 'Theatre', required: true },
@@ -88,7 +81,7 @@ const screenSchema = new Schema<Screen>({
   tiers: [tierSchema], 
   enrolledMovies: [enrolledMovieSchema],
   showtimes: [
-    { movieId: { type: String, ref: 'Movie' }, time: { type: String, required: true } }
+    { movieId: { type: String, ref: 'Movie' }, time: { type: String, required: true },expiryDate:{type:Date} }
   ] 
 });
 

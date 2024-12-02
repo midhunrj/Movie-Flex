@@ -38,8 +38,8 @@ const Header = () => {
             <Link to="/profile" className={` px-4 py-2 rounded ${
                 isActive('/profile') ? 'bg-yellow-500 text-blue-950' : 'hover:bg-gray-700 hover:text-white'
               }`}>Profile</Link>
-            <Link to="#" className="hover:bg-gray-700 px-4 py-2 rounded">Your Orders</Link>
-            <Link to="#" className="hover:bg-gray-700 px-4 py-2 rounded">Favourites</Link>
+            <Link to="/orders" className="hover:bg-gray-700 px-4 py-2 rounded">Your Orders</Link>
+            <Link to="/favourites" className="hover:bg-gray-700 px-4 py-2 rounded">Favourites</Link>
             <Link to="#" className="hover:bg-gray-700 px-4 py-2 rounded">Shows</Link>
           </div>
 

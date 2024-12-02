@@ -5,9 +5,9 @@ const Footer = () => {
   return (
     <footer className="bg-[#091057] text-[#DCE4C9] py-8">
       <div className="mx-4 px-8">
-        {/* Top Section */}
+      
         <div className="flex justify-between flex-wrap">
-          {/* Movies by Category */}
+          
           <div className="w-full md:w-1/4 mb-6">
             <h4 className="text-lg font-bold mb-4 text-white">Movies in Cinema</h4>
             <ul className="space-y-2">
@@ -19,7 +19,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Movies by Language */}
+          
           <div className="w-full md:w-1/4 mb-6">
             <h4 className="text-lg font-bold mb-4 ">Movies by Language</h4>
             <ul className="space-y-2">
@@ -31,7 +31,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Movies by Genre */}
+          
           <div className="w-full md:w-1/4 mb-6">
             <h4 className="text-lg font-bold mb-4 ">Movies by Genre</h4>
             <ul className="space-y-2">
@@ -43,7 +43,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Movies by Location */}
+          
           <div className="w-full md:w-1/4 mb-6">
             <h4 className="text-lg font-bold mb-4 ">Movies in Location</h4>
             <ul className="space-y-2">

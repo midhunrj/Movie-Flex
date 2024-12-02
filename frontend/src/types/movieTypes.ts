@@ -18,8 +18,8 @@ export interface MovieType {
        runtime: number,  
        backdrop_path: string,  
        poster_path: string,  
-       cast: string[],  
-       crew: Record<string, string>,   
+       cast: Array<{ name: string; character: string; image: string }>, 
+       crew: Array<{ name: string; job: string; image: string }>,  
        createdAt: Date ,
        is_blocked:boolean ,
        vote_average:Float32Array
@@ -64,7 +64,7 @@ export interface MovieType {
     backdrop_path: string;  
     poster_path: string; 
     startDate?: Date; 
-    cast: string[];  
+    cast: Array<{ name: string; character: string; image: string }>, 
     endDate?: Date;    
     valid?: boolean;   
   }

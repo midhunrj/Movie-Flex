@@ -16,6 +16,10 @@ import MovieDetails from "../components/User/movieDetails";
 import DateShows from "@/components/User/dateShows";
 import TheatreBooking from "@/components/User/theatreBooking";
 import TheatreShows from "@/components/User/theatreShows";
+import PaymentPage from "@/components/User/paymentPage";
+import BookingOrders from "@/components/User/bookinOrders";
+import FavouriteMovies from "@/components/User/FavouriteList";
+// import PaymentComponent from "@/components/User/confirmation";
 
 
 export const UserRoute = () => {
@@ -35,6 +39,9 @@ export const UserRoute = () => {
             <Route path='/date-shows' element={<DateShows/>}/>
             <Route path='/seat-booking' element={<TheatreBooking/>}/>
             <Route path='/theatre-shows' element={<TheatreShows/>}/>
+            <Route path='/payment-page' element={<PaymentPage/>}/>
+             <Route path='/orders' element={<BookingOrders/>}/> 
+             <Route path='/favourites' element={<FavouriteMovies/>}/>  
 
       <Route
         path="/upcoming-movies"

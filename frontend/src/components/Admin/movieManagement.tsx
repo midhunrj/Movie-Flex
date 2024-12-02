@@ -105,17 +105,53 @@ const handleSortChange=(e:React.ChangeEvent<HTMLSelectElement>)=>{
       console.log(movieDetails,"movies data including every detals");
       
     // Extract specific crew roles (like director, producer, etc.)
-    const director = movieDetails.credits.crew.find((crew:any) => crew.job === 'Director')?.name || 'N/A';
-    const producer = movieDetails.credits.crew.find((crew:any) => crew.job === 'Producer')?.name || 'N/A';
-    const cinematographer = movieDetails.credits.crew.find((crew:any) => crew.job === 'Director of Photography')?.name || 'N/A';
-    const editor = movieDetails.credits.crew.find((crew:any) => crew.job === 'Editor')?.name || 'N/A';
-    const musicComposer = movieDetails.credits.crew.find((crew:any) => crew.job === 'Original Music Composer')?.name || 'N/A';
-      
-    
-    // Extract the trailer video link (if available) or set a fallback
+    // const director = movieDetails.credits.crew.find((crew:any) => crew.job === 'Director')?.name || 'N/A';
+    // const producer = movieDetails.credits.crew.find((crew:any) => crew.job === 'Producer')?.name || 'N/A';
+    // const cinematographer = movieDetails.credits.crew.find((crew:any) => crew.job === 'Director of Photography')?.name || 'N/A';
+    // const editor = movieDetails.credits.crew.find((crew:any) => crew.job === 'Editor')?.name || 'N/A';
+    // const musicComposer = movieDetails.credits.crew.find((crew:any) => crew.job === 'Original Music Composer')?.name || 'N/A';
+     
+    const languageMapping: Record<string, string> = {
+      ta: 'Tamil',
+      ml: 'Malayalam',
+      hi: 'Hindi',
+      te: 'Telugu',
+      en: 'English',
+      ka:'Kannada'
+    };
+
+    const originalLanguage =
+      languageMapping[movieDetails.original_language] || movieDetails.original_language;
+
+    const cast = movieDetails.credits.cast.slice(0, 5).map((actor: any) => ({
+      name: actor.name,
+      character: actor.character,
+      image: actor.profile_path?`https://image.tmdb.org/t/p/w500${actor.profile_path}`:'/uploads/fallback_profile.jpeg', // Include profile image
+    }));
+    const keyCrewJobs = [
+      'Director',
+      'Producer',
+      'Director of Photography',
+      'Editor',
+      'Original Music Composer',
+      'Writer',
+      'Production Designer',
+    ];
+
+    const crew = keyCrewJobs.map((job) => {
+      let tempJob=job
+      if(tempJob==='Original Music Composer')
+      {
+        tempJob='Music director'
+      }
+      const member = movieDetails.credits.crew.find((crew: any) => crew.job === job);
+      return member ? { name: member.name, job:tempJob, image: member.profile_path?`https://image.tmdb.org/t/p/w500${member.profile_path || ''}`:'/uploads/fallback_profile.jpeg' } : null;
+    }).filter((member) => member !== null);
+
+  
     let videoLink = movieDetails.videos.results.find((video:any) => video.type === 'Trailer')?.key || '';
     if (!videoLink) {
-      // If no trailer is found, set a default video link or use a fallback
+    
       videoLink = 'default_trailer_link';  // replace with your default link
     }
 
@@ -123,7 +159,7 @@ const handleSortChange=(e:React.ChangeEvent<HTMLSelectElement>)=>{
       movie_id: movieDetails.id,  // Movie ID from the API
       title: movieDetails.title,  // Movie title
       description:movieDetails?.description,
-      language: movieDetails.original_language,  // Original language of the movie
+      language: originalLanguage,  // Original language of the movie
       overview: movieDetails.overview,  // Movie overview/description
       releaseDate: movieDetails.release_date,  // Release date
       popularity: movieDetails.popularity,  // Movie popularity
@@ -133,14 +169,15 @@ const handleSortChange=(e:React.ChangeEvent<HTMLSelectElement>)=>{
       runtime: movieDetails.runtime,  // Movie runtime in minutes
       backdrop_path: movieDetails.backdrop_path,  // Backdrop image path
       poster_path: movieDetails.poster_path,  // Poster image path
-      cast: movieDetails.credits.cast.slice(0, 5).map((actor:any) => actor.name),  // Top 5 cast members
-      crew: {
-        director,
-        producer,
-        cinematographer,
-        editor,
-        musicComposer
-      },  
+      cast,  // Top 5 cast members
+      // crew: {
+      //   director,
+      //   producer,
+      //   cinematographer,
+      //   editor,
+      //   musicComposer
+      // },  
+      crew,
       vote_average:movieDetails?.vote_average,
       duration:movieDetails?.duration,
       isApproved:true,

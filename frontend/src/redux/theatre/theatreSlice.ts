@@ -446,11 +446,11 @@ const theatreSlice = createSlice({
         state.isSuccess = true;
         //state.user.is_verified = true;
         state.message = action.payload.message||"an error occured";
-        //state.screens=action.payload.screenData
-        // state.screens = state.screens.map(screen => 
-        //   screen._id === action.payload.screenData._id ? action.payload.screenData : screen
-        // );
-      
+        
+        const updatedScreenData=action.payload.screenData;
+      state.screens=state.screens.map((screen)=>(
+       screen._id==updatedScreenData._id?updatedScreenData:screen
+      ))
         toast.success(state.message)
       })
       .addCase(saveMoviesToShowtime.rejected, (state, action) => {

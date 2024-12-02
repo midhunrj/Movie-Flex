@@ -1,7 +1,9 @@
 import { IuserRepository } from "../../application/repositories/Iuserrepository";
 import { Movie } from "../../Domain/entities/movies";
+import { TierData } from "../../Domain/entities/shows";
 import { User } from "../../Domain/entities/user";
 import { IMovie, MovieModel } from "../database/models/movieModel";
+import showModel from "../database/models/showModel";
 import { userModel } from "../database/models/userModel";
 import moment from "moment";
 export class UserRepository implements IuserRepository {

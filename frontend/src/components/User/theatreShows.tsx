@@ -8,6 +8,7 @@ import { Theatre } from '@/types/admintypes';
 import { ScreenData } from '@/types/theatre';
 import { ScreenDatas, TheatreState, TheatreType } from '@/types/theatreTypes';
 import { MovieType } from '@/types/movieTypes';
+import { FaAngleLeft } from 'react-icons/fa';
 
 interface IShowtime {
   movieId: MovieType;
@@ -77,6 +78,7 @@ const TheatreShows: React.FC = () => {
         date:selectedDate,
         SeatLayout: show.seatLayout,
         totalSeats: show.totalSeats,
+        showtimeId:show._id
       },
     });
   };
@@ -124,7 +126,12 @@ const groupedShowtimes: GroupedShowtimes = showtimes.reduce((acc, show) => {
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-3xl font-bold text-slate-950">
+      <div className="absolute top-5 left-4 z-50">
+        <button className="bg-opacity-40 min-h-8 text-opacity-100 text-gray-600 w-fit hover:text-slate-800 hover:bg-transparent rounded-md" onClick={() => navigate(-1)}>
+          <FaAngleLeft size={30} />
+        </button>
+      </div>
+        <h3 className="text-3xl ml-8 font-bold text-slate-950">
           {showtimes[0]?.theatreId?.name || 'Theatre Shows'}
         </h3>
       </div>

@@ -3,9 +3,10 @@ import { UserUseCases } from '../../application/usecases/user'
 import { log } from 'node:console';
 import { UserCoordinates } from '../../Domain/entities/user';
 import { Types } from 'mongoose';
+import { BookingMovies } from '../../application/usecases/booking';
 
 export class UserController{
-    constructor(private userUseCases:UserUseCases){}
+    constructor(private userUseCases:UserUseCases,private bookingUseCase:BookingMovies){}
 
     async register(req:Request,res:Response)
     {
@@ -320,5 +321,128 @@ async listTheatreShowtimes(req:Request,res:Response,next:NextFunction){
   }
 }
 
+async bookMovieTickets(req:Request,res:Response){
+    
+  try {
+    console.log(req.body,"booking data from frontend")
+    
+    const bookingData = await this.bookingUseCase.createBooking(req.body)
+    console.log(bookingData,"booking data in contorller")
+    
+    res.status(200).json({message:"tickets have been reserved for this seats on this showtime",bookingId:bookingData._id})
+  } catch (error:any) {
+    console.log(error,"error");
+    
+    res.status(500).json({ error: 'Error fetching showtimes' });
+  }
+}
 
+
+
+// async confirmMovieTickets(req:Request,res:Response){
+    
+//     try {
+//       console.log(req.body,"booking data from frontend")
+//       const {bookingId,totalCost}=req.body
+//       const bookingData = await this.bookingUseCase.confirmPayment(bookingId,totalCost)
+//       console.log(bookingData,"booking data in contorller")
+      
+//       res.status(200).json({message:"booking has been confirmed with the payment",bookingData,success:true})
+//     } catch (error:any) {
+//       console.log(error,"error");
+      
+//       res.status(500).json({ error: 'Error fetching showtimes' });
+//     }
+//   }
+  
+  async initiateOrder(req:Request,res:Response){
+    
+    try {
+      console.log(req.body,"booking data from frontend")
+      const {amount,currency,receipt,bookingId}=req.body
+
+      const paymentData = await this.bookingUseCase.createOrder(amount,currency,receipt,bookingId)
+      console.log(paymentData,"payment data in contorller")
+       if(!paymentData)
+       {
+        res.status(403).json({message:"your session has been expired",success:false})
+       }
+       else{
+      res.status(200).json({message:"Razorpay has been initiated with the payment",paymentData,success:true})
+       }
+    } catch (error:any) {
+      console.log(error,"error");
+      
+      res.status(500).json({ error: 'Error having initiating razorpay' });
+    }
+  }
+
+  async verifyPayment(req:Request,res:Response){
+    
+    try {
+      console.log(req.body,"booking data from frontend for confirming payment")
+      const {paymentDetails, bookingId,totalCost } = req.body;
+      const { razorpay_payment_id, razorpay_order_id, razorpay_signature}=paymentDetails;
+      const paymentVerified = this.bookingUseCase.verifyPayment( razorpay_order_id,razorpay_payment_id,razorpay_signature);
+      const bookingData = await this.bookingUseCase.confirmMovieTickets(bookingId,totalCost)
+      console.log(bookingData,"booking data in contorller")
+      
+      console.log(paymentVerified,"payment data in contorller")
+      
+      res.status(200).json({message:"booking has been confirmed with the payment",success:paymentVerified&&bookingData?true:false})
+    } catch (error:any) {
+      console.log(error,"error");
+      
+      res.status(500).json({ error: 'Error in verifying signature in payment verfication' });
+    }
+  }
+
+  async showtimeSeatLayout(req:Request,res:Response){
+    
+    try {
+      console.log(req.body,"booking data from frontend")
+      const {showtimeId}=req.query
+      const seatData = await this.userUseCases.showtimeSeats(showtimeId as string)
+      console.log(seatData,"booking data in contorller")
+      
+      res.status(200).json({message:"seatlayout on this showtime",seatData})
+    } catch (error:any) {
+      console.log(error,"error");
+      
+      res.status(500).json({ error: 'Error fetching showtimes' });
+    }
+  }
+  async bookingOrders(req:Request,res:Response){
+    
+    try {
+      console.log(req.body,"booking data from frontend")
+      const {userId}=req.query
+      const bookingData = await this.bookingUseCase.bookingHistory(userId as string)
+      console.log(bookingData,"booking data for user")
+      
+      res.status(200).json({message:"movie booking history of this user",bookingData})
+    } catch (error:any) {
+      console.log(error,"error");
+      
+      res.status(500).json({ error: 'Error fetching movie booking history' });
+    }
+  }
+
+  async cancelTickets(req:Request,res:Response){
+    
+    try {
+      console.log(req.query,"booking Id from frontend")
+      const {bookingId}=req.query
+      const bookingData = await this.bookingUseCase.cancelMovieTickets(bookingId as string)
+      console.log(bookingData,"booking data in contorller")
+      
+      res.status(200).json({message:"tickets have been reserved for this seats on this showtime",success:bookingData})
+    } catch (error:any) {
+      console.log(error,"error");
+      
+      res.status(500).json({ error: 'Error fetching showtimes' });
+    }
+  }
+  
+  
 }

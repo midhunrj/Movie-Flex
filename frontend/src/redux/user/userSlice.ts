@@ -11,6 +11,9 @@ import {
   resendOtp,
   fetchMovies,
   fetchTheatres,
+  addToFavourites,
+  deleteFromFavourites,
+  getFavouritesMovieByUser,
   //logout
 } from './userThunk';
 import { MovieType } from '@/types/movieTypes';
@@ -18,6 +21,7 @@ import { Theatre } from '@/types/admintypes';
 import { TheatreLocate } from '@/components/User/home';
 
 interface User {
+  _id?:string
   name?: string;
   email?: string;
   mobile?: string;
@@ -106,6 +110,7 @@ const userSlice = createSlice({
     setNowShowingMovies: (state, action: PayloadAction<{ runningMovies: any[] }>) => {
       state.nowShowingMovies = action.payload.runningMovies;
     },
+    
     setUserCoordinates: (state, action: PayloadAction<Coordinates>) => {
       console.log(action,"action payload");
       
@@ -311,8 +316,61 @@ const userSlice = createSlice({
         state.isLoading=true;
         state.isSuccess=false;
         state.isError=false;
-      });
+      })
+      .addCase(addToFavourites.pending, (state) => {
+        state.isLoading=true;
+        state.isSuccess=false;
+        state.isError=false;
+        
+      })
+      .addCase(addToFavourites.fulfilled, (state, action) => {
+        
+        state.isLoading=false;
+        state.isSuccess=true;
+        state.isError=false;
       
+      })
+      .addCase(addToFavourites.rejected, (state, action) => {
+        state.isLoading=true;
+        state.isSuccess=false;
+        state.isError=false;
+      })
+      .addCase(deleteFromFavourites.pending, (state) => {
+        state.isLoading=true;
+        state.isSuccess=false;
+        state.isError=false;
+        
+      })
+      .addCase(deleteFromFavourites.fulfilled, (state, action) => {
+        
+        state.isLoading=false;
+        state.isSuccess=true;
+        state.isError=false;
+        
+      })
+      .addCase(deleteFromFavourites.rejected, (state, action) => {
+        state.isLoading=true;
+        state.isSuccess=false;
+        state.isError=false;
+      })
+      .addCase(getFavouritesMovieByUser.pending, (state) => {
+        state.isLoading=true;
+        state.isSuccess=false;
+        state.isError=false;
+        
+      })
+      .addCase(getFavouritesMovieByUser.fulfilled, (state, action) => {
+        
+        state.isLoading=false;
+        state.isSuccess=true;
+        state.isError=false;
+        
+      })
+      .addCase(getFavouritesMovieByUser.rejected, (state, action) => {
+        state.isLoading=true;
+        state.isSuccess=false;
+        state.isError=false;
+      });
   },
 });
 

@@ -1,8 +1,10 @@
 import { MovieRepository } from "../repositories/iMovieRepository";
 import { Movie } from '../../Domain/entities/movies';
+import { IFavoriteRepository } from "../repositories/iFavouriteRepository";
+import { Favorite } from "../../Domain/entities/favourite";
 
 export class ManageMovies {
-  constructor(private movieRepo: MovieRepository) {}
+  constructor(private movieRepo: MovieRepository,private favouriteRepository:IFavoriteRepository) {}
 
   async createMovie(movie: Movie): Promise<Movie> {
     return await this.movieRepo.createMovie(movie);
@@ -32,4 +34,17 @@ export class ManageMovies {
 //   async getMovies(): Promise<Movie[]> {
 //     return await this.movieRepo.getMovies();
 //   }
+
+
+async addToFavourites(userId: string, movieId: string): Promise<void> {
+  await this.favouriteRepository.addFavorite(userId, movieId);
+}
+
+async removeFromFavourites(userId: string, movieId: string): Promise<void> {
+  await this.favouriteRepository.removeFavorite(userId, movieId);
+}
+
+async getFavouritesByUser(userId: string): Promise<Partial<Favorite>[]> {
+  return await this.favouriteRepository.getFavoritesByUser(userId);
+}
 }

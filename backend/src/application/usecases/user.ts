@@ -8,6 +8,7 @@ import { Movie } from "../../Domain/entities/movies";
 import { IShowtime } from "../../infrastructure/database/models/showModel";
 import { iShowRepository } from "../repositories/iShowRepository";
 import { Types } from "mongoose";
+import { TierData } from "../../Domain/entities/shows";
 export class UserUseCases{
     constructor(private userRepository:IuserRepository,private showRepository:iShowRepository,private hashservice:HashService,private otpservice:OtpService,private mailService:MailService,private jwtService:JWTService,private verifyToken:string="",private verifyMail:string="", ){}
 async register(user:User):Promise<String>
@@ -219,6 +220,11 @@ async updateProfile(userId: string | undefined, profileData: any): Promise<User 
       async getTheatreShowtimes(theatreId:string,date:string):Promise<IShowtime[]>
       {
         return await this.showRepository.listTheatreShowtimes(theatreId,date)
+      }
+
+      async showtimeSeats(showtimeId:string):Promise<TierData[]|null>
+      {
+        return await this.showRepository.getSeatlayout(showtimeId)
       }
 }
 

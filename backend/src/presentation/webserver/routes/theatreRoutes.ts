@@ -20,6 +20,7 @@ import { MongoMovieRepository } from '../../../infrastructure/repositories/movie
 import { ManageMovies } from '../../../application/usecases/movies'
 import { CloudinaryService } from '../../../infrastructure/services/cloudinaryService'
 import { ShowRepository } from '../../../infrastructure/repositories/showRepository'
+import { FavoriteRepository } from '../../../infrastructure/repositories/favouriteRepository'
 
 
 const theatreRoute=Router()
@@ -41,7 +42,8 @@ const cloudinaryService=new CloudinaryService()
 const theatreController=new TheatreController(theatreCase,fileService,cloudinaryService)
 const screenController=new ScreenController(screenuseCase)
 const movieRepo=new MongoMovieRepository()
-const manageMovies=new ManageMovies(movieRepo)
+const favouriteRepository=new FavoriteRepository()
+const manageMovies=new ManageMovies(movieRepo,favouriteRepository)
 const movieController=new MovieController(manageMovies)
 
 const upload = multer({ storage: multer.memoryStorage() });

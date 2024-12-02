@@ -13,6 +13,13 @@ import { ShowRepository } from '../../../infrastructure/repositories/showReposit
 import { ScreenController } from '../../controllers/screenController'
 import { ScreenUseCase } from '../../../application/usecases/screens'
 import { ScreenRepository } from '../../../infrastructure/repositories/screenRepository'
+import { MovieController } from '../../controllers/movieController'
+import { MongoMovieRepository } from '../../../infrastructure/repositories/movieRepository'
+import { FavoriteRepository } from '../../../infrastructure/repositories/favouriteRepository'
+import { ManageMovies } from '../../../application/usecases/movies'
+import { BookingMovies } from '../../../application/usecases/booking'
+import { MovieBookingRepository } from '../../../infrastructure/repositories/BookingRepository'
+import { PaymentRepository } from '../../../infrastructure/repositories/paymentRepository'
 
 
 const userRoute=Router()
@@ -28,10 +35,16 @@ const screenRepository=new ScreenRepository()
 const theatreRepository=new TheatreRepository()
 const authHandler=new AuthHandler(jwtService,userRepository,adminRepository,theatreRepository)
 const userUseCase=new UserUseCases(userRepository,showRepository,hashService,otpService,mailService,jwtService)
-const userController=new UserController(userUseCase)
+const bookingRepository=new MovieBookingRepository()
+const paymentRepository=new PaymentRepository()
+const bookingUseCase=new BookingMovies(bookingRepository,paymentRepository,showRepository)
+const userController=new UserController(userUseCase,bookingUseCase)
 const screenuseCase=new ScreenUseCase(screenRepository,showRepository)
 const screenController=new ScreenController(screenuseCase)
-
+const movieRepo=new MongoMovieRepository()
+const favouriteRepository=new FavoriteRepository()
+const manageMovies=new ManageMovies(movieRepo,favouriteRepository)
+const movieController=new MovieController(manageMovies)
 userRoute.post('/register',(req,res)=>userController.register(req,res))
 userRoute.post('/verify-user',(req,res)=>userController.verifyUser(req,res))
 userRoute.post('/login',(req,res)=>userController.login(req,res))
@@ -45,5 +58,16 @@ userRoute.get('/fetchUpcomingMovies',authHandler.userLogin.bind(authHandler),(re
 userRoute.get('/fetchNowShowingMovies',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.nowShowingMovies(req,res,next))
 userRoute.get('/showtimes',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.listShowtimes(req,res,next)) 
 userRoute.get('/theatres',authHandler.userLogin.bind(authHandler),(req,res,next)=>screenController.fetchUserTheatres(req,res,next)) 
-userRoute.get('/theatre-showtimes',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.listTheatreShowtimes(req,res,next)) 
+userRoute.get('/theatre-showtimes',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.listTheatreShowtimes(req,res,next))
+userRoute.put('/add-favourite',authHandler.userLogin.bind(authHandler),(req,res,next)=>movieController.addFavorite(req,res)) 
+userRoute.put('/remove-favourite',authHandler.userLogin.bind(authHandler),(req,res,next)=>movieController.removeFavorite(req,res)) 
+userRoute.get('/favourites',authHandler.userLogin.bind(authHandler),(req,res,next)=>movieController.getFavorites(req,res)) 
+userRoute.post('/book-tickets',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.bookMovieTickets(req,res))
+//userRoute.post('/confirm-payment',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.confirmMovieTickets(req,res)) 
+userRoute.post('/create-order',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.initiateOrder(req,res))
+userRoute.post('/verify-payment',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.verifyPayment(req,res))
+userRoute.get('/screen-layout',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.showtimeSeatLayout(req,res))
+userRoute.get('/bookings-history',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.bookingOrders(req,res)) 
+userRoute.put('/cancel-booking',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.cancelTickets(req,res)) 
+
 export default userRoute

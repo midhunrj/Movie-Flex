@@ -1,15 +1,18 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { Movie } from '../../../Domain/entities/movies';
+import { Screen } from './screenModel';
 import { Theatre } from '../../../Domain/entities/theatre';
-import { Screen } from '../../../Domain/entities/screens';
 
-interface ISeatInfo {
-  seatLabel: string;
+export interface ISeatInfo {
+  seatLabel?: string;
   row: number;
   col: number;
   status: string;
   userId: mongoose.Types.ObjectId | null;
   isPartition?: boolean;
+  isSelected?:boolean;
+  isBooked?:boolean;
+  isReserved?:boolean;
 }
 
 
@@ -26,7 +29,7 @@ export interface ITier {
 
 export interface IShowtime extends Document {
   movieId: mongoose.Types.ObjectId 
-  theatreId: mongoose.Types.ObjectId 
+  theatreId: mongoose.Types.ObjectId|Theatre 
   showtime: string;
   screenId: mongoose.Types.ObjectId|Screen
   totalSeats: number;
@@ -36,17 +39,20 @@ export interface IShowtime extends Document {
 
 
 const SeatSchema = new Schema<ISeatInfo>({
-  seatLabel: { type: String, required: true },
+  seatLabel: { type: String},
   row: { type: Number, required: true },
   col: { type: Number, required: true },
   status: { type: String },
   userId: { type: Schema.Types.ObjectId, ref: 'User', default: null },
   isPartition: { type: Boolean, default: false },
+  isSelected:{type:Boolean,default:false},
+  isBooked:{type:Boolean,default:false},
+  isReserved:{type:Boolean,default:false}
 });
 
 
 const RowSchema = new Schema<IRow>({
-  seats: { type: [SeatSchema], required: true },
+  seats: { type: [SeatSchema]},
 });
 
 

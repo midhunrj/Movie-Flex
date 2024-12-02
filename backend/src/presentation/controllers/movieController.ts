@@ -71,7 +71,7 @@ async createMovie(req: Request, res: Response) {
     //   new Date(createdAt)
     // );
     const {
-      title, language, overview, releaseDate, popularity, rating, genres,
+      title, language, overview, releaseDate, popularity, rating, genre,
       movie_id, video_link, runtime, backdrop_path, poster_path, cast, crew, createdAt,is_blocked
     } = req.body.movieData;
     
@@ -80,7 +80,7 @@ async createMovie(req: Request, res: Response) {
     const createdDate = createdAt ? new Date(createdAt) : new Date();
        console.log(releaseDate,"release date");
        
-    if (!title || !overview || !releaseDate  || !genres || !poster_path || !movie_id || !language  || !backdrop_path || !cast ) {
+    if (!title || !overview || !releaseDate  || !genre || !poster_path || !movie_id || !language  || !backdrop_path || !cast ) {
        console.log(req.body,"input fields");
         
       return res.status(400).json({ error: 'Missing required fields' });
@@ -92,7 +92,7 @@ async createMovie(req: Request, res: Response) {
       overview,
       releaseDate,
       runtime,
-      genres,
+      genre,
       poster_path,
       false,
       movie_id,
@@ -167,4 +167,45 @@ async blockMovie(req: Request, res: Response) {
   }
 }
 
+async addFavorite(req: Request, res: Response): Promise<void> {
+  try {
+    const { userId, movieId } = req.body;
+    await this.manageMovies.addToFavourites(userId, movieId);
+    res.status(201).json({ message: 'Movie added to favorites successfully' });
+  } catch (error) {
+    console.error("Failed to add movie to favourites", error);
+    res.status(500).json({ message: "Failed to add movie to favourites" });
+  }
 }
+
+async removeFavorite(req: Request, res: Response): Promise<void> {
+  try {
+    const { userId, movieId } = req.body;
+    await this.manageMovies.removeFromFavourites(userId, movieId);
+    res.status(200).json({ message: 'Movie removed from favorites' });
+  } catch (error) {
+    console.error("Failed to delete movies from favourites", error);
+    res.status(500).json({ message: "Failed to delete movies from favourites" });
+  }
+}
+
+async getFavorites(req: Request, res: Response): Promise<void> {
+  try {
+    const { userId } = req.query;
+    console.log("fgfgf",userId);
+    
+    const favorites = await this.manageMovies.getFavouritesByUser(userId as string);
+    console.log(favorites,"return movies of favorites");
+    
+    res.status(200).json(favorites);
+  } catch (error) {
+    console.error("Failed to fetch movie favourites of user", error);
+    res.status(500).json({ message: "Failed to fetch movie favourites of user" });
+  }    
+  }
+
+  
+}
+
+
+

@@ -1,6 +1,4 @@
 import mongoose,{Document,Schema} from 'mongoose'
-
-//import { User } from '../../../Domain/entities/user'
 import { Theatre } from '../../../Domain/entities/theatre'
 
 
@@ -21,7 +19,7 @@ const addressSchema = new Schema({
     type: { type: String, required: true, default: 'Point' },
     coordinates: { type: [Number], required: true },
   });
-  locationSchema.index({ coordinates: '2dsphere' });
+  
 const theatreSchema=new Schema<Theatre>({
     name:{type:String,required:true},
     email:{type:String,required:true,unique:true,trim:true},
@@ -29,7 +27,7 @@ const theatreSchema=new Schema<Theatre>({
     password:{type:String,required:true},
     is_verified:{type:Boolean,default:false},
     is_blocked:{type:Boolean,default:false},
-    is_approved: { type: String, enum: ['Pending', 'Approved', 'Declined'], default: 'Pending' }, // using enum
+    is_approved: { type: String, enum: ['Pending', 'Approved', 'Declined'], default: 'Pending' }, 
     licenseImage:{type:String,required:true},
     address:addressSchema,
     location:locationSchema

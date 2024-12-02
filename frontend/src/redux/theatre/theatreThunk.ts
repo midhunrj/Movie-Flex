@@ -224,7 +224,7 @@ export const updateScreen = createAsyncThunk<{screenData:ScreenDatas,message:str
   }
 );
 
-export const saveMoviesToShowtime = createAsyncThunk<any, // Adjust the return type if needed
+export const saveMoviesToShowtime = createAsyncThunk<{screenData:ScreenDatas,message:string}, // Adjust the return type if needed
 any, // Type of the argument (adjust as necessary)
 { rejectValue: string } // Type of the value used with rejectWithValue
 >(
@@ -238,7 +238,7 @@ any, // Type of the argument (adjust as necessary)
       return thunkAPI.rejectWithValue(error.message || "adding movie to showtime has failed");
     }
   }
-);
+)
 
 export const removeShowtime = createAsyncThunk <{ message: string; screenData: any }, // Type of the resolved value (success case)
 { screenId: string; showtimeId: string }, // Type of the argument passed to the thunk

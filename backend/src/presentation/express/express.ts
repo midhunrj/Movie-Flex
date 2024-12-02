@@ -1,5 +1,6 @@
 import express,{Application} from 'express'
 import cors from 'cors'
+import '../../infrastructure/services/cronJobService'
 import authRoutes from '../webserver/routes/authRoutes'
 import userRoute from '../webserver/routes/userRouter'
 import theatreRoute from '../webserver/routes/theatreRoutes'

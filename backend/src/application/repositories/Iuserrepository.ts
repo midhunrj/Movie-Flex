@@ -1,5 +1,7 @@
+import { promises } from "dns"
 import { Movie } from "../../Domain/entities/movies"
 import { User } from "../../Domain/entities/user"
+import { TierData } from "../../Domain/entities/shows"
 
 export interface IuserRepository{
     findByEmail(email:string):Promise<User|null>
@@ -12,4 +14,6 @@ export interface IuserRepository{
     RollingNow(filters:any,page:number,limit:number):Promise<Movie[]|null>
     getComingSoonCount(filters:any):Promise<number>
     getRollingNowCount(filters:any):Promise<number>
+    
+
 }

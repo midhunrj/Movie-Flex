@@ -9,6 +9,9 @@ export interface SeatInfo {
   status: string;
   userId: Types.ObjectId | null;
   isPartition?: boolean;
+  isSelected?:boolean;
+  isBooked?:boolean;
+  isReserved?:boolean;
 }
 
 

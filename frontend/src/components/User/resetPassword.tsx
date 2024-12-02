@@ -21,7 +21,7 @@ const ResetPassword=()=>{
         {
         navigate('/')
         }
-        // Store token in localStorage or context for further use
+        
     } catch (error:any) {
         console.error("reset password failed:", error.response.data.error);
     }

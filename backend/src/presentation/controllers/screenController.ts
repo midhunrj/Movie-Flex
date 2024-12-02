@@ -112,8 +112,9 @@ export class ScreenController {
       //const tierId=tierData._id
       const showTimeData = await this.screenUseCase.addMoviesToShow(showtimeData)
       
+      console.log(showTimeData,"showdata after movie added to showtime");
       
-      res.status(200).json({message:'movie has been added to the show',showData:showTimeData});
+      res.status(200).json({message:'movie has been added to the show',screenData:showTimeData});
       
     } catch (error) {
       res.status(500).json({ message: "failed to add movies to screen "});
@@ -141,7 +142,7 @@ export class ScreenController {
 
   async fetchUserTheatres(req:Request,res:Response,next:NextFunction){
     try {
-        const { latitude, longitude } = req.query;
+        const { latitude, longitude } = req.query
     
         if (!latitude || !longitude) {
           return res.status(400).json({ error: 'Latitude and Longitude are required' });

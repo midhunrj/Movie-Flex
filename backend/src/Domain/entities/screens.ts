@@ -47,7 +47,7 @@ interface EnrolledMovie {
   backdrop_path: string;  
   poster_path: string; 
   startDate?: Date; 
-  cast: string[];  
+  cast: Array<{ name: string; character: string; image: string }>,   
   endDate?: Date;    
   valid?: boolean;
 }

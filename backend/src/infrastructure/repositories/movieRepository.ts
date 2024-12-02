@@ -126,9 +126,33 @@ export class MongoMovieRepository implements MovieRepository {
       }
     
     async createMovie(movie: Movie): Promise<Movie> {
-      const movieDocument = new MovieModel(movie);
-      const savedMovie = await movieDocument.save();
-      return this.mapToMovie(savedMovie);
+      const existingMovie = await MovieModel.findOne({ movie_id: movie.movie_id });
+
+      if (existingMovie) {
+      
+        existingMovie.rating = movie.rating;
+        existingMovie.cast = movie.cast;
+        existingMovie.crew = movie.crew;
+        existingMovie.popularity = movie.popularity;
+        existingMovie.video_link = movie.video_link;
+        existingMovie.runtime = movie.runtime;
+        existingMovie.backdrop_path = movie.backdrop_path;
+        existingMovie.poster_path = movie.poster_path;
+        existingMovie.posterUrl=movie.posterUrl
+        existingMovie.language=movie.language
+        
+        console.log(existingMovie.language,"existing /n",movie.language,"invader",);
+        
+        
+        const updatedMovie = await existingMovie.save();
+        return this.mapToMovie(updatedMovie);
+      } else {
+        
+        const movieDocument = new MovieModel(movie);
+        const savedMovie = await movieDocument.save();
+        return this.mapToMovie(savedMovie);
+      }
+    
     }
 
     async getMovies(): Promise<Movie[]|null> {

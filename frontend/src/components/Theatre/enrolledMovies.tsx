@@ -49,20 +49,24 @@ const EnrolledMovies: React.FC<EnrolledMoviesProps> = ({
 
   const handleAddMovieToShowtime = async () => {
     if (selectedMovie && selectedShowtime && selectedDate && selectedEndDate) {
-      const seatLayoutByTier = screenData.tiers.map((tier:Tier) => ({
+      const seatLayoutByTier = screenData.tiers.map((tier: Tier) => ({
         tierName: tier.name,
         ticketRate: tier.ticketRate,
-        rows: tier?.seatLayout?.map((rowSeats:Seat[]) =>
-          rowSeats.map((seat:Seat) => ({
+        rows: tier?.seatLayout?.map((rowSeats: Seat[]) => ({
+          seats: rowSeats.map((seat: Seat) => ({
+            
+  
             seatLabel: seat.label,
             row: seat.row,
             col: seat.col,
             status: seat.isPartition ? 'Not available' : 'available',
-            userId: null
-          }))
-        )
+            userId: null,
+            isPartition: seat.isPartition || false,
+            isSelected: false,
+            isBooked: false,
+          })),
+        })),
       }));
-
       const showtimeData = {
         theatreId: theatre?._id,
         movieId: selectedMovie.movieId,

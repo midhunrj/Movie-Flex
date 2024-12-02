@@ -10,7 +10,10 @@ import {
   resendOtpAgain,
   getUpcomingMovies,
   getNowShowingMovies,
-  fetchTheatreData
+  fetchTheatreData,
+  removeMovieFromWishlist,
+  movieInWishList,
+  favouritesUserMovies
 } from './userService';
 
 // Define types for user payloads
@@ -25,7 +28,10 @@ interface LoginPayload {
   email: string;
   password: string;
 }
-
+export interface FavouritePayload{
+  userId:string,
+  movieId:string
+}
 export const register = createAsyncThunk(
   'user/register',
   async ({ name, email, mobile, password }: RegisterPayload, thunkAPI) => {
@@ -133,6 +139,7 @@ export const fetchMovies = createAsyncThunk<
   }
 });
 
+
 export const fetchTheatres = createAsyncThunk(
   "user/fetchTheatres",
   async ({ latitude, longitude }: { latitude: number | null; longitude: number | null }, { rejectWithValue }) => {
@@ -144,3 +151,36 @@ export const fetchTheatres = createAsyncThunk(
     }
   }
 );
+
+export const addToFavourites = createAsyncThunk(
+  'user/addMovieToFavourites',
+  async ({userId,movieId}:FavouritePayload, thunkAPI) => {
+    try {
+      return await movieInWishList({userId,movieId});
+    } catch (error:any) {
+      return thunkAPI.rejectWithValue(error.message||"something went wrong");
+    }
+  }
+)
+
+export const deleteFromFavourites = createAsyncThunk(
+  'user/deleteMovieFromFavourites',
+  async ({userId,movieId}:FavouritePayload, thunkAPI) => {
+    try {
+      return await removeMovieFromWishlist({userId,movieId});
+    } catch (error:any) {
+      return thunkAPI.rejectWithValue(error.message||"something went wrong");
+    }
+  }
+)
+
+export const getFavouritesMovieByUser = createAsyncThunk(
+  'user/getFavourites',
+  async (userId:string, thunkAPI) => {
+    try {
+      return await favouritesUserMovies(userId);
+    } catch (error:any) {
+      return thunkAPI.rejectWithValue(error.message||"something went wrong");
+    }
+  }
+)
