@@ -4,9 +4,12 @@ import { log } from 'node:console';
 import { UserCoordinates } from '../../Domain/entities/user';
 import { Types } from 'mongoose';
 import { BookingMovies } from '../../application/usecases/booking';
+import { Notification } from '../../application/usecases/notification';
+import { socketService } from '../../infrastructure/websocket/socketService';
+import { NotificationType } from '../../Domain/entities/notification';
 
 export class UserController{
-    constructor(private userUseCases:UserUseCases,private bookingUseCase:BookingMovies){}
+    constructor(private userUseCases:UserUseCases,private bookingUseCase:BookingMovies,private notificationUsecase:Notification, ){}
 
     async register(req:Request,res:Response)
     {
@@ -36,27 +39,28 @@ export class UserController{
             console.log(req.body,"jhbjh");
             
             const{email,password}=req.body
-            const user=await this.userUseCases.login(email,password)
-            console.log(user,"ifhih");
+            const userData=await this.userUseCases.login(email,password)
+            console.log(userData,"ifhih")
             
-            if (!user) {
-                return res.status(401).json({ error: "Invalid credentials" });
+            if (!userData) {
+                return res.status(401).json({ message: "Invalid credentials" });
             }
             
-            if (user.user.is_blocked) {
+            if (userData.user.is_blocked) {
                 return res.status(403).json({ message: "Your Account has been blocked" });
             }
             
-                console.log(user,"user");
-
-                const{refreshToken}=user as{refreshToken:string}
+                console.log(userData,"user");
+              const wallet=  await this.userUseCases.walletByUser(userData.user.id!)
+              
+                const{refreshToken}=userData as{refreshToken:string}
                 res.cookie('refreshToken', refreshToken, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV==="production",  // Only send secure cookies in production
                     sameSite: 'strict',
                     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
                 });
-                
+                const user={...userData,wallet}
                 return res.status(200).json(user)
             }
             
@@ -78,7 +82,7 @@ export class UserController{
             const {email}=req.body
             await this.userUseCases.sendOtp(email)
             res.status(200).json({message:"Otp sent successfully"})
-
+           
         }
         catch(error)
         {
@@ -205,19 +209,19 @@ async updateUserProfile(req: Request, res: Response,next:NextFunction): Promise<
         newPassword,
       });
 
-      // If the result is null (user not found or no updates), return a meaningful message
+    
       if (!result) {
         return res.status(404).json({ success: false, message: 'User not found or no updates made' });
       }
 
-      // Return a success response if the profile was updated
+      
       return res.status(200).json({ success: true, message: 'Profile updated successfully', data: result });
     } catch (error) {
-      // Handle errors with a type guard
+      
     if (error instanceof Error) {
         return res.status(400).json({ success: false, message: error.message });
       }
-      // Handle unexpected errors
+      
       return res.status(500).json({ success: false, message: 'An unexpected error occurred' });
     }
     
@@ -226,17 +230,31 @@ async updateUserProfile(req: Request, res: Response,next:NextFunction): Promise<
 
 async upcomingMovies(req:Request,res:Response,next:NextFunction){
     try {
-        const { page = 1, limit = 10, search = '', genre = '', language = '' } = req.query;
+        const { page, limit = 8, search = '', genre = '', language = '',sortBy } = req.query;
 
-        // Filters based on query parameters
+        
         let filters: any = {};
         if (genre) filters.genre = genre;
         if (language) filters.language = language;
-        if (search) filters.title = { $regex: search, $options: "i" }; // Case-insensitive search
+        if (search) filters.title = { $regex: search, $options: "i" }; 
 
-        // Pagination
-        const totalMovies = await this.userUseCases.upcomingMoviesCount(filters); // Get total count for pagination
-        const upcomingMovieData = await this.userUseCases.upcomingMovies(filters, Number(page), Number(limit)); // Fetch data
+        const sortOptions: any = {};
+        switch (sortBy) {
+            case 'rating':
+                sortOptions.rating = -1; 
+                break;
+            case 'popularity':
+                sortOptions.popularity = -1; 
+                break;
+            case 'releaseDate':
+            default:
+                sortOptions.releaseDate = 1; 
+                break;
+        }    
+    
+
+        const totalMovies = await this.userUseCases.upcomingMoviesCount(filters); 
+        const upcomingMovieData = await this.userUseCases.upcomingMovies(filters, Number(page), Number(limit),sortOptions); 
 
         res.status(200).json({
             message: "Here are the upcoming movies",
@@ -254,17 +272,32 @@ async upcomingMovies(req:Request,res:Response,next:NextFunction){
 
 async nowShowingMovies(req:Request,res:Response,next:NextFunction){
     try {
-        const { page = 1, limit = 10, search = '', genre = '', language = '' } = req.query;
-
-        // Filters based on query parameters
+        const { page, limit = 8, searchQuery, genre, language,sortBy } = req.query;
+        console.log(req.query,"req query gfffhg");
+        
+        console.log(sortBy,"sortby from query");
+        
         let filters: any = {};
         if (genre) filters.genre = genre;
         if (language) filters.language = language;
-        if (search) filters.title = { $regex: search, $options: "i" }; // Case-insensitive search
-
-        // Pagination
+        if (searchQuery) filters.title = { $regex: searchQuery, $options: "i" }; 
+        
+        const sortOptions: any = {};
+        switch (sortBy) {
+            case 'rating':
+                sortOptions.rating = -1; 
+                break;
+            case 'popularity':
+                sortOptions.popularity = -1; // Descending order for popularity
+                break;
+            case 'releaseDate':
+            default:
+                sortOptions.releaseDate = -1; // Ascending order for releaseDate
+                break;
+        }
+        
         const totalMovies = await this.userUseCases.nowShowingMoviesCount(filters); // Get total count for pagination
-        const nowShowingMovieData = await this.userUseCases.nowShowingMovies(filters, Number(page), Number(limit)); // Fetch data
+        const nowShowingMovieData = await this.userUseCases.nowShowingMovies(filters, Number(page), Number(limit),sortOptions); // Fetch data
 
         res.status(200).json({
             message: "These are the movies running in cinemas",
@@ -381,15 +414,60 @@ async bookMovieTickets(req:Request,res:Response){
     
     try {
       console.log(req.body,"booking data from frontend for confirming payment")
-      const {paymentDetails, bookingId,totalCost } = req.body;
+      const {paymentMethod,paymentDetails, bookingId,totalPrice,Description } = req.body;
+      
+      if(paymentMethod=="online")
+      {
       const { razorpay_payment_id, razorpay_order_id, razorpay_signature}=paymentDetails;
       const paymentVerified = this.bookingUseCase.verifyPayment( razorpay_order_id,razorpay_payment_id,razorpay_signature);
-      const bookingData = await this.bookingUseCase.confirmMovieTickets(bookingId,totalCost)
-      console.log(bookingData,"booking data in contorller")
-      
       console.log(paymentVerified,"payment data in contorller")
       
-      res.status(200).json({message:"booking has been confirmed with the payment",success:paymentVerified&&bookingData?true:false})
+      }
+      else if(paymentMethod=="wallet")
+      {
+        const userWallet=await this.userUseCases.walletByUser(req.user?.id!)
+        
+        if(userWallet?.balance!<totalPrice)
+        {
+          return res.status(400).json({message:"insufficeint balance in wallet"})
+        }
+        const type='Debit'
+         await this.userUseCases.updateUserWallet(req.user?.id!,-totalPrice,Description,type)
+      }
+      const bookingData = await this.bookingUseCase.confirmMovieTickets(bookingId,totalPrice)
+      console.log(bookingData,"booking data in contorller")
+      const recipients={
+        recipientId:req.user?.id,
+        recipientRole:req.user?.role
+      }
+      const type=NotificationType.BOOKING_CONFIRMATION
+      const title="Booking Confirmed"
+      const message= `Your ticket for ${bookingData.movieId.title} has been booked successfully.`
+      const data= { bookingId: bookingData._id }
+      await this.notificationUsecase.newNotification({
+        recipients,
+        type,
+        title,
+        message,
+        data,
+      });
+  const {userId,theatreId,selectedSeats}=bookingData
+  console.log("booking Data for theatre notification");
+  
+     await this.notificationUsecase.newNotification({
+      recipients:[{recipientId:theatreId,recipientRole:"theatre"}],
+      type,
+      title,
+      message:`the tickets of your screen ${bookingData.screenData.screenName} for the movie ${bookingData.movieId.title} at the showtime ${bookingData.showtime} on ${bookingData.showDate} has been booked successfully by user ${bookingData.userId.name}`,
+      data
+    })
+      socketService.sendNotification(theatreId, 'theatre-owner', 'booking-confirmed', {
+        userId,
+        selectedSeats,
+        bookingId: bookingData._id,
+    });
+      
+      res.status(200).json({message:"booking has been confirmed with the payment",success:true})
     } catch (error:any) {
       console.log(error,"error");
       
@@ -418,7 +496,7 @@ async bookMovieTickets(req:Request,res:Response){
       console.log(req.body,"booking data from frontend")
       const {userId}=req.query
       const bookingData = await this.bookingUseCase.bookingHistory(userId as string)
-      console.log(bookingData,"booking data for user")
+      //console.log(bookingData,"booking data for user")
       
       res.status(200).json({message:"movie booking history of this user",bookingData})
     } catch (error:any) {
@@ -433,8 +511,24 @@ async bookMovieTickets(req:Request,res:Response){
     try {
       console.log(req.query,"booking Id from frontend")
       const {bookingId}=req.query
+      const {refundAmount}=req.body
+      const type='Credit'
+      const userId=req.user?.id!
+      console.log(req.user,"req user");
+      
+      const description:string=`The movie you have booked with an id ${bookingId} has been cancelled and the amount Rs.${refundAmount} has been credited into your account`
+         await this.userUseCases.updateUserWallet(userId,refundAmount,description,type)
       const bookingData = await this.bookingUseCase.cancelMovieTickets(bookingId as string)
-      console.log(bookingData,"booking data in contorller")
+      //console.log(bookingData,"booking data in contorller")
+      
+      const notificationData = {
+        recipients:[{recipientId:req.user?.id,recipientRole:req.user?.role!}],
+        type: NotificationType.TICKET_CANCEL,
+        title: 'Ticket Cancelled',
+        message: `Your ticket with ID ${bookingId} has been cancelled successfully. Refund of Rs.${refundAmount} has been processed.`,
+        data: { bookingId },
+      };
+      await this.notificationUsecase.newNotification(notificationData);
       
       res.status(200).json({message:"tickets have been reserved for this seats on this showtime",success:bookingData})
     } catch (error:any) {
@@ -444,5 +538,81 @@ async bookMovieTickets(req:Request,res:Response){
     }
   }
   
+  async postRating(req:Request,res:Response){
+    
+    try {
+      console.log(req.query," user ud from frontend")
+      const {userId}=req.query
+      const {movieId,rating}=req.body
+      
+      const movieData = await this.userUseCases.ratingMovie(movieId,rating,userId as string)
+      console.log(movieData,"booking data in contorller")
+      
+      res.status(200).json({message:"tickets have been reserved for this seats on this showtime",movieData})
+    } catch (error:any) {
+      console.log(error,"error");
+      
+      res.status(500).json({ error: 'Error fetching showtimes' });
+    }
+  }
+
+  async userWallet(req: Request, res: Response) {
+    //const {userId} = req.params
+
+    try {
+      const userId:string=req.user?.id!
+      console.log(userId,req.params,"user with params")
+      const wallet = await this.userUseCases.walletByUser(userId);
+      res.status(200).json(wallet);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Failed to fetch wallet data' });
+    }
+  }
+
+  async updateWallet(req: Request, res: Response) {
+    const { userId, amount, description, type } = req.body;
+
+    try {
+      await this.userUseCases.updateUserWallet(userId, amount, description, type);
+      res.status(200).json({ message: 'Wallet updated successfully' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Failed to update wallet' });
+    }
+  }
+  
+  async createNotification(req: Request, res: Response): Promise<void> {
+    try {
+      const { recipients, type, title, message, data } = req.body;
+
+      await this.notificationUsecase.newNotification({
+        recipients,
+        type,
+        title,
+        message,
+        data,
+      });
+
+      res.status(201).json({ message: "Notification created successfully" });
+    } catch (error:any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getNotifications(req: Request, res: Response): Promise<void> {
+    try {
+      const { recipientId, role } = req.params;
+
+      const notifications = await this.notificationUsecase.userNotification(
+        recipientId,
+        role
+      );
+
+      res.status(200).json(notifications);
+    } catch (error:any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
   
 }

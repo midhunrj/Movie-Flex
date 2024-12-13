@@ -22,7 +22,13 @@ export interface MovieType {
        crew: Array<{ name: string; job: string; image: string }>,  
        createdAt: Date ,
        is_blocked:boolean ,
-       vote_average:Float32Array
+       vote_average:Float32Array,
+       ratingCount?:number,
+       ratings?:Array< 
+    {
+      userId: string, 
+      rating: number
+    }>
      
   }
   export interface MovieTMdb {

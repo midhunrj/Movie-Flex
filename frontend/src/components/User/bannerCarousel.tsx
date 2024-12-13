@@ -54,7 +54,7 @@ const BannerCarousel:React.FC<BannerCarouselProps> = ({ images }) => {
                 duration: 0.2,
                 ease: "easeIn",
               }}
-              className="h-screen object-cover w-full rounded-sm shadow-lg"
+              className="h-[28rem] object-fit w-full rounded-sm shadow-lg"
             />
           ) : null
         )}

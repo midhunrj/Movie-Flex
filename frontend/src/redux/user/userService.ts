@@ -1,7 +1,7 @@
 import axios, { Axios } from 'axios';
 import  axiosUrl  from '../../utils/axios/baseUrl';
 import { userAuthenticate } from '../../utils/axios/userInterceptor';
-import { FavouritePayload } from './userThunk';
+import { FavouritePayload, ratingPayload } from './userThunk';
 
 const API_BASE_URL = "http://localhost:7486";
 
@@ -31,12 +31,13 @@ export const loginUser = async (email:string, password:string) => {
         localStorage.setItem('user', JSON.stringify(response.data.user));
         localStorage.setItem('accessToken', response.data.accessToken);
         localStorage.setItem('role', response.data.role);
+        localStorage.setItem('wallet',response.data.wallet.balance)
         console.log(response,"response from backend");
         return response.data;
-    } catch (error) {
+    } catch (error:any) {
         console.log(error, "axios error"); 
-         throw error
-    
+         //return error.response.data
+      throw error
     // if (error.response && error.response.data && error.response.data.error) {
     //     console.log(error);
         
@@ -148,9 +149,9 @@ export const resendOtpAgain = async () => {
     }
 };
 
-export const getUpcomingMovies=async()=>{
+export const getUpcomingMovies=async(params:{page?:number,language?:string,genre?:string,searchQuery?:string,sortBy?:string})=>{
     try{
-        const response=await userAuthenticate.get('/fetchUpcomingMovies')
+        const response=await userAuthenticate.get('/fetchUpcomingMovies',{params})
         localStorage.setItem("upcomingMovies", response.data);
         return response.data
     }
@@ -158,18 +159,14 @@ export const getUpcomingMovies=async()=>{
     {
         console.log(error,"error in service");
         throw error
-        // if (error.response && error.response.data) {
-        //     throw new Error(error.response.data.message || error.response.data.error || "Failed to fetch upcoming movies");
-        //   } else {
-        //     throw new Error("Something went wrong while fetching upcoming movies");
-        //   }
+        
    }
 }
 
 
-export const getNowShowingMovies=async()=>{
+export const getNowShowingMovies=async(params:{page?:number,language?:string,genre?:string,searchQuery?:string,sortBy?:string})=>{
     try{
-        const response=await userAuthenticate.get('/fetchNowShowingMovies')
+        const response=await userAuthenticate.get('/fetchNowShowingMovies',{params})
         localStorage.setItem("nowShowingMovies", JSON.stringify(response.data.runningMovies));
         console.log(response.data,"console in now showing movies in return from backend");
         console.log(response.data.runningMovies,"runningMovies these are the ");
@@ -242,6 +239,19 @@ catch(error)
   };
 }
 
+export const newMovieRating = async ({userId,movieId,rating}:ratingPayload) => {
+    try{
+       const response = await userAuthenticate.put('/add-rating', {movieId,rating},{params:{userId:userId}}
+    );
+    return response.data;
+}
+catch(error)
+    {
+        console.log(error,"error in service");
+        
+       throw error
+  };
+}
 // const handleAxiosError = (error) => {
 //     if (error.response && error.response.data) {
 //         if (error.response.data.error) {

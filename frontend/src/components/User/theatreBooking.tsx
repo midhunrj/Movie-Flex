@@ -81,21 +81,21 @@ const TheatreBooking: React.FC = () => {
     const fetchSeatLayout = async () => {
       setLoading(true);
       try {
-        console.log(screenId.tiers, "tier seats");
-        // setSeatLayout(screenId.tiers);
+        console.log(screenId.tiers, "tier seats")
+        
         console.log(seatLayout,"seatlayout after tiers from location state");
         
-        setAvailableSeats(totalSeats);
+        setAvailableSeats(totalSeats)
       } catch (error) {
-        console.error("Error fetching seat layout:", error);
-        setError("Failed to load seat layout.");
+        console.error("Error fetching seat layout:", error)
+        setError("Failed to load seat layout.")
       } finally {
         setLoading(false);
       }
     };
 
     fetchSeatLayout();
-  }, [theatreId, screenId, showtime]);
+  }, [theatreId, screenId, showtime])
   
    const backendSeatLayout=async()=>{
     const response = await userAuthenticate.get('/screen-layout', {
@@ -103,6 +103,7 @@ const TheatreBooking: React.FC = () => {
     });
     console.log(response.data,"response for seatLayout");
     
+    setAvailableSeats(totalSeats);
     setSeatLayout(response.data.seatData)
          
    }
@@ -111,7 +112,7 @@ const TheatreBooking: React.FC = () => {
     await backendSeatLayout()
   }
   fetchSeatData()
-  },[showtimeId])
+  },[showtimeId,])
 
   // useEffect(()=>{
   //   setSeatLayout((prev) =>
@@ -297,7 +298,26 @@ const TheatreBooking: React.FC = () => {
           />{ticketCount} tickets</button></div> 
 </div>
       <div className="mt-6 space-x-12">
-        <h3 className="text-xl font-semibold ">Seating Information</h3>
+        <h3 className="text-xl text-center font-semibold ">Seating Information</h3>
+        <div className="flex justify-center gap-4 my-4">
+  <div className="flex items-center gap-2">
+    <div className="w-6 h-6 bg-green-500 rounded-md"></div>
+    <p className="text-sm">Selected</p>
+  </div>
+  <div className="flex items-center gap-2">
+    <div className="w-6 h-6 bg-white border rounded-md"></div>
+    <p className="text-sm">Available</p>
+  </div>
+  <div className="flex items-center gap-2">
+    <div className="w-6 h-6 bg-gray-600 rounded-md"></div>
+    <p className="text-sm text-gray-600">Booked</p>
+  </div>
+  <div className="flex items-center gap-2">
+    <div className="w-6 h-6 bg-gray-400 rounded-md"></div>
+    <p className="text-sm text-gray-600">Reserved</p>
+  </div>
+</div>
+
         {seatLayout
           .slice()
           .reverse()
@@ -309,6 +329,7 @@ const TheatreBooking: React.FC = () => {
                   {tier.tierName}
                 </h4>
                 <p className="text-gray-600">Price: ₹{tier.ticketRate}</p>
+                
                 <div className="mt-2">
                   {tier.rows
                     .slice()

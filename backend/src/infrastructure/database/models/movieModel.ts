@@ -39,7 +39,8 @@ const MovieSchema: Schema = new Schema({
   language: { type: String, required: true },     
   overview: { type: String, required: true },     
   popularity: { type: Number, required: true },   
-  rating: { type: Number, required: true },       
+  rating: { type: Number, required: true }, 
+  ratingCount:{type:Number},      
   video_link: { type: String, required: false },  
   runtime: { type: Number, required: true },      
   backdrop_path: { type: String, required: true },    
@@ -47,6 +48,12 @@ const MovieSchema: Schema = new Schema({
   cast: Array<{ name: string; character: string; image: string }>, 
   crew: Array<{ name: string; job: string; image: string }>,      
   createdAt: { type: Date, default: Date.now } ,
+  ratings: [
+    {
+      userId: { type: String, required: true }, 
+      rating: { type: Number, required: true }, 
+    },
+  ],
   is_blocked:{type:Boolean,default:false}         
 });
 
@@ -63,7 +70,8 @@ export interface IMovie extends Document {
   language: string;       
   overview: string;       
   popularity: number;     
-  rating: number;         
+  rating: number; 
+  ratingCount:number;        
   video_link?: string;    
   runtime: number;        
   backdrop_path: string;  
@@ -71,7 +79,13 @@ export interface IMovie extends Document {
   cast: Array<{ name: string; character: string; image: string }>, 
   crew: Array<{ name: string; job: string; image: string }>,       
   createdAt: Date; 
-  is_blocked:Boolean;       
+  is_blocked:Boolean; 
+  ratings:Array< 
+    {
+      userId: string, 
+      rating: number
+    }>, 
+          
 }
 
 

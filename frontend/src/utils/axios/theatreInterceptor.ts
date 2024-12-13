@@ -1,71 +1,19 @@
-// import axios from "axios";
-
-// export const theatreAuthenticate=axios.create({
-//     baseURL:'http::/localhost:7486/',
-//     headers:{
-//         "Content-Type":"application/json"
-//     },
-//     withCredentials:true
-// })
-
-// const API_BASE_URL = "http://localhost:7486";
-// theatreAuthenticate.interceptors.request.use(
-//     (request)=>{
-//         const theatreAccessToken=localStorage.getItem('theatreAccessToken')
-//         if(theatreAccessToken)
-//         {
-//            request.headers.Authorization=`Bearer ${theatreAccessToken}` 
-//         }
-//         console.log(request,"request sent");
-        
-//         return request
-//     },
-//     (error)=>
-//     {
-//         return Promise.reject(error)
-//     }
-// )
-
-// theatreAuthenticate.interceptors.response.use(
-//     (response)=>{
-//         return response
-//     },
-//     async (error)=>{
-//         try{
-//             const originalRequest=error.config
-//             if(error.response.status==401&& !originalRequest._retry)
-//             {
-//                 originalRequest._retry=true
-//             }
-//             const response=await axios.get(`${API_BASE_URL}/auth/refreshtoken`,{withCredentials:true});
-//             const newtheatreAccessToken=response.data
-//             localStorage.setItem('theatreAccessToken',newtheatreAccessToken)
-
-//             theatreAuthenticate.defaults.headers.common["Authorization"]=`Bearer ${newtheatreAccessToken}`
-
-//             return theatreAuthenticate(originalRequest)
-//         }
-//         catch(error)
-//         {
-//             console.log("token refresh failed",error);
-//         }
-//     }
-// )
 
 import axios from "axios";
+import { theatreUrl } from "./config/urlConfig";
 
-// Set the correct baseURL
+
 export const theatreAuthenticate = axios.create({
-    baseURL: 'http://localhost:7486/theatre',
+    baseURL: theatreUrl,
     headers: {
         "Content-Type": "application/json"
     },
-    withCredentials: true // Ensure cookies like refresh tokens are passed
+    withCredentials: true 
 });
 
 const API_BASE_URL = "http://localhost:7486";
 
-// Request Interceptor
+
 theatreAuthenticate.interceptors.request.use(
     (request) => {
         const theatreAccessToken = localStorage.getItem('theatreAccessToken');

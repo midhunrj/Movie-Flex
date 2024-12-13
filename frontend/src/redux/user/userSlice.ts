@@ -14,6 +14,7 @@ import {
   addToFavourites,
   deleteFromFavourites,
   getFavouritesMovieByUser,
+  postRating,
   //logout
 } from './userThunk';
 import { MovieType } from '@/types/movieTypes';
@@ -35,11 +36,15 @@ interface UserState {
   user: User | null;
   token: string | null;
   isError: boolean;
+  role:string,
   isSuccess: boolean;
   isLoading: boolean;
   message: string;
+  wallet:number;
   nowShowingMovies: MovieType[]
+  nowShowingMoviesCount:number|null
   upcomingMovies: MovieType[];
+  upcomingMoviesCount:number|null
   userCoordinates?:Coordinates
   theatres:TheatreLocate[]
   userCurrentLocation?:string|null
@@ -61,19 +66,24 @@ console.log(user,"SLICEEEEEEEE");
 
 
 const releasedMovies=localStorage.getItem('nowShowingMovies')
+const walletData=localStorage.getItem('wallet')
 const runningMovies:MovieType[]|null=releasedMovies?JSON.parse(releasedMovies):null
 const accessToken=localStorage.getItem('accessToken')
 const initialState:UserState = {
     user:user?user:null,
     token:accessToken?accessToken:null,
+    role:"user",
     isError:false,
     isSuccess:false,
     isLoading:false,
     message:'',
     nowShowingMovies:runningMovies?runningMovies:[],
+    nowShowingMoviesCount:null,
     upcomingMovies:[],
+    upcomingMoviesCount:null,
     userCoordinates:{},
     theatres:[],
+    wallet:walletData?parseFloat(walletData):0,
     userCurrentLocation:null
 };
 
@@ -121,6 +131,10 @@ const userSlice = createSlice({
     setUserLocation(state, action: PayloadAction<string>) {
       state.userCurrentLocation = action.payload;
     },
+    updateWalletBalance(state,action:PayloadAction<number>)
+    {
+      state.wallet +=action.payload
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -156,6 +170,7 @@ const userSlice = createSlice({
         state.isSuccess = true;
         state.user = action.payload.user;
         state.token=action.payload.accessToken
+        state.wallet=action.payload.wallet.balance
         state.message=action.payload.message
       })
       .addCase(login.rejected, (state, action) => {
@@ -292,6 +307,9 @@ const userSlice = createSlice({
         state.message=action.payload.message||"movie has been loaded"
         state.upcomingMovies=action.payload.upcomingMovies.upcomingMovies
         state.nowShowingMovies=action.payload.nowShowingMovies.runningMovies
+        state.nowShowingMoviesCount=action.payload.nowShowingMovies.totalMovies
+        state.upcomingMoviesCount=action.payload.upcomingMovies.totalMovies
+
       })
       .addCase(fetchMovies.rejected, (state, action:PayloadAction<string|undefined>) => {
         state.isLoading = false;
@@ -320,8 +338,7 @@ const userSlice = createSlice({
       .addCase(addToFavourites.pending, (state) => {
         state.isLoading=true;
         state.isSuccess=false;
-        state.isError=false;
-        
+        state.isError=false; 
       })
       .addCase(addToFavourites.fulfilled, (state, action) => {
         
@@ -370,9 +387,30 @@ const userSlice = createSlice({
         state.isLoading=true;
         state.isSuccess=false;
         state.isError=false;
+      })
+      .addCase(postRating.pending, (state) => {
+        state.isLoading=true;
+        state.isSuccess=false;
+        state.isError=false;
+        
+      })
+      .addCase(postRating.fulfilled, (state, action) => {
+        console.log(action.payload,"payload data");
+        
+        state.isLoading=false;
+        state.isSuccess=true;
+        state.isError=false;
+        const movieData=action.payload.movieData
+        state.nowShowingMovies=state.nowShowingMovies.map((movie)=>movie._id==movieData._id?movieData:movie)
+        state.message=action.payload.message!
+      })
+      .addCase(postRating.rejected, (state, action) => {
+        state.isLoading=true;
+        state.isSuccess=false;
+        state.isError=false;
       });
   },
 });
 
-export const { logout, clearState,setUpcomingMovies,setNowShowingMovies,setUserCoordinates,setUserLocation } = userSlice.actions;
+export const { logout, clearState,setUpcomingMovies,setNowShowingMovies,setUserCoordinates,setUserLocation,updateWalletBalance } = userSlice.actions;
 export default userSlice.reducer;

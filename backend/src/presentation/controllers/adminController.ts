@@ -1,8 +1,9 @@
 import {Request,Response} from 'express'
 import { AdminUseCase } from '../../application/usecases/admin';
+import { BookingMovies } from '../../application/usecases/booking';
 
 export class AdminController{
-    constructor(private adminCase:AdminUseCase){}
+    constructor(private adminCase:AdminUseCase,private bookingUsecase:BookingMovies){}
 
     
 
@@ -168,7 +169,6 @@ export class AdminController{
         }
     }
 
-    // Decline Theatre
     async declineTheatre(req: Request, res: Response) {
         try {
             const theatreId = req.params.theatreId;
@@ -183,4 +183,65 @@ export class AdminController{
             return res.status(500).json({ message: "Failed to decline theatre" });
         }
     }
+    
+    async dashboardOverview(req: Request, res: Response) {
+        try {
+            const dashboardData=await this.bookingUsecase.overviewDashboarrd()
+            return res.status(200).json({ message: "here the below  details of bookings dashboard",dashboardData});
+        } catch (error) {
+            console.error("Error declining theatre", error);
+            return res.status(500).json({ message: "Failed to decline theatre" });
+        }
+    }
+    async bookingTrends(req: Request, res: Response): Promise<Response> {
+        try {
+            const { interval } = req.query;
+            if (!interval) {
+                return res.status(400).json({ message: "Interval is required" });
+            }
+
+            const bookingTrend = await this.bookingUsecase.fetchBookingTrends(interval as string);
+
+            console.log(bookingTrend,"bookingTrend")
+            
+            return res.status(200).json({ message: "Booking trends fetched successfully", bookingTrend });
+        } catch (error) {
+            console.error("Error fetching booking trends", error);
+            return res.status(500).json({ message: "Failed to fetch booking trends" });
+        }
+    }
+
+    async revenueTrends(req: Request, res: Response): Promise<Response> {
+        try {
+            const { interval } = req.query; 
+            if (!interval) {
+                return res.status(400).json({ message: "Interval is required" });
+            }
+
+            const revenueTrend = await this.bookingUsecase.fetchRevenueTrends(interval as string);
+            console.log(revenueTrend,"revenueTrend")
+            
+            return res.status(200).json({ message: "Revenue trends fetched successfully", revenueTrend });
+        } catch (error) {
+            console.error("Error fetching revenue trends", error);
+            return res.status(500).json({ message: "Failed to fetch revenue trends" });
+        }
+    }
+
+    async getBookings(req: Request, res: Response): Promise<void> {
+        try {
+          const page = parseInt(req.query.page as string) || 1;
+          const limit = parseInt(req.query.limit as string) || 10;
+    
+          const { bookings, total } = await this.bookingUsecase.getbookingHistory(page, limit);
+          res.status(200).json({
+            bookings,
+            totalPages: Math.ceil(total / limit),
+            currentPage: page,
+          });
+        } catch (error) {
+          res.status(500).json({ message: "Error fetching bookings", error });
+        }
+      }
+
 }

@@ -1,7 +1,8 @@
 import axios from "axios";
+import { adminUrl } from "./config/urlConfig";
 
 export const adminAuthenticate = axios.create({
-  baseURL: 'http://localhost:7486/admin',  // Corrected the URL
+  baseURL: adminUrl,  // Corrected the URL
   headers: {
     "Content-Type": "application/json",
   },

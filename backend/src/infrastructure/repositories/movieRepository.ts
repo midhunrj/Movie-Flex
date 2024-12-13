@@ -121,15 +121,25 @@ export class MongoMovieRepository implements MovieRepository {
           movieDocument.cast,                            
           movieDocument.crew,                            
           movieDocument.createdAt,
-          movieDocument.is_blocked,                        
+          movieDocument.is_blocked, 
+          movieDocument.ratingCount                       
         );
       }
     
     async createMovie(movie: Movie): Promise<Movie> {
       const existingMovie = await MovieModel.findOne({ movie_id: movie.movie_id });
+  
+       console.log(movie.rating,"movie rating");
+       
+       const currentDate = new Date();
+       currentDate.setHours(0, 0, 0, 0); 
+       const movieReleaseDate = new Date(movie.releaseDate);
+       movieReleaseDate.setHours(0, 0, 0, 0);
 
+         const ratingCount=movieReleaseDate<currentDate?1:0
       if (existingMovie) {
-      
+         
+         existingMovie.ratingCount=ratingCount
         existingMovie.rating = movie.rating;
         existingMovie.cast = movie.cast;
         existingMovie.crew = movie.crew;
@@ -148,7 +158,7 @@ export class MongoMovieRepository implements MovieRepository {
         return this.mapToMovie(updatedMovie);
       } else {
         
-        const movieDocument = new MovieModel(movie);
+        const movieDocument = new MovieModel({...movie,ratingCount});
         const savedMovie = await movieDocument.save();
         return this.mapToMovie(savedMovie);
       }

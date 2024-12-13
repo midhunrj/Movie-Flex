@@ -16,9 +16,10 @@ interface FullMoviesListProps {
 const FullMoviesList:React.FC<FullMoviesListProps> = ({ movieType }) => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { nowShowingMovies=[], upcomingMovies=[],isSuccess,isLoading } = useSelector((state:RootState) => state.user);
+  const { nowShowingMovies=[], upcomingMovies=[],isSuccess,isLoading ,nowShowingMoviesCount,upcomingMoviesCount} = useSelector((state:RootState) => state.user);
 
   const [movies, setMovies] = useState<MovieType[]>([]);
+  const [movieCount,setMovieCount]=useState<number|null>(null)
   const [filterLanguage, setFilterLanguage] = useState<string>("");
   const [filterGenre, setFilterGenre] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("");
@@ -29,22 +30,26 @@ const FullMoviesList:React.FC<FullMoviesListProps> = ({ movieType }) => {
   const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
   useEffect(()=>{
+    window.scrollTo(0,0)
     dispatch(fetchMovies({
       page:currentPage,
       language:filterLanguage,
       genre:filterGenre,
-      searchQuery
+      searchQuery,
+      sortBy
     }
     ));
-  },[currentPage,filterGenre,filterLanguage,searchQuery])
+  },[currentPage,filterGenre,filterLanguage,searchQuery,sortBy])
 
   useEffect(() => {
     if (movieType === "now-showing") {
       setMovies(nowShowingMovies);
+      setMovieCount(nowShowingMoviesCount)
     } else if (movieType === "upcoming") {
       setMovies(upcomingMovies);
+      setMovieCount(upcomingMoviesCount)
     }
-  }, [movieType,upcomingMovies,nowShowingMovies]);
+  }, [movieType,upcomingMovies,nowShowingMovies,currentPage,]);
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) =>{ setSearchQuery(e.target.value); setCurrentPage(1) }
   const handleMovieClick = (id:string) => {
@@ -65,7 +70,8 @@ const FullMoviesList:React.FC<FullMoviesListProps> = ({ movieType }) => {
     }
     setMovies(sortedMovies);
   };
-  
+    console.log(movies,"movies in pagination");
+    
   const filteredMovies = movies
     .filter((movie) => (filterLanguage ? movie.language === filterLanguage : true))
     .filter((movie) => (filterGenre ? movie.genre.includes(filterGenre) : true))
@@ -74,8 +80,9 @@ const FullMoviesList:React.FC<FullMoviesListProps> = ({ movieType }) => {
     const indexOfLastMovie = currentPage * moviesPerPage;
     const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
     const currentMovies = filteredMovies.slice(indexOfFirstMovie, indexOfLastMovie);
-  
-    const totalPages = Math.ceil(filteredMovies.length / moviesPerPage);
+         console.log(filteredMovies,"filtered movies",currentMovies,"current movies in ghghg");
+         
+    const totalPages = Math.ceil( movieCount!/ moviesPerPage);
   
     const paginate = (pageNumber:number) => setCurrentPage(pageNumber);
   return (
@@ -89,8 +96,8 @@ const FullMoviesList:React.FC<FullMoviesListProps> = ({ movieType }) => {
         <div className="flex space-x-8">
           <Link to="/" className="hover:bg-amber-400 px-4 py-2 rounded">Home</Link>
           <Link to="/profile" className="hover:bg-gray-700 px-4 py-2 rounded">Profile</Link>
-          <Link to="#" className="hover:bg-gray-700 px-4 py-2 rounded">Your Orders</Link>
-          <Link to="#" className="hover:bg-gray-700 px-4 py-2 rounded">Favourites</Link>
+          <Link to="/orders" className="hover:bg-gray-700 px-4 py-2 rounded">Your Orders</Link>
+          <Link to="/favourites" className="hover:bg-gray-700 px-4 py-2 rounded">Favourites</Link>
           <Link to="#" className="hover:bg-gray-700 px-4 py-2 rounded">Shows</Link>
         </div>
         <div className="relative">
@@ -107,15 +114,14 @@ const FullMoviesList:React.FC<FullMoviesListProps> = ({ movieType }) => {
           <select value={filterLanguage} onChange={handleFilterLanguage} className="p-2 bg-white rounded shadow">
             <option value="">All Languages</option>
             <option value="English">English</option>
-            <option value="ml">Malayalam</option>
-            <option value="ta">Tamil</option>
-            <option value="te">Telugu</option>
-            <option value="hi">Hindi</option>
+            <option value="Malayalam">Malayalam</option>
+            <option value="Tamil">Tamil</option>
+            <option value="Telugu">Telugu</option>
+            <option value="Hindi">Hindi</option>
             <option value="Spanish">Spanish</option>
             
           </select>
 
-          {/* Genre Filter */}
           <select value={filterGenre} onChange={handleFilterGenre} className="p-2  flex  bg-white rounded shadow">
             <option value="">All Genres</option>
             <option value="Action">Action</option>
@@ -138,9 +144,9 @@ const FullMoviesList:React.FC<FullMoviesListProps> = ({ movieType }) => {
             {[...Array(8)].map((_, index) => (
               <Skeleton key={index} height={400} width={250} />
             ))}
-          </div>):currentMovies.length>0?(
+          </div>):filteredMovies.length>0?(
         <div className="grid grid-cols-4 gap-12">
-          {currentMovies.map((movie) => (
+          {filteredMovies.map((movie) => (
             <div key={movie._id} className="text-center" onClick={() => handleMovieClick(movie?.id??'')}>
               <img
                 src={movie.poster_path ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}` : "banner img brand.jpeg"}

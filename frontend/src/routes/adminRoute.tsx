@@ -9,12 +9,14 @@ import TheatreList from "../components/Admin/theatreManagement";
 import AdminProtected from "./protected/adminProtected";
 import MovieList from "../components/Admin/movieManagement";
 import RunningMovies from "../components/Admin/runningMovies";
+import Dashboard from "../components/Admin/home";
+
 
 export const AdminRoute = () => {
   return (
     <Routes>
       <Route path="/" element={<AdminLoginForm />} />
-      <Route path="/home" element={<AdminProtected><HomePage/></AdminProtected>}/>
+      <Route path="/home" element={<AdminProtected><Dashboard/></AdminProtected>}/>
             <Route path="/users" element={<AdminProtected><UserList/></AdminProtected>}/>
             <Route path="/theatre" element={<AdminProtected><TheatreList/></AdminProtected>}/>
             <Route path="/movies" element={<AdminProtected><MovieList/></AdminProtected>}/>

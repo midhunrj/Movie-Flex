@@ -181,6 +181,8 @@ async addFavorite(req: Request, res: Response): Promise<void> {
 async removeFavorite(req: Request, res: Response): Promise<void> {
   try {
     const { userId, movieId } = req.body;
+    console.log(req.body,"body req");
+    
     await this.manageMovies.removeFromFavourites(userId, movieId);
     res.status(200).json({ message: 'Movie removed from favorites' });
   } catch (error) {

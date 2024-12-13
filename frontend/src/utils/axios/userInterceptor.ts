@@ -1,7 +1,8 @@
 import axios from "axios";
+import { userUrl } from "./config/urlConfig";
 
 export const userAuthenticate = axios.create({
-    baseURL: 'http://localhost:7486/', // Corrected baseURL
+    baseURL: userUrl, 
     headers: {
         "Content-Type": "application/json"
     },
@@ -26,7 +27,7 @@ userAuthenticate.interceptors.response.use(
         return response;
     },
     async (error) => {
-        const originalRequest = error.config; // Corrected from error.config()
+        const originalRequest = error.config; 
         if (error.response.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             try {

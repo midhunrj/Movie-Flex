@@ -5,9 +5,11 @@ import { userAuthenticate } from '@/utils/axios/userInterceptor';
 import { MovieType } from '@/types/movieTypes';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store/store';
+import { FiHeart } from 'react-icons/fi';
+import { AiFillHeart } from 'react-icons/ai';
 
 interface Favorite {
-  movieId: MovieType; // Adjusted to remove `string`
+  movieId: MovieType;
   userId: string;
   createdAt: Date;
 }
@@ -19,15 +21,28 @@ const FavouriteMovies = () => {
   const userId = user?._id;
   const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
+  // Fetch favorites from backend
   const fetchFavorites = async () => {
     try {
-      const response = await userAuthenticate.get('/favourites', { params: { userId:userId } });
+      const response = await userAuthenticate.get('/favourites', { params: { userId } });
       setFavorites(response.data);
       console.log(response.data, "favourites by user from backend");
     } catch (error) {
       console.error('Error fetching favorites:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  
+  const handleRemoveFavorite = async (movieId: string) => {
+    try {
+      await userAuthenticate.delete('/remove-favourite',  {data:{ movieId, userId }}
+      );
+      
+      setFavorites((prevFavorites) => prevFavorites.filter((fav) => fav.movieId._id !== movieId));
+    } catch (error) {
+      console.error('Error removing favorite:', error);
     }
   };
 
@@ -47,14 +62,35 @@ const FavouriteMovies = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl">
             {favorites.map((favorite) => (
-              <div key={favorite.movieId._id} className="bg-white shadow-md rounded-lg p-4 hover:scale-105 cursor-pointer transition-all">
-                <img
-                  src={`${TMDB_IMAGE_BASE_URL}/${favorite.movieId.poster_path}`}
-                  alt={favorite.movieId.title}
-                  className="w-full h-72 object-fill rounded-md mb-4 "
-                />
+              <div
+                key={favorite.movieId._id}
+                className="relative bg-white shadow-md rounded-lg p-4 hover:scale-105 cursor-pointer transition-all"
+              >
+                {/* Image with Heart Icon Overlay */}
+                <div className="relative">
+                  <img
+                    src={`${TMDB_IMAGE_BASE_URL}/${favorite.movieId.poster_path}`}
+                    alt={favorite.movieId.title}
+                    className="w-full h-72 object-fill rounded-md mb-4"
+                  />
+                  <button
+                    onClick={() => handleRemoveFavorite(favorite.movieId._id!)}
+                    className="absolute top-4 right-0  text-3xl text-red-500 hover:text-red-700 focus:outline-none"
+                    aria-label="Toggle favorite"
+                  >
+                    {favorites.some(fav => fav.movieId._id === favorite.movieId._id) ? (
+                      <AiFillHeart color='red'  /> // Filled heart icon
+                    ) : (
+                      <FiHeart color='transparent' /> // Unfilled heart icon
+                    )}
+                  </button>
+                </div>
+
                 <h2 className="text-lg font-bold mb-2">{favorite.movieId.title}</h2>
-                <p>{favorite.movieId.description}</p>
+                <p className="mb-4">{favorite.movieId.description}</p>
+
+                {/* Favorite Caption */}
+                <span className="text-white bg-red-500 rounded-full py-1 px-3 text-sm">Favorite</span>
               </div>
             ))}
           </div>

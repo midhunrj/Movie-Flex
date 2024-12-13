@@ -9,8 +9,10 @@ import { IShowtime } from "../../infrastructure/database/models/showModel";
 import { iShowRepository } from "../repositories/iShowRepository";
 import { Types } from "mongoose";
 import { TierData } from "../../Domain/entities/shows";
+import { IWalletRepository } from "../repositories/iWalletRepository";
+import { WalletTransaction } from "../../Domain/entities/wallet";
 export class UserUseCases{
-    constructor(private userRepository:IuserRepository,private showRepository:iShowRepository,private hashservice:HashService,private otpservice:OtpService,private mailService:MailService,private jwtService:JWTService,private verifyToken:string="",private verifyMail:string="", ){}
+    constructor(private userRepository:IuserRepository,private showRepository:iShowRepository,private walletRepo:IWalletRepository, private hashservice:HashService,private otpservice:OtpService,private mailService:MailService,private jwtService:JWTService,private verifyToken:string="",private verifyMail:string="", ){}
 async register(user:User):Promise<String>
 {
     console.log(user.password,"before hash");
@@ -194,12 +196,12 @@ async updateProfile(userId: string | undefined, profileData: any): Promise<User 
     //    return nowShowingMovieData
     // }
 
-    async upcomingMovies(filters: any, page: number, limit: number): Promise<Movie[] | null> {
-        return await this.userRepository.ComingSoon(filters, page, limit);
+    async upcomingMovies(filters: any, page: number, limit: number,sortOptions:string): Promise<Movie[] | null> {
+        return await this.userRepository.ComingSoon(filters, page, limit,sortOptions);
       }
     
-      async nowShowingMovies(filters: any, page: number, limit: number): Promise<Movie[] | null> {
-        return await this.userRepository.RollingNow(filters, page, limit);
+      async nowShowingMovies(filters: any, page: number, limit: number,sortOptions:string): Promise<Movie[] | null> {
+        return await this.userRepository.RollingNow(filters, page, limit,sortOptions);
       }
     
       async upcomingMoviesCount(filters: any): Promise<number> {
@@ -225,6 +227,32 @@ async updateProfile(userId: string | undefined, profileData: any): Promise<User 
       async showtimeSeats(showtimeId:string):Promise<TierData[]|null>
       {
         return await this.showRepository.getSeatlayout(showtimeId)
+      }
+
+      async ratingMovie(movieId:string,rating:number,userId:string):Promise<Movie|null>
+      {
+         return await this.userRepository.newRating(movieId,rating,userId)
+      }
+
+      async walletByUser(userId: string) {
+        const wallet = await this.walletRepo.getWalletByUserId(userId);
+        // if (!wallet) {
+        //   return { balance: 0, transactions: [] };
+        // }
+        return wallet;
+      }
+      async updateUserWallet(userId: string, amount: number, description: string, type: 'Credit' | 'Debit') {
+        const transaction: WalletTransaction = {
+          userId,
+          type,
+          amount,
+          date: new Date(),
+          description,
+        };
+        console.log(transaction,"transaction here")
+        
+      
+        await this.walletRepo.updateWallet(userId, amount, transaction);
       }
 }
 

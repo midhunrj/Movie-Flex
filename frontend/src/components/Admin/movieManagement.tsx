@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { MovieTMdb, MovieType } from '@/types/movieTypes';
 import { AppDispatch } from '@/redux/store/store';
 import { Link } from 'react-router-dom';
+import { tmdbApiKey } from '@/utils/axios/config/urlConfig';
 //axiosRetry(axios,{retries:3,retryDelay:axiosRetry.exponentialDelay})
 const MovieList:React.FC = () => {
   const [movies, setMovies] = useState<MovieTMdb[]>([]);
@@ -18,15 +19,15 @@ const MovieList:React.FC = () => {
   const [showLanguageDropdown, setShowLanguageDropdown] = useState<boolean>(false);
   const [showGenreDropdown, setShowGenreDropdown] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState('popularity.desc');
-  const apiKey = 'de211859fbf9be075be8898c50affa35'; // Replace with your TMDB API key
+  
   const dispatch=useDispatch<AppDispatch>()
   
   const fetchMovies = async (page:number, languages:string[], genres:string[], searchQuery:string,sortBy:string) => {
     try {
-      let url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&page=${page}&sort_by=${sortBy}`;
+      let url = `https://api.themoviedb.org/3/discover/movie?api_key=${tmdbApiKey}&page=${page}&sort_by=${sortBy}`;
 
       if (searchQuery) {
-        url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${searchQuery}&page=${page}`;
+        url = `https://api.themoviedb.org/3/search/movie?api_key=${tmdbApiKey}&query=${searchQuery}&page=${page}`;
       } else {
         if (languages.length > 0) {
           url += `&with_original_language=${languages.join('|')}`;
@@ -98,7 +99,7 @@ const handleSortChange=(e:React.ChangeEvent<HTMLSelectElement>)=>{
   const handleAddMovie = async (movie:MovieTMdb) => {
     try {
       
-      let movieDetailsUrl=`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${apiKey}&append_to_response=credits,videos`;
+      let movieDetailsUrl=`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${tmdbApiKey}&append_to_response=credits,videos`;
 
       const {data:movieDetails}=await axios.get(movieDetailsUrl)
 

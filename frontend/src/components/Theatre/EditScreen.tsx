@@ -282,7 +282,7 @@ const EditScreen = () => {
 
   const toggleModal = () => setShowModal(!showModal);
   // const handleMovieClick = (movieId) => {
-  //   // Add navigation logic to view movie details
+  
   //   console.log(`View details for movie ID: ${movieId}`);
   // };
   const renderTabComponent=()=>{
@@ -303,14 +303,14 @@ const EditScreen = () => {
   </div>
       
   <Modal show={isModalOpen} onClose={closeModal} size="lg" aria-hidden="true">
-  {/* Modal Header */}
+  
   <Modal.Header className="bg-gray-100 text-center rounded-t-lg">
     Select Showtime
   </Modal.Header>
 
-  {/* Modal Body */}
+  
   <Modal.Body className="p-6 flex flex-col items-center space-y-6 scrollbar-hide">
-    {/* Time Picker */}
+  
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <StaticTimePicker
         displayStaticWrapperAs="mobile"
@@ -322,14 +322,14 @@ const EditScreen = () => {
           }
         }}
         onAccept={() => {
-          handleAddShowtime(); // Add selected time
-          closeModal(); // Close modal on OK
+          handleAddShowtime(); 
+          closeModal(); 
         }}
-        onClose={closeModal} // Close modal on Cancel
+        onClose={closeModal} 
       />
     </LocalizationProvider>
 
-    {/* Display Selected Time */}
+    
     {timeValue && (
       <div className="w-full text-center text-lg font-semibold text-gray-700">
         Selected Time: {timeValue.format('HH:mm')}

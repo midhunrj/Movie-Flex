@@ -159,7 +159,7 @@ export class ShowRepository implements iShowRepository {
     const radiusInRadians = radiusInKm / earthRadiusInKm;
           console.log(userCoords,"user coordinat");
           
-    // Find nearby theatres
+    
     const nearbyTheatres = await theatreModel
       .find({
         location: {

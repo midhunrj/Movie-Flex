@@ -2,9 +2,10 @@ import {NextFunction, Request,Response} from 'express'
 import { TheatreUseCase } from '../../application/usecases/theatre';
 import { FileUploadService } from '../../infrastructure/services/fileService';
 import { CloudinaryService } from '../../infrastructure/services/cloudinaryService';
+import { BookingMovies } from '../../application/usecases/booking';
 
 export class TheatreController{
-    constructor(private theatreUseCase:TheatreUseCase,private fileUploadService:FileUploadService,private CloudinaryService:CloudinaryService){}
+    constructor(private theatreUseCase:TheatreUseCase,private fileUploadService:FileUploadService,private CloudinaryService:CloudinaryService,private bookingUseCase:BookingMovies){}
 
     async register(req:Request,res:Response)
     {
@@ -201,5 +202,46 @@ export class TheatreController{
     //         res.status(500).json({ message: "failed to complete theatre profile"});
     //     }
     // }
+
+
+    async bookingTrends(req: Request, res: Response): Promise<Response> {
+        try {
+            const { interval } = req.query;
+            if (!interval) {
+                return res.status(400).json({ message: "Interval is required" });
+            }
+          console.log(req.headers,"req headers");
+          
+            const theatreId=req.headers.theatreid
+
+            const bookingTrend = await this.bookingUseCase.theatreBookingTrends(interval as string,theatreId as string);
+
+            console.log(bookingTrend,"bookingTrend")
+            
+            return res.status(200).json({ message: "Booking trends fetched successfully", bookingTrend });
+        } catch (error) {
+            console.error("Error fetching booking trends", error);
+            return res.status(500).json({ message: "Failed to fetch booking trends" });
+        }
+    }
+
+    async revenueTrends(req: Request, res: Response): Promise<Response> {
+        try {
+            const { interval } = req.query; 
+            if (!interval) {
+                return res.status(400).json({ message: "Interval is required" });
+            }
+             
+            const theatreId=req.headers.theatreid
+            const revenueTrend = await this.bookingUseCase.theatreRevenueTrends(interval as string,theatreId as string);
+            console.log(revenueTrend,"revenueTrend")
+            
+            return res.status(200).json({ message: "Revenue trends fetched successfully", revenueTrend });
+        } catch (error) {
+            console.error("Error fetching revenue trends", error);
+            return res.status(500).json({ message: "Failed to fetch revenue trends" });
+        }
+    }
+
 
 }

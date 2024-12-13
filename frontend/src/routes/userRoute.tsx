@@ -19,6 +19,8 @@ import TheatreShows from "@/components/User/theatreShows";
 import PaymentPage from "@/components/User/paymentPage";
 import BookingOrders from "@/components/User/bookinOrders";
 import FavouriteMovies from "@/components/User/FavouriteList";
+import Wallet from "@/components/User/wallet";
+import Notifications from "@/components/User/notifications";
 // import PaymentComponent from "@/components/User/confirmation";
 
 
@@ -34,18 +36,20 @@ export const UserRoute = () => {
             <Route path='/newuser-verify' element={<VerifyUser/>}/>
             <Route path='/otp-pass' element={<PassVerify/>}/>
             <Route path="/profile" element={<UserProtected><UserProfile/></UserProtected>}/>
-            <Route path="/now-showing" element={<FullMoviesList movieType="now-showing" />} />
-            <Route path="/movies/:id" element={<MovieDetails />} />
-            <Route path='/date-shows' element={<DateShows/>}/>
-            <Route path='/seat-booking' element={<TheatreBooking/>}/>
-            <Route path='/theatre-shows' element={<TheatreShows/>}/>
-            <Route path='/payment-page' element={<PaymentPage/>}/>
-             <Route path='/orders' element={<BookingOrders/>}/> 
-             <Route path='/favourites' element={<FavouriteMovies/>}/>  
+            <Route path="/now-showing" element={<UserProtected><FullMoviesList movieType="now-showing" /></UserProtected>} />
+            <Route path="/movies/:id" element={<UserProtected><MovieDetails /></UserProtected>} />
+            <Route path='/date-shows' element={<UserProtected><DateShows/></UserProtected>}/>
+            <Route path='/seat-booking' element={<UserProtected><TheatreBooking/></UserProtected>}/>
+            <Route path='/theatre-shows' element={<UserProtected><TheatreShows/></UserProtected>}/>
+            <Route path='/payment-page' element={<UserProtected><PaymentPage/></UserProtected>}/>
+             <Route path='/orders' element={<UserProtected><BookingOrders/></UserProtected>}/> 
+             <Route path='/favourites' element={<UserProtected><FavouriteMovies/></UserProtected>}/>  
+             <Route path='/wallet' element={<UserProtected><Wallet/></UserProtected>}/> 
+             <Route path='/Notification' element={<UserProtected><Notifications/></UserProtected>}/>
 
       <Route
         path="/upcoming-movies"
-        element={<FullMoviesList movieType="upcoming" />}
+        element={<UserProtected><FullMoviesList movieType="upcoming" /></UserProtected>}
       />
     </Routes>
   );

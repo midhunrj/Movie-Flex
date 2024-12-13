@@ -98,7 +98,7 @@ export class UserRepository implements IuserRepository {
   
     // Existing methods...
   
-    async ComingSoon(filters: any, page: number, limit: number): Promise<Movie[]> {
+    async ComingSoon(filters: any, page: number, limit: number,sortOptions:string): Promise<Movie[]> {
       const readyForReRelease = moment().subtract(2, "years");
   
       const query: any = {
@@ -121,16 +121,17 @@ export class UserRepository implements IuserRepository {
       }
   
       const movieData=await MovieModel.find(query)
-        .sort({ releaseDate: 1 })
+        .sort(sortOptions)
         .skip((page - 1) * limit)  // Pagination
         .limit(limit);  // Limit per page
 
         return movieData.map(this.mapToMovie)
     }
   
-    async RollingNow(filters: any, page: number, limit: number): Promise<Movie[]> {
+    async RollingNow(filters: any, page: number, limit: number,sortOptions:string): Promise<Movie[]> {
       const sixMonthsAgo = moment().subtract(6, "months");
-  
+    console.log(sortOptions,"sortOptions");
+    
       const query: any = {
         $and: [
           { releaseDate: { $lt: new Date() } },
@@ -151,9 +152,10 @@ export class UserRepository implements IuserRepository {
       }
   
       const movieData= await MovieModel.find(query)
-        .sort({ releaseDate: -1 })
-        .skip((page - 1) * limit)  // Pagination
-        .limit(limit);  // Limit per page
+        .sort(sortOptions||{releaseDate:-1})
+        .skip((page - 1) * limit)  
+        .limit(limit);  
+console.log(movieData,"returning after pagination");
 
         return movieData.map(this.mapToMovie)
     }
@@ -207,6 +209,41 @@ export class UserRepository implements IuserRepository {
   
       return await MovieModel.countDocuments(query);  // Return total count
     }
+
+    async newRating(movieId: string, rating: number,userId:string): Promise<Movie|null> {
+        
+      
+      const movieData=await MovieModel.findById(movieId)
+
+
+      const existingRating = movieData?.ratings?movieData.ratings.find((r) => r.userId === userId):null;
+
   
+  if (existingRating) {
+    // If user already rated, calculate the new average by replacing the old rating
+    const totalRating = 
+      movieData?.rating! * movieData?.ratingCount! - existingRating.rating + rating;
+    const newRating = totalRating / movieData?.ratingCount!;
+
+
+    await MovieModel.updateOne({_id:movieId,'ratings.userId': userId},{$set:{rating:newRating,'ratings.$.rating': rating},})
+
+  } else {
+    // If new rating, add to the ratings array
+    movieData?.ratings.push({ userId, rating });
+
   
+    const totalRating = movieData?.rating! * movieData?.ratingCount! + rating;
+    const count=(movieData?.ratingCount!)+1;
+    //movieData?.ratingCount +=1
+    const newRating = totalRating /count;
+  
+
+      await MovieModel.updateOne({_id:movieId},{$set:{rating:newRating},$push:{ratings:{userId,rating}},$inc:{ratingCount:1}})
+
+    }
+
+    return await MovieModel.findById(movieId)
+  
+    }
 }

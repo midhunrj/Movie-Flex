@@ -80,4 +80,36 @@ export class BookingMovies {
   {
   return await this.bookingRepository.cancelTicket(bookingId)
   }
+
+  async overviewDashboarrd() {
+    const totalBookings = await this.bookingRepository.getTotalBookings();
+    const totalRevenue = await this.bookingRepository.getTotalRevenue();
+    const cancelledBookings = await this.bookingRepository.getCancelledBookings();
+    const activeUsers = await this.bookingRepository.getActiveUsers();
+
+    return { totalBookings, totalRevenue, cancelledBookings, activeUsers };
+  }
+
+
+  async fetchBookingTrends(interval: string): Promise<any[]> {
+    return await this.bookingRepository.fetchBookingTrends(interval);
+}
+
+async fetchRevenueTrends(interval: string): Promise<any[]> {
+    return await this.bookingRepository.fetchRevenueTrends(interval);
+}
+
+async getbookingHistory(page: number, limit: number) {
+  return this.bookingRepository.getBookings(page, limit);
+}
+
+async theatreRevenueTrends(interval:string,theatreId:string):Promise<any[]>
+{
+  return await this.bookingRepository.fetchRevenueTrendsByTheatre(interval,theatreId)
+}
+
+async theatreBookingTrends(interval:string,theatreId:string):Promise<any[]>
+{
+  return await this.bookingRepository.fetchBookingTrendsByTheatre(interval,theatreId)
+}
 }

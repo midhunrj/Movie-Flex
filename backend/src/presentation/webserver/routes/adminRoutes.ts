@@ -12,6 +12,10 @@ import { MovieController } from '../../controllers/movieController'
 import { ManageMovies } from '../../../application/usecases/movies'
 import { MongoMovieRepository } from '../../../infrastructure/repositories/movieRepository'
 import { FavoriteRepository } from '../../../infrastructure/repositories/favouriteRepository'
+import { BookingMovies } from '../../../application/usecases/booking'
+import { PaymentRepository } from '../../../infrastructure/repositories/paymentRepository'
+import { MovieBookingRepository } from '../../../infrastructure/repositories/BookingRepository'
+import { ShowRepository } from '../../../infrastructure/repositories/showRepository'
 
 
 const adminRoute=Router()
@@ -28,7 +32,11 @@ if (!jwtService) {
 }
 const authHandler=new AuthHandler(jwtService,userRepository,adminRepository,theatreRepository)
 const adminCase=new AdminUseCase(adminRepository,hashService,jwtService,mailService)
-const adminController=new AdminController(adminCase)
+const paymentRepo=new PaymentRepository()
+const bookingRepo=new MovieBookingRepository()
+const showRepo=new ShowRepository()
+const bookingUsecase=new BookingMovies(bookingRepo,paymentRepo,showRepo)
+const adminController=new AdminController(adminCase,bookingUsecase)
 const movieRepo=new MongoMovieRepository()
 const favouriteRepository=new FavoriteRepository()
 const manageMovies=new ManageMovies(movieRepo,favouriteRepository)
@@ -48,5 +56,8 @@ adminRoute.post('/add-movies',authHandler.adminLogin.bind(authHandler),(req,res)
 adminRoute.get('/fetch-movies',authHandler.adminLogin.bind(authHandler),(req,res)=>movieController.fetchMovies(req,res))
 adminRoute.patch('/delete-movie/:movieid',authHandler.adminLogin.bind(authHandler),(req,res)=>movieController.deleteMovie(req,res))
 adminRoute.patch('/block-movie',authHandler.adminLogin.bind(authHandler),(req,res)=>movieController.blockMovie(req,res))
-
+adminRoute.get('/overview',authHandler.adminLogin.bind(authHandler),(req,res)=>adminController.dashboardOverview(req,res))
+adminRoute.get('/booking-trends',authHandler.adminLogin.bind(authHandler),(req,res)=>adminController.bookingTrends(req,res))
+adminRoute.get('/revenue-trends',authHandler.adminLogin.bind(authHandler),(req,res)=>adminController.revenueTrends(req,res))
+adminRoute.get('/bookings',authHandler.adminLogin.bind(authHandler),(req,res)=>adminController.getBookings(req,res))
 export default adminRoute

@@ -1,17 +1,22 @@
-import { Wallet,Transaction } from "../../../Domain/entities/wallet";
-import mongoose,{Schema,Document} from 'mongoose'
+// src/infrastructure/models/walletModel.ts
+import mongoose, { Schema, Document } from 'mongoose';
+import { Wallet, WalletTransaction } from '../../../Domain/entities/wallet';
 
 
-const transactionSchema:Schema=new Schema({
-  orderId:{type:String,required:false},
-  action:{type:String,enum:['debit','credit'],required:true},
-  amount:{type:Number,required:true},
-  date:{type:Date,default:Date.now}
-})
-const walletSchema:Schema=new Schema({
-    userId:{type:mongoose.Schema.Types.ObjectId,ref:'user',required:true},
-    balance:{type:String,required:true},
-    transactions:[transactionSchema]
-})
+interface WalletDocument extends Wallet, Document {}
 
-export const walletModel=mongoose.model<Wallet>('wallet',walletSchema)
+const WalletTransactionSchema = new Schema<WalletTransaction>({
+  userId: { type: String, required: true },
+  type: { type: String, enum: ['Credit', 'Debit'], required: true },
+  amount: { type: Number, required: true },
+  date: { type: Date, default: Date.now },
+  description: { type: String, required: true },
+});
+
+const WalletSchema = new Schema<WalletDocument>({
+  userId: { type: String, required: true, unique: true },
+  balance: { type: Number, default: 0 },
+  transactions: [WalletTransactionSchema],
+});
+
+export default mongoose.model<WalletDocument>('Wallet', WalletSchema);

@@ -8,6 +8,8 @@ export interface Booking {
     screenId: Types.ObjectId;
     movieId: Types.ObjectId;
     showtimeId: Types.ObjectId;
+    showtime?:string,
+    showDate?:Date,
     selectedSeats: string[];
     totalPrice?: number;
     theatreDetails?: {

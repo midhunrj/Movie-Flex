@@ -13,8 +13,10 @@ import {
   fetchTheatreData,
   removeMovieFromWishlist,
   movieInWishList,
-  favouritesUserMovies
+  favouritesUserMovies,
+  newMovieRating
 } from './userService';
+import { MovieType } from '@/types/movieTypes';
 
 // Define types for user payloads
 interface RegisterPayload {
@@ -49,7 +51,9 @@ export const login = createAsyncThunk(
     try {
       return await loginUser(email, password);
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.message || 'Something went wrong');
+      console.log(error,"error in thunk");
+      
+      return thunkAPI.rejectWithValue(error.response.data.message || 'Something went wrong');
     }
   }
 );
@@ -60,6 +64,8 @@ export const googleLogin = createAsyncThunk(
     try {
       return await googleLoginUser(token);
     } catch (error: any) {
+      console.log(error,"error in thunk return");
+      
       return thunkAPI.rejectWithValue(error.message || 'Something went wrong');
     }
   }
@@ -122,14 +128,15 @@ export const newPassVerify = createAsyncThunk(
   }
 )
 export const fetchMovies = createAsyncThunk<
-  { upcomingMovies: { upcomingMovies: any[] }; nowShowingMovies: { runningMovies: any[] }; message?: string },
-   { page?: number; language?: string; genre?: string; searchQuery?: string }|void,
+  { upcomingMovies: { upcomingMovies: any[],totalMovies:number }; nowShowingMovies: { runningMovies: any[],totalMovies:number }; message?: string  },
+   { page?: number; language?: string; genre?: string; searchQuery?: string ,sortBy?:string}|void,
   { rejectValue: string }
->('user/loadMovies', async (params={}, thunkAPI) => {
+>('user/loadMovies', async (params, thunkAPI) => {
   try {
     // const { page = 1, language = '', genre = '', searchQuery = '' } = params;
-    const upcomingMovies = await getUpcomingMovies();
-    const nowShowingMovies = await getNowShowingMovies();
+    const { page, language , genre , searchQuery, sortBy } = params || {}
+    const upcomingMovies = await getUpcomingMovies({page,language,genre,searchQuery,sortBy});
+    const nowShowingMovies = await getNowShowingMovies({page,language,genre,searchQuery,sortBy});
     return { 
       upcomingMovies,
       nowShowingMovies
@@ -184,3 +191,22 @@ export const getFavouritesMovieByUser = createAsyncThunk(
     }
   }
 )
+
+ export interface ratingPayload{
+  rating:number,
+  movieId:string,
+  userId:string
+}
+export const postRating = createAsyncThunk<
+  { movieData:MovieType; message?: string  },
+   ratingPayload,
+  { rejectValue: string }
+>('user/ratingMovies', async ({userId,movieId,rating}:ratingPayload, thunkAPI) => {
+  try {
+    // const { page = 1, language = '', genre = '', searchQuery = '' } = params;
+     return await newMovieRating({movieId,userId,rating})
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(error.message || 'Fetching movies failed');
+  }
+});
+

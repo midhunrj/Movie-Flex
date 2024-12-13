@@ -4,11 +4,11 @@ import expressConfig from './presentation/express/express';
 import serverConfig from './presentation/webserver/server';
 import http, { Server } from 'http';
 
-const app:Application = express(); // Explicitly define the type for the app
+const app:Application = express(); 
 
-connectDB(); // Connect to the database
+connectDB(); 
 
-const server: Server = http.createServer(app); // Explicitly define the server type
+const server: Server = http.createServer(app); 
 
-expressConfig(app); // Configure Express
-serverConfig(server).startServer(); // Start the server
+expressConfig(app); 
+serverConfig(server).startServer(); 

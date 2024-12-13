@@ -1,28 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchMovies } from '../../redux/user/userThunk';
-import { FaStar, FaHeart, FaArrowLeft, FaAngleLeft, FaPlay } from 'react-icons/fa'; // Font Awesome Icons
+import { fetchMovies, postRating } from '../../redux/user/userThunk';
+import { FaStar, FaHeart, FaArrowLeft, FaAngleLeft, FaPlay, FaHandHoldingHeart } from 'react-icons/fa'; // Font Awesome Icons
 import { AppDispatch, RootState } from '@/redux/store/store';
 import {motion, AnimatePresence } from 'framer-motion';
 import { userAuthenticate } from '@/utils/axios/userInterceptor';
+import { ClassNames } from '@emotion/react';
+import { Slider } from '@mui/material';
+import RatingModal from './ratingModal';
 
 const MovieDetails = () => {
   const { id } = useParams();
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isModelOpen,setIsModelOpen]=useState<boolean>(false)
+  const [loading,setLoading]=useState<boolean>(false)
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
   const { upcomingMovies, nowShowingMovies,user } = useSelector((state: RootState) => state.user);
   const movie = upcomingMovies.find((movie) => movie.id === id) || nowShowingMovies.find((movie) => movie.id === id);
   console.log(movie,"movie detais");
-  const userId=user?._id
+  const userId=user?._id!
   const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
   useEffect(() => {
     dispatch(fetchMovies());
-  }, [dispatch]);
+  }, [dispatch,nowShowingMovies]);
 
   if (!movie) return <div>Movie not found</div>;
 
@@ -39,10 +44,33 @@ const MovieDetails = () => {
 
   const embedUrl = `https://www.youtube.com/embed/${videoId}`;
 
+
+  const handleRateMovie = async (movieId:string, rating:number) => {
+    // const ratingData: ratingPayload = {
+    //   userId, // Assuming `userId` is available in the component's scope
+    //   movieId,
+    //   rating,
+    // };
+    dispatch(postRating({movieId,userId,rating}))
+    
+    
+    setIsModelOpen(false)
+  };
   const handleBookTicket = (movieId: string) => {
     navigate('/date-Shows', { state: { movieId } });
   };
 
+  const handleMovieNavigation=(movieId:string)=>{
+   setLoading(true)
+   window.scrollTo(0,0)
+    navigate(`/movies/${movieId}`)
+  }
+   
+  console.log(new Date,"date",movie.releaseDate,"releaseDate of movie")
+const upcoming=new Date(movie.releaseDate)<new Date()?true:false
+  const similarMovies = [...upcomingMovies, ...nowShowingMovies]
+  .filter((m) => m.genre.some((g)=>(movie.genre.includes(g)) && m.id !== movie.id))
+  .slice(0, 6)
   
   const getCastImage = (actorName: string) => {
     
@@ -50,7 +78,15 @@ const MovieDetails = () => {
   };
 
   return (
-    <div className="movie-details-page relative bg-gray-100">
+    <>
+    
+    <RatingModal
+        isOpen={isModelOpen}
+        onClose={() => setIsModelOpen(false)}
+        onSubmit={handleRateMovie}
+        movieId={movie.id!}
+      />
+         <div className="movie-details-page relative bg-gray-100">
       
       <div className="absolute top-4 left-4 z-50">
         <button className="bg-gray-200 bg-opacity-40 min-h-8 text-opacity-100 text-slate-800 w-fit hover:text-gray-300 hover:bg-transparent p-2 rounded-md" onClick={() => navigate(-1)}>
@@ -92,10 +128,10 @@ const MovieDetails = () => {
           </div> */}
         <div className="absolute inset-0 z-30 flex items-center left-48">
             <button
-              className="bg-red-600 min-h-10 w-fit text-white p-4 rounded-full"
+              className="bg-gradient-to-r from-transparent border  hover:105 border-white min-h-8 w-fit text-white p-2 rounded-md"
               onClick={() => setIsVideoPlaying(true)} 
             >
-              <FaPlay size={20}/>
+              <div></div>play trailer
             </button>
           </div>
           </div>
@@ -138,7 +174,7 @@ const MovieDetails = () => {
               className="w-full h-screen"
             ></iframe>
             <button
-              className="absolute top-4 right-4 bg-white text-black p-2 rounded-full font-bold text-lg"
+              className="absolute top-4  min-h-8 right-4 bg-white text-black p-2 rounded-full font-bold text-lg"
               onClick={() => setIsVideoPlaying(false)}
             >
               X
@@ -237,21 +273,54 @@ const MovieDetails = () => {
             </div>
           </motion.section>
           {/* Add Your Rating Button */}
-          <div className="mt-6">
-            <button className="bg-green-500 p-2 min-h-8 w-fit rounded hover:bg-green-600 transition duration-300">
+          <div className="mt-6 flex justify-center">
+            <button className="bg-green-500 p-2 min-h-8 w-fit rounded hover:bg-green-600 transition duration-300 cursor-pointer" onClick={()=>setIsModelOpen(true)}>
               Add Your Rating
             </button>
           </div>
-          <div className="absolute inset-0 z-30    flex justify-center right-1/4 top-[22rem] ">
-            <button className="bg-[#FF3C38] min-h-12 text-xl p-2 shadow-lg  rounded-lg  text-gray-200   w-48" style={{cursor:"pointer"}} onClick={() => handleBookTicket(movie.id ?? '')}>
+          <div className="absolute inset-0 z-30 h-20 flex justify-center right-1/4 top-[18rem]  pointer-events-auto ">
+            {upcoming?<button className="bg-[#FF3C38] min-h-12 text-xl p-2 shadow-lg  rounded-lg  text-gray-200   w-48" style={{cursor:"pointer"}} onClick={() => handleBookTicket(movie.id ?? '')}>
               Book tickets
             </button>
+            :<button
+            className="bg-[#006BFF]  min-h-12 text-xl px-6 py-3 shadow-lg rounded-lg text-gray-100 w-48 flex justify-center items-center gap-2 transition-all duration-300"
+            style={{ cursor: "pointer" }}
+          >
+            <FaHeart size={10} />
+            I'm Interested
+          </button>}
           </div>
          
+          <div className="p-4 mt-8">
+        <h2 className="text-2xl font-bold mb-4">You May Also Like</h2>
+        <div className=" mx-20 grid grid-cols-2  md:grid-cols-3 lg:grid-cols-4 gap-10">
+          {similarMovies.slice(0,4).map((similarMovie) => (
+            <div key={similarMovie.id} className="shadow-lg rounded-lg overflow-hidden">
+              <img
+                src={similarMovie.poster_path ? `${TMDB_IMAGE_BASE_URL}${similarMovie.poster_path}` : "/fallback-poster.jpg"}
+                alt={similarMovie.title}
+                className="w-full h-80 object-cover cursor-pointer" onClick={() => navigate(`/movies/${similarMovie.id}`)}
+              />
+              <div className="p-2 cursor-pointer ">
+                <h3 className="text-lg font-bold overflow-visible">{similarMovie.title}</h3>
+                <div className='flex  items-end align-text-bottom justify-end'>
+                <button
+                  className="text-sm cursor-pointer text-blue-500 mt-1"
+                  onClick={() => handleMovieNavigation(similarMovie.id!)} >
+                  View Details
+                </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
         </div>
         </>
       )}
     </div>
+    </>
   );
 };
 
@@ -260,205 +329,3 @@ export default MovieDetails;
 
 
 
-// import React, { useState, useEffect } from 'react';
-// import { useParams, useNavigate } from 'react-router-dom';
-// import axios from 'axios';
-// import { FaStar, FaHeart, FaArrowLeft } from 'react-icons/fa'; // Font Awesome Icons
-// import { useDispatch, useSelector } from 'react-redux';
-// import { AppDispatch, RootState } from '@/redux/store/store';
-// import { fetchMovies } from '@/redux/user/userThunk';
-
-// const MovieDetails = () => {
-//   const { id } = useParams();
-//   const [movieDetails, setMovie] = useState<any>(null);
-//   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-//   const [isFavorite, setIsFavorite] = useState(false);
-//   const navigate = useNavigate();
-
-//   const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
-//   const apiKey = 'de211859fbf9be075be8898c50affa35'; // Replace with your TMDB API key
-//   const dispatch = useDispatch<AppDispatch>();
-
-
-//   const { upcomingMovies, nowShowingMovies } = useSelector((state: RootState) => state.user);
-//   const movie = upcomingMovies.find((movie) => movie.id === id) || nowShowingMovies.find((movie) => movie.id === id);
-
-  
-
-//   useEffect(() => {
-//     dispatch(fetchMovies());
-//   }, [dispatch]);
-
-// useEffect(() => {
-//     // Fetch movie details from TMDB API
-//     const fetchMovieDetails = async () => {
-//       try {
-//         const movieDetailsUrl = `https://api.themoviedb.org/3/movie/${id}?api_key=${apiKey}&append_to_response=credits,videos`;
-//         const { data } = await axios.get(movieDetailsUrl);
-
-//         const movieData = {
-//           ...data,
-//           cast: data.credits.cast.slice(0, 10).map((actor: any) => ({
-//             name: actor.name,
-//             character: actor.character,
-//             profile_path: actor.profile_path
-//               ? `${TMDB_IMAGE_BASE_URL}${actor.profile_path}`
-//               : '/default-profile.png',
-//           })),
-//           crew: data.credits.crew.slice(0, 10).map((crewMember: any) => ({
-//             name: crewMember.name,
-//             job: crewMember.job,
-//             profile_path: crewMember.profile_path
-//               ? `${TMDB_IMAGE_BASE_URL}${crewMember.profile_path}`
-//               : '/default-profile.png',
-//           })),
-//           video: data.videos.results.find((video: any) => video.type === 'Trailer')?.key || '',
-//         };
-// console.log(movieData,"movieData in movieDetails");
-
-//         setMovie(movieData);
-//       } catch (error) {
-//         console.error('Error fetching movie details:', error);
-//       }
-//     };
-
-//     fetchMovieDetails();
-//   }, [id]);
-
-//   if (!movie) return <div>Loading...</div>;
-
-//   const handleFavoriteToggle = () => {
-//     setIsFavorite(!isFavorite); // Toggle favorite state
-//   };
-
-//   const embedUrl = `https://www.youtube.com/embed/${movie.video}?autoplay=1&controls=0`;
-
-//   const handleBookTicket = () => {
-//     navigate('/date-Shows', { state: { movieId: movie.id } });
-//   };
-
-//   return (
-//     <div className="movie-details-page relative bg-gray-100">
-//       {/* Back Button */}
-//       <div className="absolute top-4 left-4 z-50">
-//         <button className="bg-gray-800 min-h-8 text-white p-2 rounded-full" onClick={() => navigate(-1)}>
-//           <FaArrowLeft size={20} />
-//         </button>
-//       </div>
-
-//       {/* Movie Poster with Play Button */}
-//       <div className="relative">
-//         <img
-//           src={movie.backdrop_path ? `${TMDB_IMAGE_BASE_URL}${movie.backdrop_path}` : "/banner-img-brand.jpeg"}
-//           alt={movie.title}
-//           className={`w-full h-96 object-cover ${isVideoPlaying ? 'hidden' : ''}`}
-//           style={{ filter: 'brightness(50%)' }}
-//         />
-
-//         {/* Play Button and Trailer */}
-//         {!isVideoPlaying && (
-//           <div className="absolute inset-0 flex items-center justify-center">
-//             <button
-//               className="bg-red-600 min-h-10 text-white p-4 rounded-full"
-//               onClick={() => setIsVideoPlaying(true)} // Play video
-//             >
-//               Play
-//             </button>
-//           </div>
-//         )}
-
-//         {isVideoPlaying && (
-//           <div className="absolute inset-0 flex items-center justify-center bg-black">
-//             <iframe
-//               width="100%"
-//               height="100%"
-//               src={embedUrl}
-//               title={movie.title}
-//               frameBorder="0"
-//               allow="autoplay; fullscreen"
-//               allowFullScreen
-//               className="w-full h-screen object-cover"
-//             ></iframe>
-
-//             <button
-//               onClick={() => setIsVideoPlaying(false)}
-//               className="absolute top-4 right-4 min-h-8 bg-white text-black p-2 rounded-full font-bold text-lg"
-//             >
-//               X
-//             </button>
-//           </div>
-//         )}
-
-//         {/* Movie Info on Top of Poster */}
-//         {!isVideoPlaying && (
-//           <div className="absolute bottom-0 left-0 p-4 text-white z-30">
-//             <h1 className="text-4xl font-bold">
-//               {movie.title} ({new Date(movie.release_date).getFullYear()})
-//             </h1>
-//             <p className="text-lg flex items-center">
-//               Rating:
-//               {[...Array(5)].map((_, i) => (
-//                 <FaStar key={i} className={`ml-1 ${i < movie.vote_average / 2 ? 'text-yellow-400' : 'text-gray-500'}`} />
-//               ))}
-//               <span className="ml-2">{movie.vote_average}/10</span>
-//             </p>
-
-//             {/* Favorite Button */}
-//             <button
-//               className={`mt-2 p-2 rounded-full min-h-8 w-fit ${isFavorite ? 'bg-red-600' : 'bg-gray-300'} flex items-center`}
-//               onClick={handleFavoriteToggle}
-//               onMouseEnter={() => !isFavorite && setIsFavorite(true)}
-//               onMouseLeave={() => !isFavorite && setIsFavorite(false)}
-//             >
-//               <FaHeart className={`mr-2  min-h-8 w-fit ${isFavorite ? 'text-white' : 'text-gray-600'}`} />
-//               Add to Favorites
-//             </button>
-//           </div>
-//         )}
-//       </div>
-
-//       {/* Movie Details Below */}
-//       {!isVideoPlaying && (
-//         <div className="p-4">
-//           <h2 className="text-2xl font-bold">Description</h2>
-//           <p>{movie.overview}</p>
-
-//           <h3 className="text-xl font-bold mt-4">Cast</h3>
-//           <div className="flex flex-wrap gap-4 mt-2">
-//             {movie.cast.map((actor: any, index: number) => (
-//               <div key={index} className="flex flex-col items-center">
-//                 <img
-//                   src={actor.profile_path}
-//                   alt={actor.name}
-//                   className="w-32 h-32 object-cover rounded-full"
-//                 />
-//                 <p className="mt-2">{actor.name}</p>
-//                 <p className="text-sm">{actor.character}</p>
-//               </div>
-//             ))}
-//           </div>
-
-//           <h3 className="text-xl font-bold mt-4">Crew</h3>
-//           <div>
-//             {movie.crew.map((crewMember: any, index: number) => (
-//               <p key={index}>
-//                 <strong>{crewMember.job}:</strong> {crewMember.name}
-//               </p>
-//             ))}
-//           </div>
-
-//           <div className="flex items-center justify-center">
-//             <button
-//               className="bg-red-500 text-gray-200 p-2 min-h-8 w-fit"
-//               onClick={handleBookTicket}
-//             >
-//               Book tickets
-//             </button>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default MovieDetails;

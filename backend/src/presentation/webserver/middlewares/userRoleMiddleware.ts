@@ -28,6 +28,7 @@ declare global {
                 id:string,
                 role:string,
             }
+            ratingCount?:number
         }
     }
 }

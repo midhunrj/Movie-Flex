@@ -1,14 +1,15 @@
-export interface Wallet{
-    id?:string,
-    userId:string,
-    balance:number,
-    transactions:Transaction[]
-}
-
-export interface Transaction{
-    orderId?:string,
-    action:'debit'|'credit',
-    amount:number;
-    date:Date;
-
-}
+export interface WalletTransaction {
+    id?: string;
+    userId: string;
+    orderId?:string;
+    type: 'Credit' | 'Debit';
+    amount: number;
+    date: Date;
+    description: string;
+  }
+  
+  export interface Wallet {
+    userId: string;
+    balance: number;
+    transactions: WalletTransaction[];
+  }

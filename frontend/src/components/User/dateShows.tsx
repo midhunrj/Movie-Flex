@@ -274,8 +274,8 @@ const DateShows: React.FC = () => {
   <p>Loading showtimes...</p>
 ) : Object.keys(groupedShowtimes).length > 0 ? (
   Object.entries(groupedShowtimes).map(([key, details]) => (
-    <div key={key} className="border p-4 rounded-lg shadow-md bg-white">
-      <div className="mb-2 flex items-center justify-between">
+    <div key={key} className="border p-4 my-2 rounded-lg gap-4 shadow-md bg-white">
+      <div className=" flex items-center justify-between">
         <div>
           <h3 className="font-semibold text-lg text-blue-800">{details.theatreName}</h3>
           <p className="text-sm text-gray-500">{details.screenName} ({details.screenType})</p>

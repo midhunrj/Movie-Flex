@@ -16,11 +16,19 @@ export class Movie {
       public video_link: string,  
       public runtime: number,  
       public backdrop_path: string,  
-      public poster_path: string,  
+      public poster_path: string, 
+      
       public cast: Array<{ name: string; character: string; image: string }>, 
       public crew: Array<{ name: string; job: string; image: string }>,          
       public createdAt: Date ,
-      public is_blocked:Boolean 
+      public is_blocked:Boolean,
+      public ratingCount?:number, 
+      public ratings?:Array< 
+      {
+        userId: string, 
+        rating: number
+      }>
+
      ) {}
   }
   

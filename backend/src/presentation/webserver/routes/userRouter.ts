@@ -20,6 +20,9 @@ import { ManageMovies } from '../../../application/usecases/movies'
 import { BookingMovies } from '../../../application/usecases/booking'
 import { MovieBookingRepository } from '../../../infrastructure/repositories/BookingRepository'
 import { PaymentRepository } from '../../../infrastructure/repositories/paymentRepository'
+import { WalletRepository } from '../../../infrastructure/repositories/walletRepository'
+import { Notification } from '../../../application/usecases/notification'
+import { NotificationRepository } from '../../../infrastructure/repositories/notficationRepository'
 
 
 const userRoute=Router()
@@ -34,11 +37,14 @@ const screenRepository=new ScreenRepository()
 
 const theatreRepository=new TheatreRepository()
 const authHandler=new AuthHandler(jwtService,userRepository,adminRepository,theatreRepository)
-const userUseCase=new UserUseCases(userRepository,showRepository,hashService,otpService,mailService,jwtService)
+const walletRepo=new WalletRepository()
+const userUseCase=new UserUseCases(userRepository,showRepository,walletRepo,hashService,otpService,mailService,jwtService)
 const bookingRepository=new MovieBookingRepository()
 const paymentRepository=new PaymentRepository()
 const bookingUseCase=new BookingMovies(bookingRepository,paymentRepository,showRepository)
-const userController=new UserController(userUseCase,bookingUseCase)
+const notifyRepo=new NotificationRepository()
+const notifyCase=new Notification(notifyRepo)
+const userController=new UserController(userUseCase,bookingUseCase,notifyCase)
 const screenuseCase=new ScreenUseCase(screenRepository,showRepository)
 const screenController=new ScreenController(screenuseCase)
 const movieRepo=new MongoMovieRepository()
@@ -60,7 +66,7 @@ userRoute.get('/showtimes',authHandler.userLogin.bind(authHandler),(req,res,next
 userRoute.get('/theatres',authHandler.userLogin.bind(authHandler),(req,res,next)=>screenController.fetchUserTheatres(req,res,next)) 
 userRoute.get('/theatre-showtimes',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.listTheatreShowtimes(req,res,next))
 userRoute.put('/add-favourite',authHandler.userLogin.bind(authHandler),(req,res,next)=>movieController.addFavorite(req,res)) 
-userRoute.put('/remove-favourite',authHandler.userLogin.bind(authHandler),(req,res,next)=>movieController.removeFavorite(req,res)) 
+userRoute.delete('/remove-favourite',authHandler.userLogin.bind(authHandler),(req,res,next)=>movieController.removeFavorite(req,res)) 
 userRoute.get('/favourites',authHandler.userLogin.bind(authHandler),(req,res,next)=>movieController.getFavorites(req,res)) 
 userRoute.post('/book-tickets',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.bookMovieTickets(req,res))
 //userRoute.post('/confirm-payment',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.confirmMovieTickets(req,res)) 
@@ -69,5 +75,10 @@ userRoute.post('/verify-payment',authHandler.userLogin.bind(authHandler),(req,re
 userRoute.get('/screen-layout',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.showtimeSeatLayout(req,res))
 userRoute.get('/bookings-history',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.bookingOrders(req,res)) 
 userRoute.put('/cancel-booking',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.cancelTickets(req,res)) 
+userRoute.put('/add-rating',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.postRating(req,res)) 
+userRoute.get('/wallet',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.userWallet(req,res)) 
+userRoute.put('/update-wallet',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.updateWallet(req,res)) 
+userRoute.get('/Notification',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.getNotifications(req,res)) 
+userRoute.post('/wallet-payment',authHandler.userLogin.bind(authHandler),(req,res,next)=>userController.updateWallet(req,res)) 
 
 export default userRoute

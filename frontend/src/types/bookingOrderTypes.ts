@@ -1,14 +1,16 @@
 import { MovieType } from "./movieTypes";
+import { User } from "./userTypes";
 
 
 export interface BookingType {
     _id?: string;
     bookingId?: string; // Added if required
-    userId: string;
+    userId: User;
     theatreId: string;
     screenId: string;
     movieId: MovieType;
-    showtimeId: {_id:string,showtime:string};
+    showtimeId: {_id:string,showtime:string,date:string};
+    showtime?:string
     selectedSeats: string[];
     totalPrice?: number;
     theatreDetails?: {

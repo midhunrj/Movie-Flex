@@ -17,6 +17,8 @@ import BannerCarousel from "./bannerCarousel";
 import { AppDispatch, RootState } from "@/redux/store/store";
 import { MovieType } from "@/types/movieTypes";
 import { useLocalizationContext } from "@mui/x-date-pickers/internals";
+import { io } from "socket.io-client";
+import { userUrl } from "@/utils/axios/config/urlConfig";
 // import { Theatre } from "@/types/admintypes";
 //import {refreshPage} from '../../redux/user/userThunk'
 // import {toas}
@@ -50,7 +52,7 @@ interface Props {
 }
 
 const HomePage = () => {
-  const { user,isSuccess,isError,isLoading,nowShowingMovies=[],upcomingMovies=[],userCoordinates,theatres,userCurrentLocation } = useSelector((state:RootState) => state.user);
+  const { user,role,isSuccess,isError,isLoading,nowShowingMovies=[],upcomingMovies=[],userCoordinates,theatres,userCurrentLocation } = useSelector((state:RootState) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -61,6 +63,7 @@ const HomePage = () => {
   // const [nowShowingMovies,setNowShowingMovies]=useState([])
   const [browseMode, setBrowseMode] = useState<"movies" | "theatres">("movies");
   const [selectedTheatre, setSelectedTheatre] = useState<string>("");
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const [suggestedCities, setSuggestedCities] = useState<string[]>(["Kochi","Bangalore","Chennai","Mumbai","Delhi"]);
   const [selectedLocation, setSelectedLocation] = useState<string>("");
@@ -74,7 +77,26 @@ const [currentLocation, setCurrentLocation] = useState<string|null>(null);
 
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500'
   
+const userId = user?._id;
 
+useEffect(() => {
+  const socket = io(userUrl); 
+
+  
+  socket.emit("subscribe", userId, role);
+
+  
+  socket.on("Notification-unread-count", (count: number) => {
+    console.log(count,"unreadcount");
+    
+    setUnreadCount(count);
+  });
+  console.log(unreadCount,"aifhfhafhakfh");
+  
+  return () => {
+    socket.disconnect();
+  };
+}, [userId,role]);
 const handleCitySelection = async(city:string) => {
   if(city==currentLocation)
   {
@@ -198,12 +220,14 @@ const handleSearchCityChange = async (e:ChangeEvent<HTMLInputElement>) => {
 //     setLocation("Geolocation not supported");
 //   }
 // };
-const bannerImages = [
-  "banner ide.jpeg",
-  "banner ide 2.jpeg",
-  "banner img 2.jpeg",
-  "banner img.jpeg",
-];
+// const bannerImages = [
+//   "banner ide.jpeg",
+//   "banner ide 2.jpeg",
+//   "banner img 2.jpeg",
+//   "banner img.jpeg",
+// ];
+const imageMap=nowShowingMovies.map((a)=>{return `${TMDB_IMAGE_BASE_URL}/${a.backdrop_path}`})
+const bannerImages=[...imageMap]
 const getUserLocation = async () => {
   if (navigator.geolocation) {
     setIsLoadingLocation(true);
@@ -375,9 +399,9 @@ const locationTab=useLocation()
             <Link to="/profile" className={`hover:bg-gray-700 px-4 py-2 rounded ${
                 isActive('/profile') ? 'bg-yellow-500 text-blue-950' : 'hover:bg-gray-700 hover:text-white'
               }`}>Profile</Link>
-            <Link to="#" className="hover:bg-gray-700 px-4 py-2 rounded">Your Orders</Link>
-            <Link to="#" className="hover:bg-gray-700 px-4 py-2 rounded">Favourites</Link>
-            <Link to="#" className="hover:bg-gray-700 px-4 py-2 rounded">Shows</Link>
+            <Link to="/orders" className="hover:bg-gray-700 px-4 py-2 rounded">Your Orders</Link>
+            <Link to="/favourites" className="hover:bg-gray-700 px-4 py-2 rounded">Favourites</Link>
+            <Link to="/wallet" className="hover:bg-gray-700 px-4 py-2 rounded">wallet</Link>
           </div>
 
           <div className="flex items-center space-x-4">
@@ -403,8 +427,12 @@ const locationTab=useLocation()
 </div>
 
             
-            <BiBell size={24} className="text-white cursor-pointer" />
-
+            <BiBell size={24} className="text-white cursor-pointer"  onClick={()=>navigate('/Notification')} />
+           {unreadCount>0? 
+            <span className="absolute top-6 right-[7rem] translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1">
+           {unreadCount} 
+        </span>
+         :<></> } 
            
             <button
               className="bg-red-600 min-h-8 text-white rounded px-4 py-2 hover:bg-red-700 transition"
@@ -440,7 +468,7 @@ const locationTab=useLocation()
         )}
       </section>
 
-      {/* Now Showing */}
+      
       <section className="mb-8">
       <div className="flex justify-between items-center">
       <h2 className="text-2xl ml-4 font-bold text-indigo-900">

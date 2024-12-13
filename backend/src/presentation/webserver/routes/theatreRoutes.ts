@@ -21,6 +21,9 @@ import { ManageMovies } from '../../../application/usecases/movies'
 import { CloudinaryService } from '../../../infrastructure/services/cloudinaryService'
 import { ShowRepository } from '../../../infrastructure/repositories/showRepository'
 import { FavoriteRepository } from '../../../infrastructure/repositories/favouriteRepository'
+import { BookingMovies } from '../../../application/usecases/booking'
+import { MovieBookingRepository } from '../../../infrastructure/repositories/BookingRepository'
+import { PaymentRepository } from '../../../infrastructure/repositories/paymentRepository'
 
 
 const theatreRoute=Router()
@@ -39,7 +42,10 @@ const theatreCase=new TheatreUseCase(theatreRepository,hashService,otpService,ma
 const screenuseCase=new ScreenUseCase(screenRepository,showRepository)
 const fileService=new FileUploadService()
 const cloudinaryService=new CloudinaryService()
-const theatreController=new TheatreController(theatreCase,fileService,cloudinaryService)
+const bookingRepo=new MovieBookingRepository()
+const paymentRepo=new PaymentRepository()
+const bookingUseCase=new BookingMovies(bookingRepo,paymentRepo,showRepository)
+const theatreController=new TheatreController(theatreCase,fileService,cloudinaryService,bookingUseCase)
 const screenController=new ScreenController(screenuseCase)
 const movieRepo=new MongoMovieRepository()
 const favouriteRepository=new FavoriteRepository()
@@ -64,4 +70,6 @@ theatreRoute.post('/add-movies-screen',authHandler.theatreLogin.bind(authHandler
 theatreRoute.put('/update-screen',authHandler.theatreLogin.bind(authHandler),(req,res)=>screenController.updateScreen(req,res))
 theatreRoute.post('/shows-rollin-movies',authHandler.theatreLogin.bind(authHandler),(req,res)=>screenController.addMoviesToShowtime(req,res))
 theatreRoute.delete('/remove-shows',authHandler.theatreLogin.bind(authHandler),(req,res)=>screenController.removeShowtime(req,res))
+theatreRoute.get('/booking-trends',authHandler.theatreLogin.bind(authHandler),(req,res)=>theatreController.bookingTrends(req,res))
+theatreRoute.get('/revenue-trends',authHandler.theatreLogin.bind(authHandler),(req,res)=>theatreController.revenueTrends(req,res))
 export default theatreRoute

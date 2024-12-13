@@ -45,6 +45,7 @@ interface Movie {
 interface TheatreState {
   theatre: TheatreType | null;
   token: string | null;
+  role:string
   isError: boolean;
   isSuccess: boolean;
   isLoading: boolean;
@@ -64,6 +65,7 @@ const initialState: TheatreState = {
   token: theatreAccessToken ?? null,
   isError: false,
   isSuccess: false,
+  role:"theatre",
   isLoading: false,
   message: '',
   otpToken: null,

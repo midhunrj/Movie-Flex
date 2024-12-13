@@ -8,6 +8,8 @@ export interface IBooking extends Document {
     screenId: Types.ObjectId;
     movieId: Types.ObjectId;
     showtimeId: Types.ObjectId;
+    showtime:string,
+    showDate:Date,
     selectedSeats: string[];
     totalPrice?: number;
     theatreDetails?: {
@@ -47,6 +49,8 @@ const BookingSchema: Schema = new Schema({
   screenId: { type: Schema.Types.ObjectId, ref: 'Screen', required: true },
   movieId: { type: Schema.Types.ObjectId, ref: 'Movie', required: true },
   showtimeId: { type: Schema.Types.ObjectId, ref: 'Showtime', required: true },
+  showtime:{type:String,required:true},
+  showDate:{type:Date,required:true},
   bookingId:{type: String, required: true, unique: true},
   selectedSeats: {type:[String],required:true},
   totalPrice: { type: Number },
