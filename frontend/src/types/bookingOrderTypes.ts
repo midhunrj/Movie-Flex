@@ -5,7 +5,7 @@ import { User } from "./userTypes";
 export interface BookingType {
     _id?: string;
     bookingId?: string; // Added if required
-    userId: User;
+    userId?: User|null;
     theatreId: string;
     screenId: string;
     movieId: MovieType;

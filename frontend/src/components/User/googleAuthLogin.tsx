@@ -7,7 +7,7 @@ import { useDispatch,useSelector } from "react-redux";
 import { auth, googleProvider } from "../../services/firebase/firebase";
 // import { googleLogin } from "../../services/api";
 import { googleLogin } from "../../redux/admin/adminThunk";
-import { toast } from "react-toastify";
+import { Toaster, toast } from "sonner";
 import { AppDispatch, RootState } from "@/redux/store/store";
 
 const GoogleLogin = () => {

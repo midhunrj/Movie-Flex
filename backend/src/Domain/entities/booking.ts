@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { Movie } from "./movies";
 
 export interface Booking {
     _id?: string;
@@ -6,7 +7,7 @@ export interface Booking {
     userId: Types.ObjectId;
     theatreId: Types.ObjectId;
     screenId: Types.ObjectId;
-    movieId: Types.ObjectId;
+    movieId: Types.ObjectId
     showtimeId: Types.ObjectId;
     showtime?:string,
     showDate?:Date,

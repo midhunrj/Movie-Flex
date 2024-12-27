@@ -27,7 +27,7 @@ const BannerCarousel:React.FC<BannerCarouselProps> = ({ images }) => {
   }, [images.length,nextSlide,prevSlide]);
 
   return (
-    <div className="relative flex-wrap mb-4 overflow-hidden flex justify-center group">
+    <div className="relative  mb-4 overflow-hidden flex justify-center group">
     <AnimatePresence initial={false} custom={direction}>
         {images.map((image, index) =>
           index === currentIndex ? (
@@ -54,7 +54,7 @@ const BannerCarousel:React.FC<BannerCarouselProps> = ({ images }) => {
                 duration: 0.2,
                 ease: "easeIn",
               }}
-              className="h-[28rem] object-fit w-full rounded-sm shadow-lg"
+              className="h-[28rem] object-fill w-full rounded-sm shadow-lg"
             />
           ) : null
         )}

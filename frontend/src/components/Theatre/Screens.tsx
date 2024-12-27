@@ -12,7 +12,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { StaticTimePicker } from '@mui/x-date-pickers/StaticTimePicker';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import dayjs, { Dayjs } from 'dayjs';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { useDispatch, useSelector } from 'react-redux';
 import { AddScreen } from '../../redux/theatre/theatreThunk';
 
@@ -358,7 +358,7 @@ return (
 
     <TheatreHeader />
 
-    <div className="min-h-screen flex" style={{ backgroundColor: '#FEE685' }}>
+    <div className="min-h-screen flex bg-gray-200" >
       <div className="flex-col p-2 m-4 bg-indigo-950 w-full mx-20 rounded-lg justify-between text-white">
         <div>
           <h1 className="p-2 justify-center text-center text-2xl">
@@ -452,7 +452,7 @@ return (
                                 // if (movie) handleChangeShows(movie, index);
                                 openModalMovie(index)
                             }}
-                            className="text-white  w-fit px-4 py-2 min-h-8 mt-2 bg-blue-500 hover:text-indigo-700 ml-2"
+                            className="text-white  w-fit px-4 py-1 min-h-8 mt-2 bg-blue-500 hover:text-indigo-700 ml-2"
                         >
                             {showtime.movieId ? 'Edit Movie' : 'Add Movie'}
                         </button>
@@ -460,7 +460,7 @@ return (
         <button
           type="button"
           onClick={() => handleRemoveShowtime(index)}
-          className="text-white mt-2 px-4 py-2 min-h-8 bg-red-600 hover:text-zinc-400 ml-2"
+          className="text-white mt-2 px-4 py-1 min-h-8 bg-red-600 hover:text-zinc-400 ml-2"
         >
           Remove
         </button>

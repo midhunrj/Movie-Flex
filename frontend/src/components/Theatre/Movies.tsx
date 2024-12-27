@@ -78,7 +78,8 @@ const RollingMovies: React.FC = () => {
 
   return (
     <>
-      <div className="min-h-screen" style={{ backgroundColor: "#FEE685" }}>
+      {/* <div className="min-h-screen" style={{ backgroundColor: "#FEE685" }}> */}
+      <div className="min-h-screen bg-gray-100">
         <TheatreHeader />
         <h1 className="text-blue-800 text-3xl mt-4 font-medium text-center">Available Movies</h1>
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-28 mx-20 my-6">

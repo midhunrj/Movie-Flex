@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import MovieDetails from "./movieDetails";
 import { MovieType } from "@/types/movieTypes";
 import { userAuthenticate } from "@/utils/axios/userInterceptor";
-import { toast } from "react-toastify";
+import { Toaster, toast } from "sonner";
 import { Description } from "@headlessui/react";
 import { updateWalletBalance } from "@/redux/user/userSlice";
 

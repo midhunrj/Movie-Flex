@@ -5,7 +5,7 @@ import { useDispatch,useSelector } from "react-redux";
 //import { login } from "../../services/api";
 import GoogleLogin from "./googleAuthLogin";
 import { login } from "../../redux/user/userThunk";
-import {toast} from 'react-toastify'
+import {toast} from 'sonner'
 import { clearState } from "../../redux/user/userSlice";
 import { AppDispatch, RootState } from "@/redux/store/store";
 

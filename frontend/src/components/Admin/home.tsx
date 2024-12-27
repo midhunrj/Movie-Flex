@@ -100,13 +100,18 @@ const Dashboard = () => {
 
   const regions = ["Worldwide", "USA", "India", "California", "Maharashtra","Kerala","TamilNadu","AndhraPradesh", "Los Angeles"];
 
-  const [bookings, setBookings] = useState<BookingType[]>([]);
+  const [bookings, setBookings] = useState<BookingType[]>([])
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
-
+    
+  const paginate = (pageNumber:number) => setCurrentPage(pageNumber)
   const itemsPerPage = 10; // Number of rows per page
-
+  function formatToRupees(amount:number) {
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
+  }
+  
+  
   useEffect(() => {
     fetchBookings(currentPage);
   }, [currentPage]);
@@ -120,7 +125,8 @@ const Dashboard = () => {
           limit: itemsPerPage,
         },
       });
-
+     console.log(response.data.bookings,"booking history");
+     
       setBookings(response.data.bookings);
       setTotalPages(response.data.totalPages);
     } catch (error) {
@@ -248,22 +254,22 @@ const Dashboard = () => {
             </select>
           </div>
     
-        <div className="grid grid-cols-4 gap-4 mt-8">
-          <div className="bg-white  align-text-top font-medium text-gray-800 text-2xl shadow-md rounded-md p-4">
-            <h2>Total Bookings</h2>
-            <p className="text-3xl  align-text-bottom font-semibold">{overview?.totalBookings!}</p>
+        <div className="grid grid-cols-4 gap-4 mt-8  text-gray-700">
+          <div className="bg-white text-center  align-text-top font-medium text-2xl shadow-lg rounded-md p-4">
+            <h2 >Total Bookings</h2>
+            <p className="text-3xl  align-text-bottom font-semibold text-gray-800">{overview?.totalBookings!}</p>
           </div>
-          <div className="bg-white shadow-md rounded-md p-4">
-            <h2>Total Revenue</h2>
-            <p className="text-2xl">${overview?.totalRevenue}</p>
+          <div className="bg-white text-center font-medium  text-2xl shadow-lg rounded-md p-4">
+            <h2 >Total Revenue</h2>
+            <p className="text-2xl font-semibold text-gray-800">{formatToRupees(overview?.totalRevenue!)}</p>
           </div>
-          <div className="bg-white shadow-md rounded-md p-4">
-            <h2>Cancelled Bookings</h2>
-            <p className="text-2xl">{overview?.cancelledBookings}</p>
+          <div className="bg-white  text-center font-medium text-2xl shadow-lg rounded-md p-4">
+            <h2 >Cancelled Bookings</h2>
+            <p className="text-2xl font-semibold text-gray-800">{overview?.cancelledBookings}</p>
           </div>
-          <div className="bg-white shadow-md rounded-md p-4">
-            <h2>Active Users</h2>
-            <p className="text-2xl">{overview?.activeUsers}</p>
+          <div className="bg-white  font-medium text-center text-2xl hadow-lg rounded-md p-4">
+            <h2 >Active Users</h2>
+            <p className="text-2xl font-semibold text-gray-800">{overview?.activeUsers}</p>
           </div>
         </div>
         <div className="mt-4">
@@ -354,7 +360,7 @@ const Dashboard = () => {
         </div>  */}
 
 <div className="mt-8">
-            <h2 className="text-xl font-bold">{selectedRegion} - Top 10 Movies</h2>
+            <h2 className="text-xl font-bold mb-2">{selectedRegion} - Top 10 Movies</h2>
             <table className="min-w-full bg-white shadow-md rounded-md">
               <thead>
                 <tr>
@@ -393,7 +399,7 @@ const Dashboard = () => {
                 {bookings.map((booking) => (
                   <tr key={booking._id} className="border-t">
                     <td className="px-4 py-2">{booking.movieId.title}</td>
-                    <td className="px-4 py-2">{booking.userId.name}</td>
+                    <td className="px-4 py-2">{booking.userId?booking.userId?.name!:booking.screenData?.screenName}</td>
                     <td className="px-4 py-2">{new Date(booking.createdAt).toLocaleDateString()}</td>
                     <td className="px-4 py-2">{booking.status}</td>
                   </tr>
@@ -401,20 +407,32 @@ const Dashboard = () => {
               </tbody>
             </table>
 
-            <div className="flex justify-center items-center mt-4">
-              {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => handlePageChange(page)}
-                  className={`mx-1  min-h-8 px-3 py-1 rounded-md ${
-                    page === currentPage
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-200 text-gray-800"
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
+            <div className="flex justify-center items-center gap-2 mt-4">
+            <button
+    onClick={() => paginate(currentPage - 1)}
+    disabled={currentPage === 1}
+    className={`px-4 py-1  rounded-lg min-h-8  ${currentPage === 1 ? 'bg-gray-300 text-gray-500 cursor-not-allowed hidden' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+  >
+    Prev
+  </button>
+
+  {Array.from({ length: totalPages }, (_, index)=>index+1).filter((page)=>page==currentPage||page==currentPage-1||page==currentPage+1).map(page => (
+    <button
+      key={page}
+      onClick={() => paginate(page)}
+      className={`p-2 rounded-lg  min-h-8 ${currentPage === page  ? 'bg-blue-600 text-white' : 'bg-gray-300 hover:bg-blue-500 hover:text-white'}`}
+    >
+      {page}
+    </button>
+  ))}
+
+  <button
+    onClick={() => paginate(currentPage + 1)}
+    disabled={currentPage === totalPages}
+    className={`px-4 py-1 rounded-lg min-h-8 ${currentPage === totalPages ? 'bg-gray-300 text-gray-500 cursor-not-allowed hidden' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+  >
+    Next
+  </button>
             </div>
           </div>
         )}

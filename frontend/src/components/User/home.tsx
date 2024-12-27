@@ -1,24 +1,38 @@
-
 import React, { useState, useEffect, ChangeEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router";
-import { logout, setUserCoordinates, setUserLocation } from "../../redux/user/userSlice";
+import {Spinner} from "@nextui-org/spinner";
+import {
+  logout,
+  setUserCoordinates,
+  setUserLocation,
+} from "../../redux/user/userSlice";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { Button, Modal } from "flowbite-react";
-import { toast } from "react-toastify";
+import { Toaster, toast } from "sonner";
 import Footer from "./footer";
-import { BiBell, BiSearch, BiMap, BiArrowFromTop, BiArrowBack, BiAlignRight, BiArrowToBottom, BiChevronDown } from "react-icons/bi";
+import {
+  BiBell,
+  BiSearch,
+  BiMap,
+  BiArrowFromTop,
+  BiArrowBack,
+  BiAlignRight,
+  BiArrowToBottom,
+  BiChevronDown,
+} from "react-icons/bi";
 import { fetchMovies, fetchTheatres } from "../../redux/user/userThunk";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css"
+import "react-loading-skeleton/dist/skeleton.css";
 import BannerCarousel from "./bannerCarousel";
 import { AppDispatch, RootState } from "@/redux/store/store";
 import { MovieType } from "@/types/movieTypes";
 import { useLocalizationContext } from "@mui/x-date-pickers/internals";
 import { io } from "socket.io-client";
 import { userUrl } from "@/utils/axios/config/urlConfig";
+import { AiOutlineClose } from "react-icons/ai";
 // import { Theatre } from "@/types/admintypes";
 //import {refreshPage} from '../../redux/user/userThunk'
 // import {toas}
@@ -31,6 +45,7 @@ interface Address {
 }
 
 interface Screen {
+  _id: string;
   screenName: string;
   screenType: string;
   totalSeats: number;
@@ -52,20 +67,41 @@ interface Props {
 }
 
 const HomePage = () => {
-  const { user,role,isSuccess,isError,isLoading,nowShowingMovies=[],upcomingMovies=[],userCoordinates,theatres,userCurrentLocation } = useSelector((state:RootState) => state.user);
+  const {
+    user,
+    role,
+    isSuccess,
+    isError,
+    isLoading,
+    nowShowingMovies = [],
+    upcomingMovies = [],
+    userCoordinates,
+    theatres,
+    userCurrentLocation,
+  } = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [location, setLocation] = useState<string|null>(null);
-  const [searchQuery,setSearchQuery]=useState<string>("")
-  const [citysearchQuery,setcitySearchQuery]=useState<string>("")
+  const [location, setLocation] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [citysearchQuery, setcitySearchQuery] = useState<string>("");
   // const [upcomingMovies,setUpcomingMovies]=useState([])
   // const [nowShowingMovies,setNowShowingMovies]=useState([])
   const [browseMode, setBrowseMode] = useState<"movies" | "theatres">("movies");
   const [selectedTheatre, setSelectedTheatre] = useState<string>("");
   const [unreadCount, setUnreadCount] = useState(0);
 
-  const [suggestedCities, setSuggestedCities] = useState<string[]>(["Kochi","Bangalore","Chennai","Mumbai","Delhi"]);
+  const [suggestedCities, setSuggestedCities] = useState<string[]>([
+    "Ernakulam",
+    "Bangalore",
+    "Chennai",
+    "Mumbai",
+    "Delhi",
+    "Kolkata",
+    "Hyderabad",
+    "Ahmedabad",
+  ]);
+  const [searchCities, setSearchCities] = useState<string[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<string>("");
   const handleLogout = async () => {
     dispatch(logout());
@@ -73,299 +109,295 @@ const HomePage = () => {
     navigate("/");
   };
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
-const [currentLocation, setCurrentLocation] = useState<string|null>(null);
+  const [currentLocation, setCurrentLocation] = useState<string | null>(null);
 
-const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500'
-  
-const userId = user?._id;
+  const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
-useEffect(() => {
-  const socket = io(userUrl); 
+  const userId = user?._id;
 
-  
-  socket.emit("subscribe", userId, role);
+  useEffect(() => {
+    const socket = io(userUrl);
 
-  
-  socket.on("Notification-unread-count", (count: number) => {
-    console.log(count,"unreadcount");
-    
-    setUnreadCount(count);
-  });
-  console.log(unreadCount,"aifhfhafhakfh");
-  
-  return () => {
-    socket.disconnect();
-  };
-}, [userId,role]);
-const handleCitySelection = async(city:string) => {
-  if(city==currentLocation)
-  {
-    await getUserLocation()
+    socket.emit("subscribe", userId, role);
 
-    setLocation(currentLocation)
-  }
-  else{
-   await  fetchCityCoordinates(city)
-  setSelectedLocation(city);
-  setLocation(city);
-  dispatch(setUserLocation(city))
-  }
-  setIsOpen(false);
-};
+    socket.on("Notification-unread-count", (count: number) => {
+      console.log(count, "unreadcount");
 
-const fetchCityCoordinates = async (city: string) => {
-  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(city)}.json?access_token=${MAPBOX_ACCESS_TOKEN}&limit=1`;
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-    if (data.features && data.features.length > 0) {
-      const [longitude, latitude] = data.features[0].center;
-      
-      dispatch(setUserCoordinates({ latitude, longitude }));
-      console.log(`Coordinates for ${city}:`, { latitude, longitude });
+      setUnreadCount(count);
+    });
+    console.log(unreadCount, "aifhfhafhakfh");
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [userId, role]);
+  const handleCitySelection = async (city: string) => {
+    if (city == currentLocation) {
+      await getUserLocation();
+
+      setLocation(currentLocation);
     } else {
-      console.error(`No coordinates found for ${city}`);
+      await fetchCityCoordinates(city);
+      setSelectedLocation(city);
+      setLocation(city);
+      dispatch(setUserLocation(city));
     }
-  } catch (error) {
-    console.error('Error fetching city coordinates:', error);
-  }
-};
+    setIsOpen(false);
+  };
+  console.log(searchCities, "searchcities");
 
+  const fetchCityCoordinates = async (city: string) => {
+    console.log(city, "i am clicking suggested city");
 
-// const handleSearchCityChange = async (e) => {
-//   const query = e.target.value;
-//   setcitySearchQuery(query);
-
-//   if (query.length > 2) {
-//     try {
-//       const response = await fetch(`https://Linkpi.teleport.org/Linkpi/cities/?search=${query}`);
-//       const data = await response.json();
-//       const cities = data._embedded['city:search-results'].map(result => result._embedded['city:item'].name);
-//       setSuggestedCities(cities);
-//     } catch (error) {
-//       console.error("Error fetching city suggestions:", error);
-//     }
-//   } else {
-//     setSuggestedCities([]);
-//   }
-// };
-const MAPBOX_ACCESS_TOKEN="pk.eyJ1IjoiYXNoaW5qb3kiLCJhIjoiY2x6aWE4YnNkMDY0ejJxcjBlZmpid2VoYyJ9.Etsb6UwNacChll6vPVQ_1g"
-
-const handleTheatreSelection = (theatreId: string) => {
-  setSelectedTheatre(theatreId);
-  navigate('/theatre-Shows', { state: { theatreId } });
-};
-
-useEffect(() => {
-  if (userCurrentLocation) {
-    console.log(`Location updated: ${userCurrentLocation}`);
-  }
-}, [userCurrentLocation]);
-
-const handleSearchCityChange = async (e:ChangeEvent<HTMLInputElement>) => {
-  const query = e.target.value;
-  setcitySearchQuery(query);
-
-  if (query.length > 2) {
-    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_ACCESS_TOKEN}&autocomplete=true&types=place&limit=5`;
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+      city
+    )}.json?access_token=${MAPBOX_ACCESS_TOKEN}&limit=1`;
     try {
-      const response = await fetch(url)
-      console.log(response);
-      
-      const data = await response.json()
-      const cityNames = data.features.map((feature:any) => feature.place_name);
-      setSuggestedCities(["Current Location", ...cityNames]);
-    } catch (error) {
-      console.error("Error fetching city suggestions:", error);
-    }
-  } else {
-    setSuggestedCities(["Current Location"]);
-  }
-};
+      const response = await fetch(url);
+      const data = await response.json();
+      console.log(data, "search of coordinates location");
 
-// const getUserLocation = () => {
-//   if (navigator.geolocation) {
-//     navigator.geolocation.getCurrentPosition(
-//       async (position) => {
-//         const { latitude, longitude } = position.coords;
-//         const geoApiKey = "dfd10cf75e1e42ac8410797d0be42cf2";
-//         const response = await fetch(
-//           `https://Linkpi.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${geoApiKey}`
-//         );
-//         const data = await response.json();
+      if (data.features && data.features.length > 0) {
+        const [longitude, latitude] = data.features[0].center;
 
-//         let userLocation;
-//         const components = data.results[0].components;
-//         // More precise location check
-//         if (components.suburb) {
-//           userLocation = components.suburb;
-//         } else if (components.town) {
-//           userLocation = components.town;
-//         } else if (components.village) {
-//           userLocation = components.village;
-//         } else if (components.city) {
-//           userLocation = components.city;
-//         } else {
-//           userLocation = "Location not available";
-//         }
-
-//         setLocation(userLocation);
-//       },
-//       (error) => {
-//         console.error(error);
-//         setLocation("Unable to retrieve location");
-//       }
-//     );
-//   } else {
-//     setLocation("Geolocation not supported");
-//   }
-// };
-// const bannerImages = [
-//   "banner ide.jpeg",
-//   "banner ide 2.jpeg",
-//   "banner img 2.jpeg",
-//   "banner img.jpeg",
-// ];
-const imageMap=nowShowingMovies.map((a)=>{return `${TMDB_IMAGE_BASE_URL}/${a.backdrop_path}`})
-const bannerImages=[...imageMap]
-const getUserLocation = async () => {
-  if (navigator.geolocation) {
-    setIsLoadingLocation(true);
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
         dispatch(setUserCoordinates({ latitude, longitude }));
         dispatch(fetchTheatres({ latitude, longitude }));
+        console.log(`Coordinates for ${city}:`, { latitude, longitude });
+      } else {
+        console.error(`No coordinates found for ${city}`);
+      }
+    } catch (error) {
+      console.error("Error fetching city coordinates:", error);
+    }
+  };
 
-        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_ACCESS_TOKEN}&types=place&limit=1`;
-        try {
-          const response = await fetch(url);
-          const data = await response.json();
-          if (data.features && data.features.length > 0) {
-            const userLocation = data.features[0].place_name;
-            setCurrentLocation(userLocation);
-            dispatch(setUserLocation(userLocation));
-          } else {
-            console.error("Unable to fetch user location details.");
-            setCurrentLocation("Location not found");
+  const MAPBOX_ACCESS_TOKEN =
+    "pk.eyJ1IjoiYXNoaW5qb3kiLCJhIjoiY2x6aWE4YnNkMDY0ejJxcjBlZmpid2VoYyJ9.Etsb6UwNacChll6vPVQ_1g";
+
+  const handleTheatreSelection = (screenId: string) => {
+    setSelectedTheatre(screenId);
+    navigate("/theatre-Shows", { state: { screenId } });
+  };
+
+  useEffect(() => {
+    if (userCurrentLocation) {
+      console.log(`Location updated: ${userCurrentLocation}`);
+    }
+  }, [userCurrentLocation]);
+
+  const handleSearchCityChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setcitySearchQuery(query);
+
+    if (query.length > 2) {
+      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+        query
+      )}.json?access_token=${MAPBOX_ACCESS_TOKEN}&autocomplete=true&types=place&limit=5`;
+      try {
+        const response = await fetch(url, {
+          headers: {
+            "Cache-Control": "no-store",
+            Pragma: "no-cache",
+          },
+        });
+        console.log(response);
+
+        const data = await response.json();
+        const cityNames = data.features.map(
+          (feature: any) => feature.place_name
+        );
+        setSearchCities([...cityNames]);
+      } catch (error) {
+        console.error("Error fetching city suggestions:", error);
+      }
+    }
+  };
+
+  const imageMap = nowShowingMovies.map((a) => {
+    return `${TMDB_IMAGE_BASE_URL}/${a.backdrop_path}`;
+  });
+  const bannerImages = [...imageMap];
+  const getUserLocation = async () => {
+    if (navigator.geolocation) {
+      setIsLoadingLocation(true);
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          dispatch(setUserCoordinates({ latitude, longitude }));
+          dispatch(fetchTheatres({ latitude, longitude }));
+
+          const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_ACCESS_TOKEN}&types=place&limit=1`;
+          try {
+            const response = await fetch(url);
+            const data = await response.json();
+            if (data.features && data.features.length > 0) {
+              const userLocation = data.features[0].place_name;
+              setCurrentLocation(userLocation);
+              dispatch(setUserLocation(userLocation));
+            } else {
+              console.error("Unable to fetch user location details.");
+              setCurrentLocation("Location not found");
+            }
+          } catch (error) {
+            console.error("Error fetching current location:", error);
+            setCurrentLocation("Unable to retrieve location");
+          } finally {
+            setIsLoadingLocation(false);
           }
-        } catch (error) {
-          console.error("Error fetching current location:", error);
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
           setCurrentLocation("Unable to retrieve location");
-        } finally {
           setIsLoadingLocation(false);
         }
-      },
-      (error) => {
-        console.error("Geolocation error:", error);
-        setCurrentLocation("Unable to retrieve location");
-        setIsLoadingLocation(false);
-      }
-    );
-  } else {
-    console.error("Geolocation is not supported by this browser.");
-    setCurrentLocation("Geolocation not supported");
-  }
-};
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser.");
+      setCurrentLocation("Geolocation not supported");
+    }
+  };
 
-
-  const sanitizeString = (str:string) => {
+  const sanitizeString = (str: string) => {
     return str.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
   };
-  const santizedSearchQuery=sanitizeString(searchQuery)
-  console.log(nowShowingMovies,"nowshowing movies in home page");
-  
-  const filteredNowShowing = nowShowingMovies.filter((movie:MovieType) =>{
-    const sanitizedMovieTitle=sanitizeString(movie?.title??'')
+  const santizedSearchQuery = sanitizeString(searchQuery);
+  console.log(nowShowingMovies, "nowshowing movies in home page");
+
+  const filteredNowShowing = nowShowingMovies.filter((movie: MovieType) => {
+    const sanitizedMovieTitle = sanitizeString(movie?.title ?? "");
     //movie.title.replace(/[^a-zA-Z0-9]/g, "").toLowerCase().includes(searchQuery.replace(/[^a-zA-Z0-9]/g, "").toLowerCase())
-    return sanitizedMovieTitle.includes(santizedSearchQuery)
-  }
-  );
-    console.log(upcomingMovies,"upcomingMovies in home");
-    
-  const filteredUpcoming = upcomingMovies.filter((movie:MovieType) =>
-  {
-    const sanitizedMovieTitle=sanitizeString(movie.title??'')
+    return sanitizedMovieTitle.includes(santizedSearchQuery);
+  });
+  console.log(upcomingMovies, "upcomingMovies in home");
+
+  const filteredUpcoming = upcomingMovies.filter((movie: MovieType) => {
+    const sanitizedMovieTitle = sanitizeString(movie.title ?? "");
     //movie.title.toLowerCase().includes(searchQuery.toLowerCase())
-    return sanitizedMovieTitle.includes(santizedSearchQuery)
-  }
-  );
-  const filterMovies = (movies:MovieType[]):MovieType[] => {
-    return movies.filter(movie => movie?.title?.toLowerCase().includes(searchQuery.toLowerCase()));
+    return sanitizedMovieTitle.includes(santizedSearchQuery);
+  });
+  const filterMovies = (movies: MovieType[]): MovieType[] => {
+    return movies.filter((movie) =>
+      movie?.title?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
   };
-const locationTab=useLocation()
+  const locationTab = useLocation();
   const isActive = (path: string) => locationTab?.pathname === path;
   useEffect(() => {
     if (!user) {
       navigate("/");
     }
-    dispatch(fetchMovies())
-   // getUserLocation();
+    dispatch(fetchMovies());
+    // getUserLocation();
   }, [user]);
 
-  const MovieCarousel:React.FC<{ movies:MovieType[] }>=({movies}) => (
-    <motion.div className="flex overflow-x-auto  scrollbar-hide space-x-4 p-4" drag="x" dragConstraints={{ right: 0, left: -300 }}>
+  const MovieCarousel: React.FC<{ movies: MovieType[] }> = ({ movies }) => (
+    <motion.div
+      className="flex overflow-x-auto  scrollbar-hide space-x-4 p-4"
+      drag="x"
+      dragConstraints={{ right: 0, left: -300 }}
+    >
       {movies.slice(0, 8).map((movie) => (
-        <motion.div key={movie._id} className="flex-none w-80">
+        <motion.div key={movie._id} className=" flex-none w-80">
           <img
-            src={movie.poster_path ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}` : "/path/to/fallback-image.jpg"}
+            src={
+              movie.poster_path
+                ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}`
+                : ''
+            }
             alt={movie.title}
             className="w-full cursor-pointer rounded-lg hover:scale-105 transition-transform"
           />
           <p className="mt-2 text-lg font-semibold">{movie.title}</p>
-          <p className="text-sm text-gray-600">Rating: {movie.rating || "Popular"}</p>
+          <p className="text-sm text-gray-600">
+            Rating: {movie.rating || "Popular"}
+          </p>
         </motion.div>
       ))}
     </motion.div>
-  )
+  );
   return (
     <>
-   {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="relative bg-white rounded-lg shadow-lg w-full max-w-md mx-auto">
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center  justify-center bg-black bg-opacity-50">
+          <div className="relative bg-white rounded-lg shadow-lg w-1/2 max-w-7xl mx-auto">
             <div className="flex justify-between items-center bg-blue-600 text-white p-4 rounded-t-lg">
-              <h3 className="text-lg font-semibold">Select Your Location</h3>
+              <h3 className="text-lg font-semibold ml-12">
+                Select Your Location
+              </h3>
               <button
                 className="text-white hover:text-gray-200"
                 onClick={() => setIsOpen(false)}
               >
-                &times;
+                          <AiOutlineClose size={20} />
               </button>
             </div>
             <div className="p-6 space-y-4">
-  <input
-    type="text"
-    placeholder="Enter your location..."
-    value={citysearchQuery}
-    onChange={handleSearchCityChange}
-    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-  />
-  {suggestedCities.length > 0 && (
-    <div className="max-h-48 overflow-y-auto border border-gray-300 rounded-lg mt-2">
-      <div
-        className="p-3 cursor-pointer hover:bg-gray-100 transition flex items-center"
-        onClick={getUserLocation}
-      >
-        {isLoadingLocation ? (
-          <span>Loading location...</span>
-        ) : currentLocation ? (
-          <span onClick={()=>handleCitySelection(currentLocation)}>{currentLocation}</span>
-        ) : (
-          <span>Detect My Location</span>
-        )}
-      </div>
-      {suggestedCities.map((city) => (
-        <div
-          key={city}
-          className="p-3 cursor-pointer hover:bg-gray-100 transition"
-          onClick={() => handleCitySelection(city)}
-        >
-          {city}
-        </div>
-      ))}
-    </div>
-  )}
-</div>
+              <input
+                type="text"
+                placeholder="Enter your location..."
+                value={citysearchQuery}
+                onChange={handleSearchCityChange}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+
+              <div
+                className="p-3 cursor-pointer w-fit h-fit bg-yellow-100 rounded-md hover:bg-gray-100 transition "
+                onClick={getUserLocation}
+              >
+                {isLoadingLocation ? (
+                  <span className="flex gap-2 ">
+
+                        <Spinner size="sm" color="danger" className="text-red-500" />
+
+                   
+                  Loading location...</span>
+                ) : currentLocation ? (
+                  <span onClick={() =>{const place=currentLocation.split(',')[0]
+                     handleCitySelection(place)}}>
+                    {currentLocation}
+                  </span>
+                ) : (
+                  <span>Detect My Location</span>
+                )}
+              </div>
+              {citysearchQuery.length > 0 && searchCities.length > 0 ? (
+                <>
+                  <div className="max-h-48 overflow-y-auto border border-gray-300 rounded-lg mt-2">
+                    {searchCities.map((city) => (
+                      <div
+                        key={city}
+                        className="p-3 cursor-pointer hover:bg-gray-100 transition"
+                        onClick={() => {
+                          const place = city.split(",")[0]
+                          handleCitySelection(place);
+                        }}
+                      >
+                        {city}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-xl m-2 text-slate-950 font-semibold">
+                    Top Cities
+                  </h2>
+                  <div className=" min-h-fit m-2 border shadow-lg   overflow-hidden gap-4 grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 rounded-lg mt-2">
+                    {suggestedCities.map((city) => (
+                      <div className="relative  m-2 p-4">
+                        <button
+                          key={city}
+                          className=" p-2 cursor-pointer w-28 h-fit bg-blue-100 hover:bg-gray-100 transition"
+                          onClick={() => handleCitySelection(city)}
+                        >
+                          {city}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
 
             <div className="flex justify-end p-4 border-t border-gray-200 rounded-b-lg">
               <button
@@ -378,10 +410,9 @@ const locationTab=useLocation()
           </div>
         </div>
       )}
-  
 
-      <div className=" bg-gray-100">
-        <header className="flex items-center justify-between w-full text-white bg-[#091057] p-4">
+      <div className=" bg-gray-100 text-slate-950">
+        <header className="flex items-center justify-between w-full bg-blue-950 text-white  p-4">
           <div className="flex items-center">
             <img
               src="movielogo 2.jpeg"
@@ -393,49 +424,85 @@ const locationTab=useLocation()
 
           {/* Center: Navbar Links */}
           <div className="flex space-x-8">
-            <Link to="/" className={`hover:bg-amber-400 px-4 py-2 rounded ${
-                isActive('/home') ? 'bg-yellow-500 text-blue-950' : 'hover:bg-gray-700 hover:text-white'
-              }`}>Home</Link>
-            <Link to="/profile" className={`hover:bg-gray-700 px-4 py-2 rounded ${
-                isActive('/profile') ? 'bg-yellow-500 text-blue-950' : 'hover:bg-gray-700 hover:text-white'
-              }`}>Profile</Link>
-            <Link to="/orders" className="hover:bg-gray-700 px-4 py-2 rounded">Your Orders</Link>
-            <Link to="/favourites" className="hover:bg-gray-700 px-4 py-2 rounded">Favourites</Link>
-            <Link to="/wallet" className="hover:bg-gray-700 px-4 py-2 rounded">wallet</Link>
+            <Link
+              to="/"
+              className={`hover:bg-amber-400 px-4 py-2 rounded ${
+                isActive("/home")
+                  ? "bg-yellow-500 text-blue-950"
+                  : "hover:bg-gray-700 hover:text-white"
+              }`}
+            >
+              Home
+            </Link>
+            <Link
+              to="/profile"
+              className={`hover:bg-gray-700 px-4 py-2 rounded ${
+                isActive("/profile")
+                  ? "bg-yellow-500 text-blue-950"
+                  : "hover:bg-gray-700 hover:text-white"
+              }`}
+            >
+              Profile
+            </Link>
+            <Link to="/orders" className="hover:bg-gray-700 px-4 py-2 rounded">
+              Your Orders
+            </Link>
+            <Link
+              to="/favourites"
+              className="hover:bg-gray-700 px-4 py-2 rounded"
+            >
+              Favourites
+            </Link>
+            <Link to="/wallet" className="hover:bg-gray-700 px-4 py-2 rounded">
+              wallet
+            </Link>
           </div>
 
           <div className="flex items-center space-x-4">
-            
             <div className="relative">
               <input
                 type="text"
                 placeholder="Search"
-                value={searchQuery} 
+                value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="p-2 rounded bg-gray-700 text-white pl-10"
               />
-              <BiSearch className="absolute left-2 top-2 text-gray-300" size={24} />
+              <BiSearch
+                className="absolute left-2 top-2 text-gray-300"
+                size={24}
+              />
             </div>
 
-            
             <div className="flex items-center bg-white w-fit rounded p-2 text-black">
-  <BiMap size={24} onClick={() => setIsOpen(true)} />
-  <span className="ml-1 flex items-center cursor-pointer" onClick={() => setIsOpen(true)}>
-    {location ? location :userCurrentLocation?userCurrentLocation: "Fetching Location..."}
-    <BiChevronDown size={20} className="ml-1" />
-  </span>
-</div>
+              <BiMap size={24} onClick={() => setIsOpen(true)} />
+              <span
+                className="ml-1 flex items-center cursor-pointer"
+                onClick={() => setIsOpen(true)}
+              >
+                {location
+                  ? location
+                  : userCurrentLocation
+                  ? userCurrentLocation
+                  : "Fetching Location..."}
+                <BiChevronDown size={20} className="ml-1" />
+              </span>
+            </div>
 
-            
-            <BiBell size={24} className="text-white cursor-pointer"  onClick={()=>navigate('/Notification')} />
-           {unreadCount>0? 
-            <span className="absolute top-6 right-[7rem] translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1">
-           {unreadCount} 
-        </span>
-         :<></> } 
-           
+            <BiBell
+              size={24}
+              className="text-white cursor-pointer"
+              onClick={() => navigate("/Notification")}
+            />
+            {unreadCount > 0 ? (
+              <span className="absolute top-6 right-[7rem] translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1">
+                {unreadCount}
+              </span>
+            ) : (
+              <></>
+            )}
+
             <button
-              className="bg-red-600 min-h-8 text-white rounded px-4 py-2 hover:bg-red-700 transition"
+              className="bg-red-600 min-h-8 text-white rounded px-4 py-1 hover:bg-red-700 transition"
               onClick={handleLogout}
             >
               Logout
@@ -443,98 +510,123 @@ const locationTab=useLocation()
           </div>
         </header>
 
-       
-       { browseMode === "movies"? ( <><BannerCarousel images={bannerImages} />
+        {browseMode === "movies" ? (
+          <>
+            {searchQuery.length == 0 ? (
+              <BannerCarousel images={bannerImages} />
+            ) : (
+              <></>
+            )}
 
-       {/* Upcoming Movies */}
-       {/* Upcoming Movies */}
-       <section className="mb-8">
-       <div className="flex justify-between items-center">
-      <h2 className="text-2xl ml-4 font-bold text-indigo-900">
-        Upcoming Movies &nbsp; &gt;&gt;&gt;
-      </h2>
-      <Link to="/upcoming-movies" className="text-blue-800 hover:text-base hover:font-medium mr-2">
-        See All &gt;
-      </Link>
-      </div>
-        {isLoading ? (
-          <div className="flex  justify-evenly space-x-4 mt-4">
-          {[...Array(4)].map((_, index) => (
-            <Skeleton key={index} height={300} width={300} />
-          ))}
-        </div>
-        ) : (
-          <MovieCarousel movies={filterMovies(upcomingMovies)} />
-        )}
-      </section>
+            <section className="mb-8">
+              {filteredUpcoming.length > 0 ? (
+                <div className="flex justify-between items-center">
+                  <h2 className="text-2xl ml-4 font-bold text-indigo-900">
+                    Upcoming Movies &nbsp; &gt;&gt;&gt;
+                  </h2>
+                  <Link
+                    to="/upcoming-movies"
+                    className="text-indigo-900 hover:text-base hover:font-medium mr-2"
+                  >
+                    See All &gt;
+                  </Link>
+                </div>
+              ) : (
+                <></>
+              )}
+              {isLoading ? (
+                <div className="flex  justify-evenly space-x-4 mt-4">
+                  {[...Array(4)].map((_, index) => (
+                    <Skeleton key={index} height={300} width={300} />
+                  ))}
+                </div>
+              ) : (
+                <MovieCarousel movies={filterMovies(upcomingMovies)} />
+              )}
+            </section>
 
-      
-      <section className="mb-8">
-      <div className="flex justify-between items-center">
-      <h2 className="text-2xl ml-4 font-bold text-indigo-900">
-        Now Showing &nbsp; &gt;&gt;&gt;
-      </h2>
-      <Link to="/now-showing" className="text-blue-800 hover:text-base hover:font-medium mr-2">
-        See All &gt;
-      </Link>
-    </div>
-        {isLoading ? (
-           <div className="flex  justify-evenly space-x-4 mt-4">
-           {[...Array(4)].map((_, index) => (
-             <Skeleton key={index} height={300} width={300} />
-           ))}
-         </div>
-        ) : (
-          <MovieCarousel movies={filterMovies(nowShowingMovies)} />
-        )}
-      </section>
-      
-       </> ): (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 m-4">
-        {theatres?.map((theatre: TheatreLocate, index: number) => (
-          <div
-            key={theatre?._id || index} // Fallback to index if _id is missing
-            className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer"
-            onClick={() => handleTheatreSelection(theatre._id)}
-          >
-            <span className="w-full h-40 px-4 py-2 object-cover bg-yellow-200 text-red-500 rounded-md mb-4">
-              {theatre.screens.screenType}
-             
-              
-            </span>
-            <h3 className="text-lg mt-4 font-bold text-gray-700 mb-2">{theatre.name}</h3>
-            <p className="text-sm text-gray-600">
-              {theatre.address.place}, {theatre.address.city}
-            </p>
-            <p className="text-sm text-gray-600">
-              Distance: {(theatre.distance / 1000).toFixed(1)} km
-            </p>
-            <p className="mt-4 text-sm text-gray-500">
-              <strong>Screen:</strong> {theatre.screens.screenName} - {theatre.screens.screenType}
-            </p>
-            <p className="text-sm text-gray-500">
-              <strong>Total Seats:</strong> {theatre.screens.totalSeats}
-            </p>
+            <section className="mb-8">
+              {filteredNowShowing.length > 0 ? (
+                <div className="flex justify-between items-center">
+                  <h2 className="text-2xl ml-4 font-bold text-indigo-900">
+                    Now Showing &nbsp; &gt;&gt;&gt;
+                  </h2>
+                  <Link
+                    to="/now-showing"
+                    className="text-indigo-900 hover:text-base hover:font-medium mr-2"
+                  >
+                    See All &gt;
+                  </Link>
+                </div>
+              ) : (
+                <></>
+              )}
+              {isLoading ? (
+                <div className="flex  justify-evenly space-x-4 mt-4">
+                  {[...Array(4)].map((_, index) => (
+                    <Skeleton key={index} height={300} width={300} />
+                  ))}
+                </div>
+              ) : (
+                <MovieCarousel movies={filterMovies(nowShowingMovies)} />
+              )}
+            </section>
+          </>
+        ) : (browseMode=="theatres"?(theatres.length>0?(
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 m-4">
+            {theatres?.map((theatre: TheatreLocate, index: number) => (
+              <div
+                key={theatre?._id || index}
+                className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer"
+                onClick={() => handleTheatreSelection(theatre.screens?._id)}
+              >
+                <span className="w-full h-40 px-4 py-2 object-cover bg-yellow-200 text-red-500 rounded-md mb-4">
+                  {theatre.screens.screenType}
+                </span>
+                <h3 className="text-lg mt-4 font-bold text-gray-700 mb-2">
+                  {theatre.name}
+                </h3>
+                <p className="text-sm text-gray-600">
+                  {theatre.address.place}, {theatre.address.city}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Distance: {(theatre.distance / 1000).toFixed(1)} km
+                </p>
+                <p className="mt-4 text-sm text-gray-500">
+                  <strong>Screen:</strong> {theatre.screens.screenName} -{" "}
+                  {theatre.screens.screenType}
+                </p>
+                <p className="text-sm text-gray-500">
+                  <strong>Total Seats:</strong> {theatre.screens.totalSeats}
+                </p>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      
-          )}
-      <div className="flex justify-center space-x-4 my-4">
-        <button
-          onClick={() => setBrowseMode("movies")}
-          className={`px-4 py-2 w-fit min-h-12 mb-4 rounded ${browseMode === "movies" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
-        >
-          Browse by Movies
-        </button>
-        <button
-          onClick={() => setBrowseMode("theatres")}
-          className={`px-4 py-2 w-fit min-h-12 mb-4rounded ${browseMode === "theatres" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
-        >
-          Browse by Theatres
-        </button>
-      </div>
-    
+        ):(<div className="flex justify-center m-10 items-center flex-col">
+          <img src="https://via.placeholder.com/150?text=No+Upcoming+Movies" alt="No Upcoming Movies" className="w-48 h-48 mb-4" />
+          <p className="text-xl font-semibold text-gray-700">No Theatres found in this location</p>
+        </div>)):null)}
+        <div className="flex justify-center space-x-4 my-4">
+          <button
+            onClick={() => setBrowseMode("movies")}
+            className={`px-4 py-2 w-fit min-h-12 mb-4 rounded ${
+              browseMode === "movies" ? "bg-blue-600 text-white" : "bg-gray-200"
+            }`}
+          >
+            Browse by Movies
+          </button>
+          <button
+            onClick={() => setBrowseMode("theatres")}
+            className={`px-4 py-2 w-fit min-h-12 mb-4rounded ${
+              browseMode === "theatres"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200"
+            }`}
+          >
+            Browse by Theatres
+          </button>
+        </div>
+
         {/* Footer */}
         <Footer />
       </div>
@@ -543,10 +635,6 @@ const locationTab=useLocation()
 };
 
 export default HomePage;
-
-
-
-
 
 // unused code here jhfshfjhfkjsfhkjsfhkjsfh -------------------------------------------------------- kjhkjhkjhkjshkjshfjh///
 // import React, { useState, useEffect } from "react";
@@ -730,9 +818,8 @@ export default HomePage;
 
 // export default HomePage;
 
-
-
-{/* <header className="bg-blue-950 text-white py-4">
+{
+  /* <header className="bg-blue-950 text-white py-4">
   <div className="container mx-auto grid grid-cols-12 ">
     <div className="col-span-8">
       <h1 className="text-xl">Movie Ticket Booking</h1>
@@ -746,4 +833,7 @@ export default HomePage;
     </div>
   </div>
 </header>
-         */}
+         */
+}
+
+// bg-[#480ca8]

@@ -3,7 +3,7 @@ import { useDispatch,useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import './css/login.css'
 //import { resetPass } from "../../services/api";
-import { toast } from "react-toastify";
+import { Toaster, toast } from "sonner";
 import { resetPass } from "../../redux/user/userThunk";
 import { AppDispatch, RootState } from "@/redux/store/store";
 const ResetPassword=()=>{

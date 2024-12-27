@@ -6,13 +6,13 @@ import { User, UserCoordinates } from "../../Domain/entities/user";
 import { JWTService } from "../../infrastructure/services/jwtService";
 import { Movie } from "../../Domain/entities/movies";
 import { IShowtime } from "../../infrastructure/database/models/showModel";
-import { iShowRepository } from "../repositories/iShowRepository";
+import { IShowRepository } from "../repositories/iShowRepository";
 import { Types } from "mongoose";
 import { TierData } from "../../Domain/entities/shows";
 import { IWalletRepository } from "../repositories/iWalletRepository";
 import { WalletTransaction } from "../../Domain/entities/wallet";
 export class UserUseCases{
-    constructor(private userRepository:IuserRepository,private showRepository:iShowRepository,private walletRepo:IWalletRepository, private hashservice:HashService,private otpservice:OtpService,private mailService:MailService,private jwtService:JWTService,private verifyToken:string="",private verifyMail:string="", ){}
+    constructor(private userRepository:IuserRepository,private showRepository:IShowRepository,private walletRepo:IWalletRepository, private hashservice:HashService,private otpservice:OtpService,private mailService:MailService,private jwtService:JWTService,private verifyToken:string="",private verifyMail:string="", ){}
 async register(user:User):Promise<String>
 {
     console.log(user.password,"before hash");
@@ -219,9 +219,9 @@ async updateProfile(userId: string | undefined, profileData: any): Promise<User 
         return await this.showRepository.listShowtimes(movieId,date,userCoords)
       }
 
-      async getTheatreShowtimes(theatreId:string,date:string):Promise<IShowtime[]>
+      async getTheatreShowtimes(screenId:string,date:string):Promise<IShowtime[]>
       {
-        return await this.showRepository.listTheatreShowtimes(theatreId,date)
+        return await this.showRepository.listTheatreShowtimes(screenId,date)
       }
 
       async showtimeSeats(showtimeId:string):Promise<TierData[]|null>

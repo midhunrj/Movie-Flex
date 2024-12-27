@@ -1,10 +1,19 @@
 import { EnrolledMovie, ScreenModel } from "../database/models/screenModel";
 import { Screen } from '../../Domain/entities/screens';
-import { iScreenRepository } from "../../application/repositories/iScreenRepository";
+import { IScreenRepository } from "../../application/repositories/iScreenRepository";
 import { UserCoordinates } from "../../Domain/entities/user";
 import { theatreModel } from "../database/models/theatreModel";
-
-export class ScreenRepository implements iScreenRepository{
+import showModel from "../database/models/showModel";
+import { BookingModel } from "../database/models/bookingModel";
+import { MovieModel } from "../database/models/movieModel";
+import { NotificationType } from "../database/models/notficationModel";
+import { Notification } from "../../application/usecases/notification";
+//const notification=new Notification
+export class ScreenRepository implements IScreenRepository{
+  private notificationService:Notification
+  constructor(notificationService: Notification) {
+    this.notificationService = notificationService;
+  }
   async create(screen: Screen): Promise<Screen> {
     console.log(screen,"screen in repository")
     
@@ -106,6 +115,7 @@ async enrollMovieData(screenId:string,movie:any):Promise<Screen|null>
 
  async fetchTheatresWithScreens(userCoords: UserCoordinates) {
   const { longitude, latitude } = userCoords;
+console.log('coordinatesssss',longitude,latitude);
 
   if (longitude === undefined || latitude === undefined) {
     throw new Error('Longitude and Latitude must be defined');
@@ -136,5 +146,164 @@ async enrollMovieData(screenId:string,movie:any):Promise<Screen|null>
   
   return theatres;
 }
+
+async updateExpiredMovieFromScreen() {
+    const screens=await ScreenModel.find()
+
+    for(const screen of screens)
+    {
+      const movieIds=screen.enrolledMovies.map((item)=>item.movieId.toString())
+      const validShowtimes = screen.showtimes.filter(
+        (showtime) =>
+            movieIds.includes(showtime.movieId!) && showtime?.expiryDate! > new Date()
+    );
+      const movieWithShowtimes=new Set(validShowtimes.map(showtime=>showtime.movieId))
+
+      screen.enrolledMovies=screen.enrolledMovies.filter((movie)=>movieWithShowtimes.has(movie.movieId.toString()))
+      
+       screen.showtimes=screen.showtimes.map((show)=>{if(show.expiryDate!< new Date())
+       {
+        return{
+          ...show,
+          movieId:null,
+          expiryDate:null
+
+        }
+       }
+       return show
+       })
+      await screen.save()
+    }
+}
+
+async removeMovieFromScreen(movieId: string, screenId: string): Promise<Screen | null> {
+  try{  
+    
+  const screenData=await ScreenModel.findByIdAndUpdate(screenId,{$pull:{'enrolledMovies':{movieId:movieId}}},{new:true})
+  console.log(screenData,"after return from deleting enroll Movie");
+  
+  return screenData
+  }
+  catch(error:any)
+  {
+    console.error("error removing movie From screen",error)
+    return null
+  }
+
+}
+
+async updateShowFromScreen(screenId: string, prevTime: string, newTime: string): Promise<Screen | null> {
+  console.log("kk");
+  
+    const screenData=await ScreenModel.findById(screenId)
+    if(!screenData||!Array.isArray(screenData?.showtimes!))
+      {
+        console.log("fdsfnsdk");
+        
+        return null
+      } 
+    const Showtimes=[...screenData?.showtimes!]
+     const updatedShowtimes=Showtimes.map((show)=>{
+      if(show.time==prevTime)
+      {
+        
+        show.time=newTime
+      }
+      return show
+     })
+     console.log(updatedShowtimes,"updatedShowtimes");
+     screenData.showtimes=updatedShowtimes
+     await screenData?.save()
+   const bookingDatas=await BookingModel.find({$and:[{showDate:{$lte:new Date()}},{showtime:{$eq:prevTime}},{screenId:screenId}]})
+     
+   for(const booking of bookingDatas){
+    
+    
+      booking.showtime=newTime
+   
+   await booking.save()
+   const movieName=await MovieModel.findById(booking.movieId,{title:1,_id:0})
+   
+   const data = {
+    bookingId: booking._id,
+    movieDetails: {
+      name: movieName?.title!,
+      image: movieName?.poster_path!,
+    },
+    screenData: {
+      screenName: booking.screenData?.screenName,
+      screenType: booking.screenData?.screenType,
+      tierName:booking.screenData?.tierName
+    },
+    // theatreDetails: {
+    //   name: bookingData.theatreDetails?.name,
+    //   address: bookingData.theatreDetails?.address,
+    // },
+    showDetails: {
+      showtime: booking.showtime,
+      showDate: booking.showDate,
+    },
+    selectedSeats: booking.selectedSeats,
+    totalPrice: booking.totalPrice,
+  };
+
+  const notificationData = {
+    recipients:[{recipientId:booking.userId,recipientRole:"user"}],
+    type: NotificationType.SYSTEM_ALERT,
+    title: 'Showtime has been Rescheduled',
+    message: `🎬 Reminder: Your movie ${movieName?.title} starts at ${prevTime} on ${booking.showDate} has been rescheduled to ${newTime}. Be there in time! Enjoy the show! ✨"`,
+    data,
+  };
+  console.log(notificationData,"kmklj");
+  
+     await this.notificationService.newNotification(notificationData)
+   }
+    return screenData
+}
+
  }
+
+//  class ManageShowtimesUseCase {
+//   constructor(
+//       private showRepository: ShowRepository,
+//       private bookingRepository: BookingRepository,
+//       private refundService: RefundService,
+//       private notificationService: NotificationService
+//   ) {}
+
+//   async addShow(newShowData) {
+//       const today = new Date();
+//       const tomorrow = new Date(today.setDate(today.getDate() + 1));
+
+//       if (newShowData.date < tomorrow) {
+//           throw new Error("Showtime can only be scheduled from tomorrow or later.");
+//       }
+
+//       // Detect conflicts
+//       const conflictingShows = await this.showRepository.findConflicts(newShowData.date);
+
+//       if (conflictingShows.length > 0) {
+//           // Refund and notify users
+//           const affectedBookings = await this.bookingRepository.findByShowIds(
+//               conflictingShows.map(show => show.id)
+//           );
+
+//           await Promise.all(
+//               affectedBookings.map(async (booking) => {
+//                   await this.refundService.processRefund(booking.id, booking.amount);
+//                   await this.notificationService.send({
+//                       userId: booking.userId,
+//                       message: `Your booking for ${booking.showTitle} on ${booking.date} has been canceled. Refund processed.`,
+//                   });
+//               })
+//           );
+
+//           // Delete conflicting shows
+//           await this.showRepository.deleteByIds(conflictingShows.map(show => show.id));
+//       }
+
+//       // Add new show
+//       await this.showRepository.add(newShowData);
+//   }
+// }
 

@@ -8,6 +8,7 @@ import { FaAngleLeft, FaArrowLeft } from "react-icons/fa";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store/store";
+import {motion} from 'framer-motion'
 const ticketImages = [
   "scooterImage",
   " bikeImage",
@@ -97,6 +98,10 @@ const TheatreBooking: React.FC = () => {
     fetchSeatLayout();
   }, [theatreId, screenId, showtime])
   
+  const slideUpVariants = {
+    hidden: { y: "100%", opacity: 0 },
+    visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: "easeInOut" } },
+  };
    const backendSeatLayout=async()=>{
     const response = await userAuthenticate.get('/screen-layout', {
       params: { showtimeId }, // Pass showtimeId as a query parameter
@@ -114,21 +119,6 @@ const TheatreBooking: React.FC = () => {
   fetchSeatData()
   },[showtimeId,])
 
-  // useEffect(()=>{
-  //   setSeatLayout((prev) =>
-  //     prev.map((tier) => ({
-  //       ...tier,
-  //       seatLayout: tier.seatLayout.map((row) =>
-  //         row.map((seat) => ({
-  //           ...seat,
-  //           isSelected: false,
-  //         }))
-  //       ),
-  //     }))
-  //   );
-  //   setSelectedSeats(0);
-
-  // },[ticketCount])
 
   console.log(seatLayout,"seatlayout after tiers from backend");
    
@@ -146,22 +136,30 @@ const TheatreBooking: React.FC = () => {
     if (!seat?.isBooked) {
       if(seat.isSelected)
       {
+        console.log('jumbo');
+        
         seat.isSelected=false
         setSeatNames((prev)=>prev.filter((name)=>name!=seat.seatLabel))
         setSelectedSeats(prev=>prev-1)
       }
       else if (selectedSeats<ticketCount) {
+        console.log("sumbo");
+        
         seat.isSelected=true
         setSeatNames((prev)=>[...prev,seat.seatLabel])
         setSelectedSeats(prev=>prev+1)
       }
       else{
+        console.log("vdfvdf");
+        
         let clear = false;
         for (let tier of updatedLayout) {
           for (let row of tier.rows) {
             for (let s of row.seats) {
               if (s.isSelected) {
                 s.isSelected = false;
+                console.log("jokr");
+                
                 setSelectedSeats(prev=>prev-1)
                 setSeatNames((prev)=>prev.filter((name)=>name!=s.seatLabel))
                 clear = true;
@@ -176,6 +174,8 @@ const TheatreBooking: React.FC = () => {
             true;
           }
         }
+        console.log("fsd");
+        
         seat.isSelected=true
         setSeatNames((prev)=>[...prev,seat.seatLabel])
         setSelectedSeats(prev=>prev+1)
@@ -183,12 +183,6 @@ const TheatreBooking: React.FC = () => {
       
       setSeatLayout(updatedLayout);
 
-      // const totalSelected = updatedLayout.reduce(
-      //   (count, tier) =>
-      //     count +
-      //     tier.seatLayout.flat().filter((s: Seat) => s.isSelected).length,
-      //   0
-      // );
     
     }
   };
@@ -210,13 +204,6 @@ const TheatreBooking: React.FC = () => {
       const selectedSeatsData = seatLayout
         .flatMap((tier: Tier) => tier.rows.flatMap((row)=>row.seats))
         .filter((seat: any) => seat.isSelected);
-
-      // await userAuthenticate.post("/book-seats", {
-      //   theatreId,
-      //   screenId,
-      //   showtime,
-      //   seats: selectedSeatsData,
-      // });
 
       
         const totalCost = calculateTotalCost();
@@ -250,21 +237,6 @@ const TheatreBooking: React.FC = () => {
             showtime,
           },
         });
-      
-      
-      // setSeatLayout((prev) =>
-      //   prev.map((tier: any) => ({
-      //     ...tier,
-      //     seatLayout: tier.seatLayout.map((row: any) =>
-      //       row.map((seat: any) =>
-      //         seat.isSelected
-      //           ? { ...seat, isBooked: true, isSelected: false }
-      //           : seat
-      //       )
-      //     ),
-      //   }))
-      // );
-      // setSelectedSeats(0);
     } catch (error) {
       console.error("Booking failed:", error);
     }
@@ -384,14 +356,34 @@ const TheatreBooking: React.FC = () => {
           Screen
         </p>
       </div>
-      <div className="flex justify-center">
-      <button
+      {selectedSeats>0?
+      <motion.div
+    className="mt-4 bg-gray-200 p-4 rounded-lg"
+    initial="hidden"
+    animate="visible"
+    exit="hidden"
+    variants={slideUpVariants}
+  >
+    <div className="flex justify-between mb-2">
+      <span>Selected Seats:</span>
+      <span>{seatNames.join(", ")}</span>
+    </div>
+    <div className="flex justify-between font-bold">
+      <span>Total Price:</span>
+      <span>₹{calculateTotalCost()}</span>
+    </div>
+    <div className="flex justify-center">
+    <button
         onClick={() => setShowConfirmModal(true)}
         className="bg-blue-600 text-white  w-fit min-h-8 flex justify-center py-2 px-4 rounded hover:bg-blue-700"
       >
         Book Tickets
       </button>
-      </div>
+    </div>
+  </motion.div>
+:<></>}
+      
+      
 
       <Modal open={showconfirmModal} onClose={() => setShowModal(false)}>
         <div className="p-6 bg-white rounded shadow-md w-96 mx-auto mt-24">

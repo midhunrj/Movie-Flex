@@ -53,35 +53,35 @@ useEffect(()=>{
     <div>
         <SidebarMenu>
         <h1 className='text-blue-500 text-nowrap font-bold'>UserList</h1>
-        <table className="min-w-full border-collapse border border-gray-300 mt-4">
+        <table className="min-w-full  border-collapse  bg-white rounded-lg shadow-lg  mt-4">
             <thead>
-              <tr>
-                <th className="border border-gray-300 p-2">No</th>
-                <th className="border border-gray-300 p-2">Name</th>
-                <th className="border border-gray-300 p-2">Email</th>
-                <th className="border border-gray-300 p-2">Mobile</th>
-                <th className="border border-gray-300 p-2">status</th>
-                <th className="border border-gray-300 p-2 col-span-2">Action</th>
+              <tr className='rounded-lg border-collapse border  bg-sky-100'>
+                <th className=" border border-gray-300 p-4">No</th>
+                <th className="border border-gray-300  p-4">Name</th>
+                <th className="border  border-gray-300  p-4">Email</th>
+                <th className="border border-gray-300  p-4">Mobile</th>
+                <th className=" border border-gray-300 p-4">status</th>
+                <th className="border border-gray-300  p-4">Action</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className='space-y-2'>
             {currentUsers?.length > 0 ? (
                 currentUsers.map((user, index) => (
-                  <tr key={user._id}>
-                    <td className="border border-gray-300 p-2">{indexOfFirstUser + index + 1}</td>
-                    <td className="border border-gray-300 p-2">{user.name}</td>
-                    <td className="border border-gray-300 p-2">{user.email}</td>
-                    <td className="border border-gray-300 p-2">{user.mobile}</td>
+                  <tr key={user._id} className='rounded-lg border-spacing-1 border  border-gray-300  gap-2'>
+                    <td className=" border-gray-300 p-4 text-center">{indexOfFirstUser + index + 1}</td>
+                    <td className=" border-gray-300 p-4">{user.name}</td>
+                    <td className=" border-gray-300 p-4">{user.email}</td>
+                    <td className=" border-gray-300 p-4">{user.mobile}</td>
                     <td
-                      className={`border border-gray-300 p-2 ${
+                      className={`  text-center border-gray-300 p-2 ${
                         user.is_blocked ? 'text-red-500' : 'text-green-500'
                       }`}
                     >
                       {user.is_blocked ? 'Blocked' : 'Active'}
                     </td>
-                    <td className="border border-gray-300 p-2 col-span-2">
+                    <td className=" text-center border-gray-300 p-2 ">
                       <button
-                        className={`px-6 py-2 min-h-8  ${
+                        className={`px-4 py-2  h-fit min-h-8  ${
                           user.is_blocked ? 'bg-green-500' : 'bg-red-500'
                         } text-white rounded`}
                         onClick={() => handleBlockUnblock(user._id, user.is_blocked)}
@@ -103,7 +103,7 @@ useEffect(()=>{
             <button
               onClick={handlePreviousPage}
               disabled={currentPage === 1}
-              className="px-4 py-2 mx-2 min-h-8 bg-blue-500 text-white rounded  cursor-pointer hover:bg-blue-800"
+              className="px-2 py-1 h-fit mx-2 min-h-8 bg-blue-500 text-white rounded  cursor-pointer hover:bg-blue-800"
             >
               Previous
             </button>
@@ -111,7 +111,7 @@ useEffect(()=>{
             <button
               onClick={handleNextPage}
               disabled={currentPage >= Math.ceil(userData?.length / usersPerPage)}
-              className="px-4 py-2 mx-2 min-h-8 bg-blue-500  text-white rounded cursor-pointer hover:bg-blue-800"
+              className="px-2 py-1 h-fit mx-2 min-h-8 bg-blue-500  text-white rounded cursor-pointer hover:bg-blue-800"
             >
               Next
             </button>

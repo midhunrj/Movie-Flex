@@ -17,6 +17,7 @@ export interface EnrolledMovie {
 }
 
 export interface Screen extends Document {
+  _id:string
   theatreId: Types.ObjectId;
   screenName: string;
   screenType: string;
@@ -36,7 +37,7 @@ export interface Screen extends Document {
   }[];
   enrolledMovies: EnrolledMovie[]; 
   showtimes: {
-    _id: string; movieId: string; time: string;expiryDate?:Date; 
+    _id: string; movieId: string|null; time: string;expiryDate?:Date|null; 
 }[]
 }
 

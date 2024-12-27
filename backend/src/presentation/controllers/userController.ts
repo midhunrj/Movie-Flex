@@ -280,8 +280,7 @@ async nowShowingMovies(req:Request,res:Response,next:NextFunction){
         let filters: any = {};
         if (genre) filters.genre = genre;
         if (language) filters.language = language;
-        if (searchQuery) filters.title = { $regex: searchQuery, $options: "i" }; 
-        
+        if (searchQuery) filters.search =searchQuery 
         const sortOptions: any = {};
         switch (sortBy) {
             case 'rating':
@@ -298,7 +297,8 @@ async nowShowingMovies(req:Request,res:Response,next:NextFunction){
         
         const totalMovies = await this.userUseCases.nowShowingMoviesCount(filters); // Get total count for pagination
         const nowShowingMovieData = await this.userUseCases.nowShowingMovies(filters, Number(page), Number(limit),sortOptions); // Fetch data
-
+         console.log(nowShowingMovieData,"now showing  after search");
+         
         res.status(200).json({
             message: "These are the movies running in cinemas",
             runningMovies: nowShowingMovieData,
@@ -334,7 +334,7 @@ async listShowtimes(req:Request,res:Response,next:NextFunction){
   }
 }
 async listTheatreShowtimes(req:Request,res:Response,next:NextFunction){
-    const { theatreId,date } = req.query;
+    const { screenId,date } = req.query;
   try {
     console.log(req.query,"jhjjk");
     // const userCoords: UserCoordinates = {
@@ -343,7 +343,7 @@ async listTheatreShowtimes(req:Request,res:Response,next:NextFunction){
     //   };
     //const objectIdMovieId = new Types.ObjectId(movieId as string);
 
-    const showtimes = await this.userUseCases.getTheatreShowtimes(theatreId as string,date as string);
+    const showtimes = await this.userUseCases.getTheatreShowtimes(screenId as string,date as string);
     console.log(showtimes,"showtimes");
     
     res.status(200).json({message:"available showtimes for movie in this region",showtimes});
@@ -359,7 +359,7 @@ async bookMovieTickets(req:Request,res:Response){
   try {
     console.log(req.body,"booking data from frontend")
     
-    const bookingData = await this.bookingUseCase.createBooking(req.body)
+    const bookingData = await this.bookingUseCase.userSideBooking(req.body)
     console.log(bookingData,"booking data in contorller")
     
     res.status(200).json({message:"tickets have been reserved for this seats on this showtime",bookingId:bookingData._id})
@@ -443,7 +443,29 @@ async bookMovieTickets(req:Request,res:Response){
       const type=NotificationType.BOOKING_CONFIRMATION
       const title="Booking Confirmed"
       const message= `Your ticket for ${bookingData.movieId.title} has been booked successfully.`
-      const data= { bookingId: bookingData._id }
+      const data = {
+        bookingId: bookingData._id,
+        movieDetails: {
+          name: bookingData.movieId.title,
+          image: bookingData.movieId.poster_path,
+        },
+        screenData: {
+          screenName: bookingData.screenData?.screenName,
+          screenType: bookingData.screenData?.screenType,
+          tierName:bookingData.screenData?.tierName
+        },
+        // theatreDetails: {
+        //   name: bookingData.theatreDetails?.name,
+        //   address: bookingData.theatreDetails?.address,
+        // },
+        showDetails: {
+          showtime: bookingData.showtime,
+          showDate: bookingData.showDate,
+        },
+        selectedSeats: bookingData.selectedSeats,
+        totalPrice: bookingData.totalPrice,
+      };
+  
       await this.notificationUsecase.newNotification({
         recipients,
         type,
@@ -494,11 +516,13 @@ async bookMovieTickets(req:Request,res:Response){
     
     try {
       console.log(req.body,"booking data from frontend")
-      const {userId}=req.query
-      const bookingData = await this.bookingUseCase.bookingHistory(userId as string)
+      const {userId,page,limit}=req.query
+      const limits=parseInt(limit as string)
+      const pageNumber=parseInt(page as string)
+      const {bookings,total} = await this.bookingUseCase.bookingHistory(userId as string,limits,pageNumber)
       //console.log(bookingData,"booking data for user")
       
-      res.status(200).json({message:"movie booking history of this user",bookingData})
+      res.status(200).json({message:"movie booking history of this user",bookingData:bookings,totalPages: Math.ceil(total / limits)})
     } catch (error:any) {
       console.log(error,"error");
       
@@ -518,9 +542,33 @@ async bookMovieTickets(req:Request,res:Response){
       
       const description:string=`The movie you have booked with an id ${bookingId} has been cancelled and the amount Rs.${refundAmount} has been credited into your account`
          await this.userUseCases.updateUserWallet(userId,refundAmount,description,type)
-      const bookingData = await this.bookingUseCase.cancelMovieTickets(bookingId as string)
+      const cancelTicket = await this.bookingUseCase.cancelMovieTickets(bookingId as string)
+      if(cancelTicket)
+      {  
+      const bookingData=await this.bookingUseCase.getBookingDetail(bookingId as string)
       //console.log(bookingData,"booking data in contorller")
-      
+      const data = {
+        bookingId: bookingData?._id,
+        movieDetails: {
+          name: bookingData?.movieId?.title,
+          image: bookingData?.movieId?.poster_path,
+        },
+        screenData: {
+          screenName: bookingData.screenData?.screenName,
+          screenType: bookingData.screenData?.screenType,
+          tierName:bookingData.screenData?.tierName
+        },
+        // theatreDetails: {
+        //   name: bookingData.theatreDetails?.name,
+        //   address: bookingData.theatreDetails?.address,
+        // },
+        showDetails: {
+          showtime: bookingData.showtime,
+          showDate: bookingData.showDate,
+        },
+        selectedSeats: bookingData.selectedSeats,
+        totalPrice: bookingData.totalPrice,
+      };
       const notificationData = {
         recipients:[{recipientId:req.user?.id,recipientRole:req.user?.role!}],
         type: NotificationType.TICKET_CANCEL,
@@ -529,8 +577,8 @@ async bookMovieTickets(req:Request,res:Response){
         data: { bookingId },
       };
       await this.notificationUsecase.newNotification(notificationData);
-      
-      res.status(200).json({message:"tickets have been reserved for this seats on this showtime",success:bookingData})
+    }
+      res.status(200).json({message:"tickets have been reserved for this seats on this showtime",success:cancelTicket})
     } catch (error:any) {
       console.log(error,"error");
       

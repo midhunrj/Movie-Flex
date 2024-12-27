@@ -243,5 +243,73 @@ export class TheatreController{
         }
     }
 
+    async listTheatreShowtimes(req:Request,res:Response,next:NextFunction){
+        const { screenId,date } = req.query;
+      try {
+        console.log(req.query,"jhjjk");
+        // const userCoords: UserCoordinates = {
+        //     latitude: parseFloat(req.query.latitude as string),
+        //     longitude: parseFloat(req.query.longitude as string),
+        //   };
+        //const objectIdMovieId = new Types.ObjectId(movieId as string);
+    
+        const showtimes = await this.theatreUseCase.getTheatreShowtimes(screenId as string,date as string);
+        console.log(showtimes,"showtimes");
+        
+        res.status(200).json({message:"available showtimes for movie in this region",showtimes});
+      } catch (error:any) {
+        console.log(error,"error");
+        
+        res.status(500).json({ error: 'Error fetching showtimes' });
+      }
+    }
+    async showtimeSeatLayout(req:Request,res:Response){
+    
+        try {
+          console.log(req.body,"booking data from frontend")
+          const {showtimeId}=req.params
+          const seatData = await this.theatreUseCase.showtimeSeats(showtimeId as string)
+          console.log(seatData,"booking data in contorller")
+          
+          res.status(200).json({message:"seatlayout on this showtime",seatData})
+        } catch (error:any) {
+          console.log(error,"error");
+          
+          res.status(500).json({ error: 'Error fetching showtimes' });
+        }
+      }
 
+      async bookMovieTickets(req:Request,res:Response){
+    
+        try {
+          console.log(req.body,"booking data from frontend")
+          
+          const bookingData = await this.bookingUseCase.theatreSideBooking(req.body)
+          console.log(bookingData,"booking data in contorller")
+          
+          res.status(200).json({message:"tickets have been reserved for this seats on this showtime",bookingId:bookingData._id})
+        } catch (error:any) {
+          console.log(error,"error");
+          
+          res.status(500).json({ error: 'Error fetching showtimes' });
+        }
+      }
+
+      async getBookings(req: Request, res: Response): Promise<void> {
+        try {
+          const page = parseInt(req.query.page as string) || 1;
+          const limit = parseInt(req.query.limit as string) || 10;
+            const theatreId=req.query.theatreId as string
+          const { bookings, total } = await this.bookingUseCase.getTheatrebookingHistory(page, limit,theatreId);
+          res.status(200).json({
+            bookings,
+            totalPages: Math.ceil(total / limit),
+            currentPage: page,
+          });
+        } catch (error) {
+          res.status(500).json({ message: "Error fetching bookings", error });
+        }
+      }
+
+      
 }

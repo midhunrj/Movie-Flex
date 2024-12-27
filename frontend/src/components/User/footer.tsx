@@ -3,7 +3,7 @@ import { FaPhoneAlt, FaRedoAlt, FaEnvelope, FaFacebook, FaTwitter, FaInstagram }
 
 const Footer = () => {
   return (
-    <footer className="bg-[#091057] text-[#DCE4C9] py-8">
+    <footer className="bg-blue-950 text-[#DCE4C9] py-8">
       <div className="mx-4 px-8">
       
         <div className="flex justify-between flex-wrap">

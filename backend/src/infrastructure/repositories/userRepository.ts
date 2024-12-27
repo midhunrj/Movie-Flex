@@ -140,7 +140,7 @@ export class UserRepository implements IuserRepository {
       };
   
       if (filters.search) {
-        query.title = { $regex: filters.search, $options: 'i' }; // Case-insensitive search on title
+        query.title = { $regex: filters.search, $options: 'i' }; 
       }
   
       if (filters.genre) {
@@ -150,14 +150,25 @@ export class UserRepository implements IuserRepository {
       if (filters.language) {
         query.language = filters.language; // Filter by language
       }
-  
-      const movieData= await MovieModel.find(query)
+      console.log(filters,"filter search ",page);
+      
+      console.log(query,"for search query");
+      
+      if(isNaN(page)){
+        const movieData= await MovieModel.find(query)
+        .sort(sortOptions||{releaseDate:-1})
+
+        return movieData.map(this.mapToMovie)
+      }
+      else {
+        const movieData= await MovieModel.find(query)
         .sort(sortOptions||{releaseDate:-1})
         .skip((page - 1) * limit)  
         .limit(limit);  
-console.log(movieData,"returning after pagination");
-
+//console.log(movieData,"returning after pagination");
+      
         return movieData.map(this.mapToMovie)
+      }
     }
   
     async getComingSoonCount(filters: any): Promise<number> {

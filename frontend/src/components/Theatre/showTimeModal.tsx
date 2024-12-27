@@ -1,9 +1,11 @@
 import React from 'react';
+import { toast } from 'sonner';
+import Swal from 'sweetalert2';
 
 interface Showtime {
   _id?: string;
   time: string;
-  movieId?: string; 
+  movieId?: string;
 }
 
 interface ShowtimeModalProps {
@@ -18,6 +20,7 @@ interface ShowtimeModalProps {
   selectedEndDate: string;
   handleDateChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleEndDateChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  
 }
 
 const ShowtimeModal: React.FC<ShowtimeModalProps> = ({
@@ -32,10 +35,35 @@ const ShowtimeModal: React.FC<ShowtimeModalProps> = ({
   selectedEndDate,
   handleDateChange,
   handleEndDateChange,
+  
 }) => {
   const handleOverwriteShowtime = (showtime: Showtime) => {
-    if (confirm('This showtime already has a movie assigned. Do you want to overwrite it?')) {
-      handleShowtimeSelect(showtime);
+    Swal.fire({
+      title: 'Confirm Overwrite',
+      text: 'This showtime already has a movie assigned. Do you want to overwrite it?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, overwrite it!',
+      customClass: {
+        confirmButton: 'bg-blue-600 w-fit text-white px-4 py-2 min-h-8 rounded-md hover:bg-blue-800',
+        cancelButton: 'bg-gray-300 w-fit text-gray-700 px-4 py-2 min-h-8 rounded-md hover:bg-gray-400',
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleShowtimeSelect(showtime);
+       // toast.success('Showtime overwritten successfully.', 'success');
+      }
+    });
+  };
+
+  const handleConfirmShowtime = () => {
+    const today = new Date().toISOString().split('T')[0]; 
+    if (selectedDate === today && selectedShowtime?.movieId) {
+      toast.error(' Movies cannot be added to showtimes starting today it will be done only from tomorrow.');
+    } else {
+      handleAddMovieToShowtime();
     }
   };
 
@@ -52,13 +80,18 @@ const ShowtimeModal: React.FC<ShowtimeModalProps> = ({
           availableShowtimes.length > 0 ? (
             <div>
               <h4 className="mb-2 text-center text-gray-700">Select Showtime:</h4>
-              <div className="flex gap-4 flex-wrap">
+              <div className="flex gap-4 mt-4 flex-wrap">
                 {availableShowtimes.map((showtime) => (
-                  <div key={showtime._id} className="relative">
+                  <div key={showtime._id} className="flex flex-col items-center">
+                    {showtime.movieId && (
+                      <span className="text-xs -mb-5 text-red-600 bg-yellow-200 px-1 py-0.5 rounded ">
+                        Movie Added
+                      </span>
+                    )}
                     <button
-                      className={`w-fit mb-2 min-h-8 px-4 py-2 rounded ${
+                      className={`w-fit mb-2 mt-8 min-h-8 px-4 py-2 rounded ${
                         showtime.movieId
-                          ? 'bg-red-600 text-white'
+                          ? 'bg-red-600 text-white hover:bg-slate-900'
                           : 'bg-slate-900 text-white hover:bg-gray-800'
                       }`}
                       onClick={() =>
@@ -69,11 +102,7 @@ const ShowtimeModal: React.FC<ShowtimeModalProps> = ({
                     >
                       {showtime.time}
                     </button>
-                    {showtime.movieId && (
-                      <span className="absolute top-0 right-0 text-xs text-red-600 bg-yellow-200 px-1 py-0.5 rounded">
-                        Movie Added
-                      </span>
-                    )}
+                    
                   </div>
                 ))}
               </div>
@@ -109,7 +138,7 @@ const ShowtimeModal: React.FC<ShowtimeModalProps> = ({
 
             <button
               className="w-fit justify-center px-4 py-2 bg-green-600 min-h-8 text-white rounded-lg hover:bg-lime-500"
-              onClick={handleAddMovieToShowtime}
+              onClick={handleConfirmShowtime}
             >
               Confirm Showtime
             </button>
@@ -126,6 +155,5 @@ const ShowtimeModal: React.FC<ShowtimeModalProps> = ({
     </div>
   );
 };
-
 
 export default ShowtimeModal;

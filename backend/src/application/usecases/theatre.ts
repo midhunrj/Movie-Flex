@@ -1,4 +1,7 @@
+import { TierData } from "../../Domain/entities/shows";
 import { Theatre } from "../../Domain/entities/theatre";
+import { IShowtime } from "../../infrastructure/database/models/showModel";
+import { ShowRepository } from "../../infrastructure/repositories/showRepository";
 import { HashService } from "../../infrastructure/services/hashService";
 import { JWTService } from "../../infrastructure/services/jwtService";
 import { LocationService } from "../../infrastructure/services/locationService";
@@ -7,7 +10,7 @@ import { OtpService } from "../../infrastructure/services/otpService";
 import { ITheatreRepository } from "../repositories/iTheatreRepository";
 
 export class TheatreUseCase{
-    constructor (private theatreRepository:ITheatreRepository,private hashService:HashService,private otpService:OtpService,private mailService:MailService,private jwtService:JWTService,private locationService:LocationService)
+    constructor (private theatreRepository:ITheatreRepository,private showRepository:ShowRepository, private hashService:HashService,private otpService:OtpService,private mailService:MailService,private jwtService:JWTService,private locationService:LocationService)
     {}
 
     async register(theatre:Theatre, theatreLicensePath: string):Promise<String>
@@ -181,5 +184,12 @@ async completeTheatreprofile(theatreId: string|undefined, addressData: any): Pro
 
     return updatedProfile;
 }
-
+async getTheatreShowtimes(screenId:string,date:string):Promise<IShowtime[]>
+      {
+        return await this.showRepository.listTheatreShowtimes(screenId,date)
+      }
+      async showtimeSeats(showtimeId:string):Promise<TierData[]|null>
+      {
+        return await this.showRepository.getSeatlayout(showtimeId)
+      }
 }

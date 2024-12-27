@@ -5,12 +5,13 @@ export interface BookingRepository {
   create(booking: Booking): Promise<Booking>;
   isValid(id: string): Promise<Booking | null>;
   update(booking: Booking): Promise<Booking|null>;
+  getByBookingId(id:string):Promise<Partial<Booking|null>>
   confirmBooking(booking: Booking): Promise<Partial<Booking|null>>;
   delete(id:string|null):Promise<void>
   findExpiredBookings(): Promise<Booking[]>;
 //   cancelBooking(id: string): Promise<void>;
 cancelTicket(bookingId:string): Promise<boolean>;
-  bookingOrderHistory(userId:string):Promise<Partial<Booking>[]>
+  bookingOrderHistory(userId:string,limits:number,page:Number):Promise<{ bookings: Booking[]; total: number }>
   getTotalBookings(): Promise<number>;
   getTotalRevenue(): Promise<number>;
   getCancelledBookings(): Promise<number>;
@@ -22,4 +23,5 @@ cancelTicket(bookingId:string): Promise<boolean>;
   fetchRevenueTrendsByTheatre(interval:String,theatreId:string):Promise<any[]>
   fetchBookingTrendsByTheatre(interval:string,theatreId:string):Promise<any[]>
    getBookings(page: number, limit: number): Promise<{ bookings: Booking[]; total: number }>
+   getTheatreBookings(page: number, limit: number,theatreId:string): Promise<{ bookings: Booking[]; total: number }>
 }

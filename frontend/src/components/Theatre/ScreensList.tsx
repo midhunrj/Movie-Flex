@@ -43,7 +43,7 @@ const ScreensList = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-yellow-200" >
+      <div className="min-h-screen bg-zinc-100" >
         <TheatreHeader />
         <h1 className="text-4xl font-bold text-blue-400 text-center mt-8">
           Welcome to Movie Ticket Booking

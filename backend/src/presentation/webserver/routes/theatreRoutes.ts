@@ -24,6 +24,8 @@ import { FavoriteRepository } from '../../../infrastructure/repositories/favouri
 import { BookingMovies } from '../../../application/usecases/booking'
 import { MovieBookingRepository } from '../../../infrastructure/repositories/BookingRepository'
 import { PaymentRepository } from '../../../infrastructure/repositories/paymentRepository'
+import { NotificationRepository } from '../../../infrastructure/repositories/notficationRepository'
+import { Notification } from '../../../application/usecases/notification'
 
 
 const theatreRoute=Router()
@@ -34,11 +36,14 @@ const mailService=new MailService()
 const jwtService=new JWTService()
 const adminRepository=new AdminRepository()
 const userRepository=new UserRepository()
-const screenRepository=new ScreenRepository()
+const notificationRepo=new NotificationRepository()
+const notification=new Notification(notificationRepo)
+const screenRepository=new ScreenRepository(notification)
 const showRepository=new ShowRepository()
 const locationService=new LocationService(process.env.geocoding_Apikey||"")
 const authHandler=new AuthHandler(jwtService,userRepository,adminRepository,theatreRepository)
-const theatreCase=new TheatreUseCase(theatreRepository,hashService,otpService,mailService,jwtService,locationService)
+const showRepo=new ShowRepository()
+const theatreCase=new TheatreUseCase(theatreRepository,showRepo,hashService,otpService,mailService,jwtService,locationService)
 const screenuseCase=new ScreenUseCase(screenRepository,showRepository)
 const fileService=new FileUploadService()
 const cloudinaryService=new CloudinaryService()
@@ -72,4 +77,10 @@ theatreRoute.post('/shows-rollin-movies',authHandler.theatreLogin.bind(authHandl
 theatreRoute.delete('/remove-shows',authHandler.theatreLogin.bind(authHandler),(req,res)=>screenController.removeShowtime(req,res))
 theatreRoute.get('/booking-trends',authHandler.theatreLogin.bind(authHandler),(req,res)=>theatreController.bookingTrends(req,res))
 theatreRoute.get('/revenue-trends',authHandler.theatreLogin.bind(authHandler),(req,res)=>theatreController.revenueTrends(req,res))
+theatreRoute.delete('/remove-enroll_movie',authHandler.theatreLogin.bind(authHandler),(req,res)=>screenController.removeMovieFromScreen(req,res))
+theatreRoute.get('/showtimes',authHandler.theatreLogin.bind(authHandler),(req,res,next)=>theatreController.listTheatreShowtimes(req,res,next))
+theatreRoute.get('/screen-layout/:showtimeId',authHandler.theatreLogin.bind(authHandler),(req,res,next)=>theatreController.showtimeSeatLayout(req,res))
+theatreRoute.post('/book-tickets',authHandler.theatreLogin.bind(authHandler),(req,res,next)=>theatreController.bookMovieTickets(req,res))
+theatreRoute.get('/bookings',authHandler.theatreLogin.bind(authHandler),(req,res)=>theatreController.getBookings(req,res))
+theatreRoute.put('/update-showtime',authHandler.theatreLogin.bind(authHandler),(req,res)=>screenController.updateShowtime(req,res))
 export default theatreRoute

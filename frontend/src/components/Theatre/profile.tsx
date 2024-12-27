@@ -5,7 +5,7 @@ import { CompleteTheatreProfile } from '../../redux/theatre/theatreThunk';
 import { useDispatch, useSelector } from 'react-redux';
 import usePreviousPath from '../../utils/hooks/previousPath';
 import { Navigate, useLocation, useNavigate } from 'react-router';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { AppDispatch, RootState } from '@/redux/store/store';
 interface AddressData {
   place?: string;
@@ -142,8 +142,8 @@ const theatreAddress=theatre?.address||{}
   return (
     <>
       <TheatreHeader />
-      <div className="min-h-screen flex items-center justify-center" style={{backgroundColor:"#FEE685"}}>
-        <div className="bg-violet-950 my-8 text-white w-auto h-auto rounded-lg  p-8 shadow-lg">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100" >
+        <div className="bg-slate-900 my-8 text-white w-auto h-auto rounded-lg border border-b-slate-950  p-8 shadow-lg">
           <h2 className="text-yellow-500 text-3xl font-medium text-center mb-6">
             Complete Your Theatre Profile
           </h2>
@@ -279,3 +279,4 @@ const theatreAddress=theatre?.address||{}
 };
 
 export default TheatreProfile;
+// bg-gradient-to-t from-yellow-200 via-slate-950 to-blue-950

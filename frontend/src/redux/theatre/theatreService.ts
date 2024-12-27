@@ -304,3 +304,23 @@ export const removeShow = async (screenId:string,showtimeId:string) => {
     }
   }
 };
+
+export const deleteMovieFromScreen=async(movieId:string,screenId:string)=>{
+  try{
+    const response = await theatreAuthenticate.delete('/remove-enroll_movie', {
+      params: {
+        screenId,
+        movieId
+      },});
+  return response.data;
+}catch (error: unknown) {
+  console.error("Error in service", error);
+  if (axios.isAxiosError(error) && error.response) {
+    const message = error.response?.data?.message || error.response?.data?.error || "Something went wrong";
+    throw new Error(message);
+  } else {
+    throw new Error("An unknown error occurred");
+  }
+}
+
+}

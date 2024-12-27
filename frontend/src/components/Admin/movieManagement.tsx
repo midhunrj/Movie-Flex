@@ -4,7 +4,7 @@ import axios from 'axios';
 import SidebarMenu from './sidebarMenu';
 import { useDispatch } from 'react-redux';
 import { addMovie } from '../../redux/admin/adminThunk';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { MovieTMdb, MovieType } from '@/types/movieTypes';
 import { AppDispatch } from '@/redux/store/store';
 import { Link } from 'react-router-dom';
@@ -47,7 +47,19 @@ const MovieList:React.FC = () => {
     }
   };
 
-  
+  const languages = [
+    { code: 'en', name: 'English' },
+    { code: 'ml', name: 'Malayalam' },
+    { code: 'ta', name: 'Tamil' },
+    { code: 'te', name: 'Telugu' },
+    { code: 'hi', name: 'Hindi' }
+  ];
+
+  const genres = [
+    { id: '28', name: 'Action' },
+    { id: '35', name: 'Comedy' },
+    { id: '18', name: 'Drama' }
+  ];
   useEffect(() => {
     fetchMovies(currentPage, selectedLanguages, selectedGenres, searchTerm,sortBy);
   }, [currentPage, selectedLanguages, selectedGenres, searchTerm,sortBy]);
@@ -219,11 +231,11 @@ const handleSortChange=(e:React.ChangeEvent<HTMLSelectElement>)=>{
         
 
         {/* Language Filter */}
-        <div className="flex  mt-4 items-center space-x-4">
+        <div className="flex  mt-4  items-center space-x-4">
             <div className='relative w-full'>
           <button
             onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
-            className="p-2 border border-gray-300 rounded min-h-16 bg-white text-gray-700 w-full"
+            className="p-2 border  border-gray-300 rounded min-h-12  bg-white text-gray-700 w-40"
           >
             Select Languages
           </button>
@@ -246,19 +258,19 @@ const handleSortChange=(e:React.ChangeEvent<HTMLSelectElement>)=>{
           </div>
         </div> */}
         <div
-      className={`absolute z-10 mt-2 p-4 border border-gray-300 bg-white rounded shadow-lg grid grid-cols-2 gap-2 transition-all duration-300 ease-in-out ${
+      className={`absolute z-10 mt-2 p-4 w-full border border-gray-300 bg-white rounded shadow-lg grid  gap-2 transition-all duration-300 ease-in-out ${
         showLanguageDropdown ? 'block' : 'hidden'
       }`}
     >
-      {['en', 'ml', 'ta', 'te', 'hi'].map((lang) => (
+      {languages.map(({code,name}) => (
         <button
-          key={lang}
-          onClick={() => toggleLanguage(lang)}
-          className={`p-2 min-h-8 rounded ${
-            selectedLanguages.includes(lang) ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'
+          key={code}
+          onClick={() => toggleLanguage(code)}
+          className={`p-2 min-h-8 rounded w-full ${
+            selectedLanguages.includes(code) ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'
           }`}
         >
-          {lang === 'en' ? 'English' : lang.toUpperCase()}
+          {name}
         </button>
       ))}
     </div>
@@ -268,63 +280,37 @@ const handleSortChange=(e:React.ChangeEvent<HTMLSelectElement>)=>{
         <div className="relative space-x-4 w-full">
           <button
             onClick={() => setShowGenreDropdown(!showGenreDropdown)}
-            className="p-2 border min-h-16 border-gray-300 rounded bg-white text-gray-700 w-full"
+            className="p-2 border min-h-12 border-gray-300 rounded bg-white text-gray-700 w-full"
           >
             Select Genres
           </button>
-          {/* <div
-      className={`overflow-hidden transition-all duration-300 ease-in-out ${
-        showGenreDropdown ? 'h-auto' : 'h-0'
-      }`}
-    >
-      <div className="mt-2 p-4 border border-gray-300 bg-white rounded shadow-lg grid grid-cols-2 gap-2">
-
-              {[
-                { id: '28', name: 'Action' },
-                { id: '35', name: 'Comedy' },
-                { id: '18', name: 'Drama' },
-                // Add more genres as needed
-              ].map((genre) => (
-                <button
-                  key={genre.id}
-                  onClick={() => toggleGenre(genre.id)}
-                  className={`p-2 min-h-8 rounded ${selectedGenres.includes(genre.id) ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
-                >
-                  {genre.name}
-                </button>
-              ))}
-            </div>
-          </div> */}
+         
 
 <div
-      className={`absolute z-10 mt-2 p-4 border border-gray-300 bg-white rounded shadow-lg grid grid-cols-2 gap-2 transition-all duration-300 ease-in-out ${
+      className={`absolute z-10 mt-2 p-4 border border-gray-300 bg-white rounded shadow-lg grid  gap-2 transition-all duration-300 ease-in-out ${
         showGenreDropdown ? 'block' : 'hidden'
       }`}
     >
-      {[
-        { id: '28', name: 'Action' },
-        { id: '35', name: 'Comedy' },
-        { id: '18', name: 'Drama' },
-      ].map((genre) => (
+      {genres.map(({id,name}) => (
         <button
-          key={genre.id}
-          onClick={() => toggleGenre(genre.id)}
+          key={id}
+          onClick={() => toggleGenre(id)}
           className={`p-2 min-h-8 rounded ${
-            selectedGenres.includes(genre.id) ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'
+            selectedGenres.includes(id) ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'
           }`}
         >
-          {genre.name}
+          {name}
         </button>
       ))}
     </div>
         </div>
 
-        <div className="ml-4">
-            <label className="block text-gray-700">Sort By:</label>
+        <div className="relative w-full space-x-4">
+            {/* <label className="block text-gray-700">Sort By:</label> */}
             <select
               value={sortBy}
               onChange={handleSortChange}
-              className="mt-2 p-2 border border-gray-300 rounded bg-white"
+              className=" p-2 border min-h-12 border-gray-300 rounded bg-white"
             >
               <option value="popularity.desc">Most Popular</option>
               <option value="release_date.desc">New Releases</option>

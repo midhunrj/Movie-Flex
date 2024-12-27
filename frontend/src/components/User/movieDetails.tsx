@@ -9,6 +9,8 @@ import { userAuthenticate } from '@/utils/axios/userInterceptor';
 import { ClassNames } from '@emotion/react';
 import { Slider } from '@mui/material';
 import RatingModal from './ratingModal';
+import { MovieType } from '@/types/movieTypes';
+import { Favorite } from './FavouriteList';
 
 const MovieDetails = () => {
   const { id } = useParams();
@@ -22,18 +24,52 @@ const MovieDetails = () => {
   const { upcomingMovies, nowShowingMovies,user } = useSelector((state: RootState) => state.user);
   const movie = upcomingMovies.find((movie) => movie.id === id) || nowShowingMovies.find((movie) => movie.id === id);
   console.log(movie,"movie detais");
+
+  const MovieTime=()=>{
+   let hour= Math.floor(movie?.duration!/60)
+   let min= movie?.duration!%60
+     return `${hour}hr ${min}min`
+  }
   const userId=user?._id!
   const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
-
+const fetchFavourites=async()=>{
+  const response = await userAuthenticate.get<Favorite[]>('/favourites', { params: { userId } });
+   console.log(response.data,"response from favourites",movie);
+    if(response.data.some((mov)=>mov.movieId._id==movie?.id))
+    {
+      setIsFavorite(true)
+    }
+   
+}
+const handleRateMovie = async (movieId:string, rating:number) => {
+  // const ratingData: ratingPayload = {
+  //   userId, // Assuming `userId` is available in the component's scope
+  //   movieId,
+  //   rating,
+  // };
+  dispatch(postRating({movieId,userId,rating}))
+  
+  
+  setIsModelOpen(false)
+};
   useEffect(() => {
     dispatch(fetchMovies());
-  }, [dispatch,nowShowingMovies]);
+    fetchFavourites()
+  
+  }, [isModelOpen]);
 
-  if (!movie) return <div>Movie not found</div>;
+   if (!movie) return <div>Movie not found</div>;
 
   const handleFavoriteToggle = async(movieId:string) => {
     setIsFavorite(!isFavorite); 
+    if(!isFavorite)
+    {
     await userAuthenticate.put('/add-favourite',{userId,movieId})
+    }
+    else
+    {
+      await userAuthenticate.delete('/remove-favourite',  {data:{ movieId, userId }})
+    }
   };
 
   let videoId = movie?.video_link.split('v=')[1];
@@ -45,17 +81,7 @@ const MovieDetails = () => {
   const embedUrl = `https://www.youtube.com/embed/${videoId}`;
 
 
-  const handleRateMovie = async (movieId:string, rating:number) => {
-    // const ratingData: ratingPayload = {
-    //   userId, // Assuming `userId` is available in the component's scope
-    //   movieId,
-    //   rating,
-    // };
-    dispatch(postRating({movieId,userId,rating}))
-    
-    
-    setIsModelOpen(false)
-  };
+
   const handleBookTicket = (movieId: string) => {
     navigate('/date-Shows', { state: { movieId } });
   };
@@ -89,7 +115,7 @@ const upcoming=new Date(movie.releaseDate)<new Date()?true:false
          <div className="movie-details-page relative bg-gray-100">
       
       <div className="absolute top-4 left-4 z-50">
-        <button className="bg-gray-200 bg-opacity-40 min-h-8 text-opacity-100 text-slate-800 w-fit hover:text-gray-300 hover:bg-transparent p-2 rounded-md" onClick={() => navigate(-1)}>
+        <button className="bg-gray-100 bg-opacity-80  min-h-8  h-fit text-opacity-100 text-slate-900 w-fit hover:text-gray-300 hover:bg-transparent p-2 rounded-md" onClick={() => navigate(-1)}>
           <FaAngleLeft size={30} />
         </button>
       </div>
@@ -128,7 +154,7 @@ const upcoming=new Date(movie.releaseDate)<new Date()?true:false
           </div> */}
         <div className="absolute inset-0 z-30 flex items-center left-48">
             <button
-              className="bg-gradient-to-r from-transparent border  hover:105 border-white min-h-8 w-fit text-white p-2 rounded-md"
+              className="bg-gradient-to-r from-transparent border  hover:105 border-white min-h-8 w-fit text-white px-4 py-1 rounded-md"
               onClick={() => setIsVideoPlaying(true)} 
             >
               <div></div>play trailer
@@ -163,10 +189,10 @@ const upcoming=new Date(movie.releaseDate)<new Date()?true:false
         )} */}
 
 {isVideoPlaying && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black">
+          <div className="absolute inset-x-0 flex items-center justify-center bg-black">
             <iframe
-              width="100%"
-              height="100%"
+              // width="100%"
+              // height="100%"
               src={`${embedUrl}?autoplay=1`}
               title={movie.title}
               allow="autoplay; fullscreen"
@@ -183,19 +209,44 @@ const upcoming=new Date(movie.releaseDate)<new Date()?true:false
         )}
       
 
+      {/* (
+          <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+            <div className="bg-white p-4 rounded-lg max-w-lg w-full relative">
+              <button
+                onClick={() => setSelectedMovie(null)}
+                className="absolute top-2 right-2 text-gray-600 hover:text-black"
+              >
+                &times;
+              </button>
+              <h2 className="text-lg font-bold text-gray-800 mb-4">{selectedMovie.title} - Trailer</h2>
+              <iframe
+                className="w-full h-64"
+                src={getYouTubeEmbedUrl(selectedMovie.video_link)}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                title={selectedMovie.title}
+              />
+            </div>
+          </div>
+        )} */}
+
         
         {!isVideoPlaying && (
-          <div className="absolute bottom-0 left-0 p-4 text-white z-30">
+          <div className="absolute top-28 left-1/4 p-4 flex gap-2 flex-col text-white z-30">
             <h1 className="text-4xl font-bold">
               {movie.title} ({new Date(movie.releaseDate).getFullYear()})
             </h1>
-            <p className="text-lg flex items-center">
+            <p className="text-lg flex p-2 w-fit bg-gray-600 bg-opacity-50 space-x-3 text-center items-center">
               Rating:
-              {[...Array(5)].map((_, i) => (
-                <FaStar key={i} className={`ml-1 ${i < movie.rating / 2 ? 'text-yellow-400' : 'text-gray-500'}`} />
-              ))}
+              {
+                <FaStar  size={26} className={`ml-1 ${ movie.rating  ? 'text-red-500' : 'text-gray-500'}`} />
+              }
               <span className="ml-2">{movie.rating}/10</span>
+
+              <button className='p-3 bg-white  w-fit h-fit text-lg text-slate-950' onClick={()=>setIsModelOpen(true)}> Rate Now</button>
             </p>
+            <p className='space-x-4 text-base  text-slate-100'> <span>{MovieTime()}</span>  <span>{movie.genre.join(',')}</span>   <span> {new Date(movie.releaseDate).toDateString()}</span></p>
 
             {/* Favorite Button */}
             
@@ -208,7 +259,7 @@ const upcoming=new Date(movie.releaseDate)<new Date()?true:false
         <>
         <div className='absolute z-40 bg-slate-200 shadow-md flex mx-8 justify-start space-x-2'>
             <button
-  className={`mt-2 p-2 rounded-full min-h-8 w-fit ${isFavorite ? 'bg-sky-700' : 'bg-red-600'} flex items-center cursor-pointer`}
+  className={`mt-2 p-2 rounded-lg min-h-8 w-fit text-gray-100 ${isFavorite ? 'bg-gradient-to-br from-indigo-600 to-red-600' : 'bg-red-600'} flex items-center cursor-pointer`}
   onClick={() => handleFavoriteToggle(movie.id!)}
 >
   <FaHeart size={10} className={`mr-2 ${isFavorite ? 'text-red-600' : 'text-slate-200'}`} />
@@ -278,7 +329,7 @@ const upcoming=new Date(movie.releaseDate)<new Date()?true:false
               Add Your Rating
             </button>
           </div>
-          <div className="absolute inset-0 z-30 h-20 flex justify-center right-1/4 top-[18rem]  pointer-events-auto ">
+          <div className="absolute inset-0 z-30 h-20 flex justify-center right-1/4 top-[19rem]  pointer-events-auto ">
             {upcoming?<button className="bg-[#FF3C38] min-h-12 text-xl p-2 shadow-lg  rounded-lg  text-gray-200   w-48" style={{cursor:"pointer"}} onClick={() => handleBookTicket(movie.id ?? '')}>
               Book tickets
             </button>

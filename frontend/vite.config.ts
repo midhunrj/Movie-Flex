@@ -11,7 +11,9 @@ export default defineConfig({
       '@services': '/src/services',
       '@utils': '/src/utils',
       '@routes': '/src/routes',
-      '@': path.resolve(__dirname, './src')
+      '@': path.resolve(__dirname, './src'),
+       '@coreui': 'node_modules/@coreui',
+      
     }
   },
   server:{

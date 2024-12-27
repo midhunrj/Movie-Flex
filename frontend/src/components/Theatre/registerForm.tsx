@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { register } from "../../redux/theatre/theatreThunk";
-import { toast } from "react-toastify";
+import { Toaster, toast } from "sonner";
 import { clearState } from "../../redux/theatre/theatreSlice";
 import { AppDispatch, RootState } from "@/redux/store/store";
 import './css/signup.css';

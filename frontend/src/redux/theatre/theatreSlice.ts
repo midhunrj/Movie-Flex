@@ -17,10 +17,11 @@ import {
   saveTierData,
   updateScreen,
   saveMoviesToShowtime,
-  removeShowtime
+  removeShowtime,
+  deleteEnrolledMovie
   
 } from './theatreThunk';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { RollingMoviesData } from './theatreService';
 import { ScreenDatas, TheatreType } from '@/types/theatreTypes';
 //import { log } from 'util';
@@ -483,6 +484,36 @@ const theatreSlice = createSlice({
         toast.success(state.message);
       })
       .addCase(removeShowtime.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.message = action.payload || 'An error occurred';
+        toast.error(state.message);
+      })
+      .addCase(deleteEnrolledMovie.pending, (state) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+        state.isError = false;
+        state.message = '';
+      })
+
+      .addCase(deleteEnrolledMovie.fulfilled, (state, action) => {
+        console.log(action.payload,"action payload data");
+        
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.message = action.payload.message || 'Showtime removed successfully';
+
+        const updatedScreen = action.payload.screenData;
+
+        // Update the screens state with the updated screen data
+        state.screens = state.screens.map((screen) =>
+          screen._id === updatedScreen._id ? updatedScreen : screen
+        );
+
+        toast.success(state.message);
+      })
+      .addCase(deleteEnrolledMovie.rejected, (state, action) => {
         state.isLoading = false;
         state.isSuccess = false;
         state.isError = true;

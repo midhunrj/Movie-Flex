@@ -41,6 +41,7 @@ export interface IBooking extends Document {
     createdAt: Date;
     expiresAt: Date;
     refundRequested?: boolean;
+    
 }
 
 const BookingSchema: Schema = new Schema({

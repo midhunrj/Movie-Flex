@@ -150,6 +150,7 @@ export class MongoMovieRepository implements MovieRepository {
         existingMovie.poster_path = movie.poster_path;
         existingMovie.posterUrl=movie.posterUrl
         existingMovie.language=movie.language
+        existingMovie.releaseDate=movie.releaseDate
         
         console.log(existingMovie.language,"existing /n",movie.language,"invader",);
         

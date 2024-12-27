@@ -3,6 +3,7 @@ import { ScreenUseCase } from '../../application/usecases/screens';
 import { NextFunction } from 'express-serve-static-core';
 import { log } from 'node:console';
 import { UserCoordinates } from '../../Domain/entities/user';
+import { Screen } from '../../Domain/entities/screens';
 
 export class ScreenController {
   constructor(
@@ -157,6 +158,46 @@ export class ScreenController {
       } catch (error) {
         console.error('Error in getting theatres with screens:', error);
         return res.status(500).json({ error: 'Internal Server Error' });
+      }
+    }
+
+    async removeMovieFromScreen(req: Request, res: Response): Promise<void> {
+      try {
+        console.log(req.query,"query values");
+        console.log(req.body,"body");
+        
+        const {movieId,screenId}  = req.query
+        
+        
+        
+        //const tierId=tierData._id
+        const screenData = await this.screenUseCase.removeMovieFromEnroll(movieId as string,screenId as string)
+        
+        
+        res.status(200).json({message:'movie has been removed from the screen',screenData});
+        
+      } catch (error) {
+        res.status(500).json({ message: "failed to remove movie "});
+      }
+    }
+  
+    async updateShowtime(req: Request, res: Response): Promise<void> {
+      try {
+        console.log(req.query,"query values");
+        console.log(req.body,"body");
+        
+        const {screenId,prevTime,newTime}  = req.body
+        
+        
+        
+        //const tierId=tierData._id
+        const screenData = await this.screenUseCase.updateShowtimeFromScreen(screenId as string,prevTime as string,newTime as string)
+        
+        
+        res.status(200).json({message:'showtime has been updated from the screen',screenData});
+        
+      } catch (error) {
+        res.status(500).json({ message: "failed to remove movie "});
       }
     }
 }

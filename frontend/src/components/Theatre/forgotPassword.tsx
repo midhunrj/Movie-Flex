@@ -1,5 +1,5 @@
 import React,{useState,useEffect} from "react";
-import { toast } from "react-toastify";
+import { Toaster, toast } from "sonner";
 import { BrowserRouter,useNavigate } from "react-router-dom";
 import { useDispatch,useSelector } from "react-redux";
 import { forgotPass } from "../../redux/theatre/theatreThunk";

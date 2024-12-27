@@ -455,7 +455,7 @@ const Seat = React.memo(({ row, col, isFilled, isPartition,className }:Seat) => 
         <>
             <TheatreHeader />
             <div className=" min-h-screen flex" style={{backgroundColor:"#FEE685"}}>
-                <div className="flex-col p-2 m-4 bg-indigo-950 w-full mx-20 rounded-lg justify-between text-white">
+                <div className="flex-col p-2 m-4 bg-slate-900 w-full mx-20 rounded-lg justify-between text-white">
                     <h1 className="p-2 justify-center text-center text-2xl">Seats Management</h1>
                     <div className="flex justify-start flex-col text-lg font-mono gap-4 text-white">
                         <span>Name: {tier.name}</span>

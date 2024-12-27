@@ -35,9 +35,9 @@ const TheatreShows: React.FC = () => {
   
   const [dateIndex, setDateIndex] = useState(0);
   const datesToShow = dates.slice(dateIndex, dateIndex + 3);
-  const  theatreId =  location.state?.theatreId; 
+  const  screenId =  location.state?.screenId; 
   useEffect(() => {
-    if (theatreId && selectedDate)
+    if (screenId && selectedDate)
 {
     fetchTheatreShowtimes();
 }
@@ -48,7 +48,7 @@ const TheatreShows: React.FC = () => {
     setLoading(true);
     try {
       const response = await userAuthenticate.get('/theatre-showtimes', {
-        params: { theatreId ,date: selectedDate },
+        params: { screenId ,date: selectedDate },
       });
       setShowtimes(response.data.showtimes);
       console.log(response.data.showtimes);

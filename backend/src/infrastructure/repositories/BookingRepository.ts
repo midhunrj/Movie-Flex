@@ -55,6 +55,10 @@ export class MovieBookingRepository implements BookingRepository {
             row.seats.forEach((seat) => {
               if (selectedSeats.includes(seat.seatLabel!)) {
                 seat.isReserved = true;
+                if(booking.status=="Booked")
+                {
+                  seat.isBooked=true
+                }
               }
             });
           });
@@ -95,13 +99,13 @@ export class MovieBookingRepository implements BookingRepository {
       throw new Error("Showtime not found");
     }
 
-    const selectedSeats = booking.selectedSeats; // Example: ["M2", "M3"]
+    const selectedSeats = booking.selectedSeats; 
     showtime.seatLayout.forEach((tier) => {
       tier.rows.forEach((row) => {
         row.seats.forEach((seat) => {
           if (selectedSeats.includes(seat.seatLabel!)) {
             seat.isSelected=false
-            seat.isBooked = true; // Assuming the booking confirms directly
+            seat.isBooked = true; 
           }
         });
       });
@@ -195,11 +199,15 @@ export class MovieBookingRepository implements BookingRepository {
     return bookingData
   }
 
-  async bookingOrderHistory(userId: string): Promise<Partial<Booking>[]> {
-       const bookingData=await BookingModel.find({userId:userId,paymentStatus:{$ne:"Pending"}}).populate("movieId").populate({path:"showtimeId",select:"_id showtime date"})
+  async bookingOrderHistory(userId: string,limits:number,page:Number): Promise<{ bookings: Booking[]; total: number }> {
+    const skip=(Number(page)-1)*limits
+    console.log(skip,limits);
+    
+       const bookings=await BookingModel.find({userId:userId,paymentStatus:{$ne:"Pending"}}).populate("movieId").populate({path:"showtimeId",select:"_id showtime date"}).sort({createdAt:-1}).skip(skip).limit(limits)
 
        //console.log(bookingData,"bookingData for a user")
-       return bookingData
+       const total = await BookingModel.countDocuments({userId:userId})
+       return {bookings,total}
        
   }
   
@@ -393,10 +401,51 @@ while (currentDate <= now) {
         .skip(skip)
         .limit(limit)
         .sort({ createdAt: -1 });
+        
       const total = await BookingModel.countDocuments();
       return { bookings, total };
     
 }
+
+async getTheatreBookings(page: number, limit: number, theatreId: string): Promise<{ bookings: Booking[]; total: number; }> {
+    const skip=(page-1)*limit
+
+    const bookings=await BookingModel.find({theatreId:theatreId}).populate('userId').populate('movieId')
+    .skip(skip)
+    .limit(limit)
+    .sort({createdAt:-1})
+
+    const total=await BookingModel.countDocuments({theatreId:theatreId})
+
+    return {bookings,total}
+}
+
+// async getBookings(page: number, limit: number): Promise<{ bookings: IBooking[]; total: number }> {
+//   const skip = (page - 1) * limit;
+//   const bookings = await BookingModel.find()
+//   .populate('movieId')
+//     .skip(skip)
+//     .limit(limit)
+//     .sort({ createdAt: -1 }).lean();
+
+//     const populateBookings=await Promise.all(
+//     bookings.map(async (booking)=>
+//     {
+//     let userData=await userModel.findById(booking.userId).lean()
+//     if(!userData)
+//     {
+//       userData=await theatreModel.findById(booking.userId).lean()
+//     }
+//     return {
+//       ...booking,
+//       userData
+//     }
+//   })
+// )
+//   const total = await BookingModel.countDocuments();
+//   return { bookings:populateBookings as IBooking[], total };
+
+// }
 
 
 async fetchBookingTrendsByTheatre(interval: string,theatreId:string): Promise<any[]> {
@@ -540,9 +589,11 @@ const revenueMap = new Map(RevenueData.map((item) => [item._id, item.totalRevenu
 
 
 
-
 }
 
+async getByBookingId(id: string): Promise<Partial<Booking|null>> {
+  return await BookingModel.findById(id).populate('movieId').lean()
+}
 
 }
 

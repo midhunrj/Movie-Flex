@@ -6,9 +6,9 @@ import { MovieType } from '@/types/movieTypes';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store/store';
 import { FiHeart } from 'react-icons/fi';
-import { AiFillHeart } from 'react-icons/ai';
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 
-interface Favorite {
+export interface Favorite {
   movieId: MovieType;
   userId: string;
   createdAt: Date;
@@ -90,7 +90,9 @@ const FavouriteMovies = () => {
                 <p className="mb-4">{favorite.movieId.description}</p>
 
                 {/* Favorite Caption */}
-                <span className="text-white bg-red-500 rounded-full py-1 px-3 text-sm">Favorite</span>
+                <div className='flex justify-end items-end'>
+                <span className="text-white bg-red-500    rounded-lg py-1 px-3 text-sm" onClick={() => handleRemoveFavorite(favorite.movieId._id!)}> Mark UnFavorite</span>
+                </div>
               </div>
             ))}
           </div>

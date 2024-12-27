@@ -30,6 +30,8 @@ const FullMoviesList:React.FC<FullMoviesListProps> = ({ movieType }) => {
   const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
   useEffect(()=>{
+    console.log("jhfjh");
+    
     window.scrollTo(0,0)
     dispatch(fetchMovies({
       page:currentPage,
@@ -42,6 +44,8 @@ const FullMoviesList:React.FC<FullMoviesListProps> = ({ movieType }) => {
   },[currentPage,filterGenre,filterLanguage,searchQuery,sortBy])
 
   useEffect(() => {
+    console.log("skjhfh");
+    
     if (movieType === "now-showing") {
       setMovies(nowShowingMovies);
       setMovieCount(nowShowingMoviesCount)
@@ -49,7 +53,7 @@ const FullMoviesList:React.FC<FullMoviesListProps> = ({ movieType }) => {
       setMovies(upcomingMovies);
       setMovieCount(upcomingMoviesCount)
     }
-  }, [movieType,upcomingMovies,nowShowingMovies,currentPage,]);
+  }, [movieType,upcomingMovies,nowShowingMovies,currentPage]);
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) =>{ setSearchQuery(e.target.value); setCurrentPage(1) }
   const handleMovieClick = (id:string) => {
@@ -186,9 +190,9 @@ const FullMoviesList:React.FC<FullMoviesListProps> = ({ movieType }) => {
           )}
         </div>
 
-         {/* pagination */}
+         
          <div className="flex justify-center mt-8 space-x-2">
-  {/* Previous Button */}
+  
   <button
     onClick={() => paginate(currentPage - 1)}
     disabled={currentPage === 1}
@@ -197,7 +201,6 @@ const FullMoviesList:React.FC<FullMoviesListProps> = ({ movieType }) => {
     Previous
   </button>
 
-  {/* Page Numbers */}
   {Array.from({ length: totalPages }, (_, index) => (
     <button
       key={index + 1}
@@ -208,7 +211,6 @@ const FullMoviesList:React.FC<FullMoviesListProps> = ({ movieType }) => {
     </button>
   ))}
 
-  {/* Next Button */}
   <button
     onClick={() => paginate(currentPage + 1)}
     disabled={currentPage === totalPages}

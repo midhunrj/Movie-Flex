@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import ShowtimeModal from './showTimeModal';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveMoviesToShowtime } from '../../redux/theatre/theatreThunk';
+import { deleteEnrolledMovie, saveMoviesToShowtime } from '../../redux/theatre/theatreThunk';
 import { EnrolledMovie,  ScreenDatas, Seat, Showtime, Tier } from '@/types/theatreTypes';
 import { AppDispatch, RootState } from '@/redux/store/store';
 import { ScreenData } from './EditScreen';
+import { FaTrash } from 'react-icons/fa';
 
 
 
@@ -26,7 +27,9 @@ const EnrolledMovies: React.FC<EnrolledMoviesProps> = ({
   const [selectedShowtime, setSelectedShowtime] = useState<Showtime | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedEndDate, setSelectedEndDate] = useState<string>('');
-
+   
+  console.log(screenData,"screenData in enrolledMovie");
+  
   const toggleModal = () => {
     setShowModal(!showModal);
     setSelectedShowtime(null);
@@ -47,6 +50,9 @@ const EnrolledMovies: React.FC<EnrolledMoviesProps> = ({
   const { theatre, isSuccess, isLoading } = useSelector((state: RootState) => state.theatre);
   const dispatch = useDispatch<AppDispatch>();
 
+  const handleDeleteEnrolledMovie=(movieId:string,screenId:string)=>{
+    dispatch(deleteEnrolledMovie({movieId,screenId}))
+  }
   const handleAddMovieToShowtime = async () => {
     if (selectedMovie && selectedShowtime && selectedDate && selectedEndDate) {
       const seatLayoutByTier = screenData.tiers.map((tier: Tier) => ({
@@ -90,7 +96,7 @@ const EnrolledMovies: React.FC<EnrolledMoviesProps> = ({
       <h2 className="text-lg text-center font-semibold mb-6">Enrolled Movies</h2>
 
       {screenData.enrolledMovies && screenData.enrolledMovies.length > 0 ? (
-        <div className="grid grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12">
           {screenData.enrolledMovies.map((movie) => (
             <div
               key={movie._id}
@@ -99,18 +105,27 @@ const EnrolledMovies: React.FC<EnrolledMoviesProps> = ({
               <img
                 src={movie.poster_path ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}` : 'banner img brand.jpeg'}
                 alt={movie.title}
-                className="w-80 h-72 object-cover rounded-lg transition-transform"
+                className="w-full h-72 object-cover rounded-lg transition-transform"
               />
               <p className="mt-2 text-lg font-semibold text-gray-600">{movie.title}</p>
               <p className="text-sm text-gray-600">
                 {movie.rating > 0 ? `Rating: ${movie.rating}` : 'Popular'}
               </p>
+              <div className='ml-4 flex flex-col sm:flex-row justify-center gap-4'>
               <button
-                className="mt-2 px-4 py-2 w-fit bg-blue-500 text-white rounded-lg min-h-12 mb-4 hover:bg-blue-600"
+                className="mt-2 items-center p-2  h-fit w-full sm:w-fit bg-blue-500 text-white rounded-lg min-h-8 mb-4 hover:bg-blue-600"
                 onClick={() => handleMovietoShow(movie)}
               >
                 Add to show
               </button>
+              <button
+    className="mt-2 p-2 h-fit w-full sm:w-fit bg-red-600 text-white rounded-lg min-h-8 flex items-center gap-2 hover:bg-amber-500"
+    onClick={() => handleDeleteEnrolledMovie(movie.movieId, screen?._id!)}
+  >
+    <FaTrash size={20} />
+    Delete
+  </button>
+              </div>
             </div>
           ))}
         </div>

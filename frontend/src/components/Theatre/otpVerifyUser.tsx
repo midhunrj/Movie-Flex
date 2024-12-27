@@ -1,6 +1,6 @@
 import React,{useEffect, useState} from "react";
 import { useNavigate } from "react-router";
-import { toast } from "react-toastify";
+import { Toaster, toast } from "sonner";
 import { useDispatch,useSelector } from "react-redux";
 import './css/login.css'
 // import { userVerify } from "../../services/api";

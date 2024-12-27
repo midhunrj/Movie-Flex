@@ -1,23 +1,46 @@
 import { Types } from "mongoose";
-import { iShowRepository } from "../../application/repositories/iShowRepository";
+import { IShowRepository } from "../../application/repositories/iShowRepository";
 import { Row, Showtime, TierData } from "../../Domain/entities/shows";
 import { UserCoordinates } from "../../Domain/entities/user";
 import { Screen, ScreenModel } from "../database/models/screenModel";
 import showModel, { IRow, IShowtime, ITier } from "../database/models/showModel";
 import { theatreModel } from "../database/models/theatreModel";
+import { BookingModel, IBooking } from "../database/models/bookingModel";
+import { userModel } from "../database/models/userModel";
+import walletModel from "../database/models/walletModel";
 
+import { NotificationType } from "../database/models/notficationModel";
+import { NotificationRepository } from "./notficationRepository";
+import { RefundService } from "../services/refundService";
+import { WalletRepository } from "./walletRepository";
+const walletRepo = new WalletRepository();
+const notificationRepo = new NotificationRepository();
+const refundService = new RefundService( notificationRepo,walletRepo)
 
-export class ShowRepository implements iShowRepository {
+export class ShowRepository implements IShowRepository {
   async createShowtimes(showData: any): Promise<void> {
     const { movieId, theatreId, screenId, showtime, startDate, totalSeats, endDate, seatLayout } = showData;
     
     console.log(seatLayout[0].rows[0].seats,"seatLyout in showtime creation");
     
+    const oldshowtimes=await showModel.countDocuments({screenId,showtime})
     const start = new Date(startDate);
     const end = new Date(endDate);
 
     const showtimeDocs: IShowtime[] = [];
     for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
+      if(oldshowtimes>0)
+      {
+        const deletingShowtimes=await showModel.find({screenId,showtime,date:new Date(d)})
+
+        for(const showtime of deletingShowtimes)
+        {
+         await refundService.refundBookingCancellation(showtime._id as string)
+        }
+
+      await showModel.deleteMany({screenId,showtime,date:new Date(d)})
+      }
+      
       const newShowtime: IShowtime = new showModel({
         movieId,
         theatreId,
@@ -51,6 +74,7 @@ export class ShowRepository implements iShowRepository {
       await screenData.save();
   }
     await showModel.insertMany(showtimeDocs);
+
   }
 
   async deleteExpiredShowtimes(currentDate: Date): Promise<void> {
@@ -227,12 +251,12 @@ export class ShowRepository implements iShowRepository {
   async removeShowtimes(showtime: string, screenId: string):Promise<void>{
       await showModel.deleteMany({screenId:screenId,showtime:showtime})
   }
-   async listTheatreShowtimes(theatreId: string,date:string): Promise<IShowtime[]> {
+   async listTheatreShowtimes(screenId: string,date:string): Promise<IShowtime[]> {
     const currentDate = new Date();
     const today = currentDate.toISOString().split('T')[0];
     const currentTime = currentDate.toISOString();
     console.log(currentTime, "current timee");
-    const showtimes = await showModel.find({ theatreId,date: new Date(date) }).populate('movieId').populate('screenId').populate('theatreId');
+    const showtimes = await showModel.find({ screenId,date: new Date(date) }).populate('movieId').populate('screenId').populate('theatreId');
     
     const filteredShowtimes = showtimes.filter((show) => {
       if (date === today) {
@@ -279,6 +303,16 @@ async resetSeatValues(showtimeId: Types.ObjectId,selectedSeats:string[]): Promis
   await showtime?.save()
   }
   return showtime!
+}
+
+async updateShowtimes(prevTime: string, screenId: string, newTime: string) {
+    const showtimes=await showModel.updateMany({screenId,showtime:prevTime},{$set:{showtime:newTime}})
+
+    // for(const show of showtimes)
+    // {
+    //   show[prevTime]=newTime
+    // }
+    // await showtimes.save()
 }
 }
  

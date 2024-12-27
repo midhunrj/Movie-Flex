@@ -7,7 +7,7 @@ import { IPaymentRepository } from "../repositories/iPaymentRepository";
 export class BookingMovies {
   constructor(private bookingRepository: BookingRepository,private paymentRepo:IPaymentRepository,private showRepository:ShowRepository) {}
 
-  async createBooking(bookingDetails: any): Promise<Booking> {
+  async userSideBooking(bookingDetails: any): Promise<Booking> {
     // Ensure booking details are valid and include required fields
     const booking = {
       ...bookingDetails,
@@ -71,9 +71,13 @@ export class BookingMovies {
   //   await this.bookingRepository.cancelTicket(booking);
   // }
 
-  async bookingHistory(userId:string):Promise<Partial<Booking>[]>
+  async getBookingDetail(id:string):Promise<any>
   {
-    return await this.bookingRepository.bookingOrderHistory(userId)
+    return await this.bookingRepository.getByBookingId(id)
+  }
+  async bookingHistory(userId:string,limits:number,page:Number):Promise<{ bookings: Booking[]; total: number }>
+  {
+    return await this.bookingRepository.bookingOrderHistory(userId,limits,page)
   }
 
   async cancelMovieTickets(bookingId:string):Promise<boolean>
@@ -111,5 +115,20 @@ async theatreRevenueTrends(interval:string,theatreId:string):Promise<any[]>
 async theatreBookingTrends(interval:string,theatreId:string):Promise<any[]>
 {
   return await this.bookingRepository.fetchBookingTrendsByTheatre(interval,theatreId)
+}
+async getTheatrebookingHistory(page: number, limit: number,theatreId:string) {
+  return this.bookingRepository.getTheatreBookings(page, limit,theatreId);
+}
+async theatreSideBooking(bookingDetails: any): Promise<Booking> {
+  // Ensure booking details are valid and include required fields
+  const booking = {
+    ...bookingDetails,
+    status: "Booked",
+    paymentStatus: "Paid",
+    createdAt: new Date(),
+    expiresAt: new Date(Date.now() + 5 * 60 * 1000), // Set expiration to 15 minutes from now
+  };
+
+  return await this.bookingRepository.create(booking);
 }
 }

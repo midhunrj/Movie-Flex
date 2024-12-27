@@ -1,12 +1,11 @@
-
-import React, { useState, useEffect, ChangeEvent } from 'react';
-import Header from './header';
-import Footer from './footer';
-import axios from 'axios';
-import { userAuthenticate } from '../../utils/axios/userInterceptor';
-import { useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import { RootState } from '@/redux/store/store';
+import React, { useState, useEffect, ChangeEvent } from "react";
+import Header from "./header";
+import Footer from "./footer";
+import axios from "axios";
+import { userAuthenticate } from "../../utils/axios/userInterceptor";
+import { useSelector } from "react-redux";
+import { toast } from "sonner";
+import { RootState } from "@/redux/store/store";
 
 interface User {
   name: string;
@@ -23,33 +22,33 @@ interface OtpResponse {
   success: boolean;
   message?: string;
 }
-const UserProfile:React.FC = () => {
-  const { user } = useSelector((state:RootState) => state.user);
+const UserProfile: React.FC = () => {
+  const { user } = useSelector((state: RootState) => state.user);
   const [formData, setFormData] = useState<User>({
-    name: user?.name || '',
-    email: user?.email || '',
-    mobile: user?.mobile || '',
+    name: user?.name || "",
+    email: user?.email || "",
+    mobile: user?.mobile || "",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
-  const [otp, setOtp] = useState('');
+  const [otp, setOtp] = useState("");
   const [emailChanged, setEmailChanged] = useState(false);
   const [showOtpInput, setShowOtpInput] = useState(false);
-  const [error, setError] = useState<string|null>(null);
-  const [verifyButtonLabel, setVerifyButtonLabel] = useState('Verify Email');
-  
+  const [error, setError] = useState<string | null>(null);
+  const [verifyButtonLabel, setVerifyButtonLabel] = useState("Verify Email");
+
   const [showPasswordFields, setShowPasswordFields] = useState(false);
-  const [oldPassword, setOldPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   useEffect(() => {
     if (user) {
       setFormData({
-        name: user.name || '',
-        email: user.email || '',
-        mobile: user.mobile || '',
+        name: user.name || "",
+        email: user.email || "",
+        mobile: user.mobile || "",
       });
     }
   }, [user]);
@@ -60,27 +59,27 @@ const UserProfile:React.FC = () => {
 
   const handleOtpVerify = async () => {
     try {
-      const response = await axios.post('/api/verify-otp', { otp });
+      const response = await axios.post("/api/verify-otp", { otp });
       if (response.data.success) {
         setOtpVerified(true);
         setShowOtpInput(false);
         setEmailChanged(false);
-        setVerifyButtonLabel('Verified');
+        setVerifyButtonLabel("Verified");
       } else {
-        setError('OTP verification failed');
+        setError("OTP verification failed");
       }
     } catch (error) {
-      setError('OTP verification failed');
+      setError("OTP verification failed");
     }
   };
 
-  const handleChange = (e:ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    if (user && name === 'email' && value !== user.email) {
+    if (user && name === "email" && value !== user.email) {
       setEmailChanged(true);
       setOtpVerified(false);
       setShowOtpInput(false);
-      setVerifyButtonLabel('Verify Email');
+      setVerifyButtonLabel("Verify Email");
     }
 
     setFormData({
@@ -92,7 +91,7 @@ const UserProfile:React.FC = () => {
   const handleEmailVerifyClick = async () => {
     if (!showOtpInput) {
       setShowOtpInput(true);
-      setVerifyButtonLabel('Verify OTP');
+      setVerifyButtonLabel("Verify OTP");
     } else {
       await handleOtpVerify();
     }
@@ -100,19 +99,19 @@ const UserProfile:React.FC = () => {
 
   const handleSave = async () => {
     if (emailChanged && !otpVerified) {
-      toast.error('Please verify OTP for the updated email.');
+      toast.error("Please verify OTP for the updated email.");
       return;
     }
 
-    const updatedData:FormData = { ...formData };
+    const updatedData: FormData = { ...formData };
 
     if (showPasswordFields) {
       if (!oldPassword || !newPassword) {
-        toast.error('Please fill out all password fields.');
+        toast.error("Please fill out all password fields.");
         return;
       }
       if (newPassword !== confirmPassword) {
-        toast.error('New password and confirm password do not match.');
+        toast.error("New password and confirm password do not match.");
         return;
       }
 
@@ -121,20 +120,23 @@ const UserProfile:React.FC = () => {
     }
 
     try {
-      const response = await userAuthenticate.put('/userprofile', updatedData);
+      const response = await userAuthenticate.put("/userprofile", updatedData);
       if (response.data.success) {
         setIsEditing(false);
         setShowPasswordFields(false);
-        setOldPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
-        setPasswordError('');
-        toast.success('Profile updated successfully!');
+        setOldPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setPasswordError("");
+        toast.success("Profile updated successfully!");
       } else {
-        toast.error(response.data.message || 'Error saving user data');
+        toast.error(response.data.message || "Error saving user data");
       }
-    } catch (err:any) {
+    } catch (err: any) {
       toast.error(err.response.data.message);
+    }
+    finally{
+      //setShowPasswordFields(false)
     }
   };
 
@@ -142,9 +144,9 @@ const UserProfile:React.FC = () => {
     if (showPasswordFields) {
       // If already showing, hide it and clear the fields
       setShowPasswordFields(false);
-      setOldPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
     } else {
       // If not showing, show the fields
       setShowPasswordFields(true);
@@ -155,71 +157,72 @@ const UserProfile:React.FC = () => {
     <>
       <Header />
       <div className="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-        <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+        <div className="bg-white p-6 rounded-lg  shadow-lg w-full min-h-max max-w-md ">
           <h2 className="text-2xl font-semibold mb-4 text-center">
-            {isEditing ? 'Edit Profile' : 'User Profile'}
+            {isEditing ? "Edit Profile" : "User Profile"}
           </h2>
 
           <div className="space-y-4">
+            {!showPasswordFields &&
+            <>            <div className="flex items-center space-x-4">
+            <label className="w-28 font-medium">Name:</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              disabled={!isEditing}
+              className={`w-full p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent rounded border ${!isEditing ? 'bg-gray-200' : 'bg-white'}`}
+            />
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <label className="w-28 font-medium">Email:</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              disabled
+              // disabled={!isEditing || (isEditing && showOtpInput)}
+              className={`w-full p-2 border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent border ${!isEditing ? 'bg-gray-200' : 'bg-slate-200'}`}
+            />
+            {/* {isEditing && (
+              <button
+                onClick={handleEmailVerifyClick}
+                className={`px-4 py-2 bg-blue-500 min-h-8 text-white rounded hover:bg-blue-600 ${!emailChanged ? 'cursor-not-allowed opacity-50' : ''}`}
+                disabled={!emailChanged}
+              >
+                {verifyButtonLabel}
+              </button>
+            )} */}
+          </div>
+
+          {/* {showOtpInput && (
             <div className="flex items-center space-x-4">
-              <label className="w-28 font-medium">Name:</label>
+              <label className="w-20 font-medium">Enter OTP:</label>
               <input
                 type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                disabled={!isEditing}
-                className={`w-full p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent rounded border ${!isEditing ? 'bg-gray-200' : 'bg-white'}`}
+                name="otp"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                className="w-fit p-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent inset-0 border-collapse border-spacing-2 border-hidden bg-white"
               />
             </div>
+          )} */}
 
-            <div className="flex items-center space-x-4">
-              <label className="w-28 font-medium">Email:</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                disabled
-                // disabled={!isEditing || (isEditing && showOtpInput)}
-                className={`w-full p-2 border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent border ${!isEditing ? 'bg-gray-200' : 'bg-slate-200'}`}
-              />
-              {/* {isEditing && (
-                <button
-                  onClick={handleEmailVerifyClick}
-                  className={`px-4 py-2 bg-blue-500 min-h-8 text-white rounded hover:bg-blue-600 ${!emailChanged ? 'cursor-not-allowed opacity-50' : ''}`}
-                  disabled={!emailChanged}
-                >
-                  {verifyButtonLabel}
-                </button>
-              )} */}
-            </div>
-
-            {showOtpInput && (
-              <div className="flex items-center space-x-4">
-                <label className="w-20 font-medium">Enter OTP:</label>
-                <input
-                  type="text"
-                  name="otp"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  className="w-fit p-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent inset-0 border-collapse border-spacing-2 border-hidden bg-white"
-                />
-              </div>
-            )}
-
-            <div className="flex items-center space-x-4">
-              <label className="w-28 font-medium">Mobile:</label>
-              <input
-                type="text"
-                name="mobile"
-                value={formData.mobile}
-                onChange={handleChange}
-                disabled={!isEditing}
-                className={`w-full p-2 rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent border ${!isEditing ? 'bg-gray-200' : 'bg-white'}`}
-              />
-            </div>
-
+          <div className="flex items-center space-x-4">
+            <label className="w-28 font-medium">Mobile:</label>
+            <input
+              type="text"
+              name="mobile"
+              value={formData.mobile}
+              onChange={handleChange}
+              disabled={!isEditing}
+              className={`w-full p-2 rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent border ${!isEditing ? 'bg-gray-200' : 'bg-white'}`}
+            />
+          </div>
+</>}
             {/* Password Fields */}
             {showPasswordFields && (
               <>
@@ -267,13 +270,13 @@ const UserProfile:React.FC = () => {
                 <>
                   <button
                     onClick={handleChangePasswordClick}
-                    className="px-4 py-2 min-h-8 w-fit bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                    className="px-4 py-1 min-h-8 w-fit bg-yellow-500 text-white rounded hover:bg-yellow-600"
                   >
-                    {showPasswordFields ? 'Close ' : 'Change Password'}
+                    {showPasswordFields ? "Close " : "Change Password"}
                   </button>
                   <button
                     onClick={handleSave}
-                    className="px-4 py-2 min-h-8 bg-green-500 text-white rounded hover:bg-green-600"
+                    className="px-4 py-1 min-h-8 bg-green-500 text-white rounded w-fit hover:bg-green-600"
                   >
                     Save Profile
                   </button>
@@ -281,7 +284,7 @@ const UserProfile:React.FC = () => {
               ) : (
                 <button
                   onClick={handleEdit}
-                  className="px-4 py-2 min-h-8 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  className="px-4 py-1 min-h-8 bg-blue-500 text-white rounded w-fit hover:bg-blue-600"
                 >
                   Edit Profile
                 </button>

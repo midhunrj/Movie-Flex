@@ -1,6 +1,6 @@
 // import React from "react";
 // import { useRazorpay, RazorpayOrderOptions } from "react-razorpay";
-// import { toast } from "react-toastify";
+// import { Toaster, toast } from "sonner";
 
 // const PaymentComponent = () => {
 //   const { error, isLoading, Razorpay } = useRazorpay();

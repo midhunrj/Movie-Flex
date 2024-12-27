@@ -53,6 +53,12 @@ const TheatreHeader = () => {
 
             
             <div className="flex space-x-6">
+            <Link
+                to="/theatre/home"
+                className="hover:bg-gray-700 p-4 rounded transition"
+              >
+                Home
+              </Link>
               <Link to="/theatre/movies"
                 className="hover:bg-gray-700 p-4 rounded transition"
               >

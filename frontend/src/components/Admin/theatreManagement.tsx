@@ -4,7 +4,7 @@ import SidebarMenu from './sidebarMenu';
 import { fetchTheatres, blockTheatre, unblockTheatre, approveTheatre, declineTheatre } from '../../redux/admin/adminThunk';
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { AppDispatch, RootState } from '@/redux/store/store';
 import { TheatreType } from '@/types/theatreTypes';
 
@@ -78,22 +78,22 @@ const handlePreviousPage = () => {
           <div>
             <h1 className='text-wrap font-bold text-blue-500'>TheatreList</h1>
           </div>
-          <table className="min-w-full border-collapse border border-gray-300 mt-4">
+          <table className="min-w-full border-collapse border rounded-lg shadow-lg border-gray-200 mt-4">
             <thead>
-              <tr>
-                <th className="border border-gray-300 p-2">No</th>
-                <th className="border border-gray-300 p-2">Name</th>
-                <th className="border border-gray-300 p-2">Email</th>
-                <th className="border border-gray-300 p-2">Mobile</th>
-                <th className="border border-gray-300 p-2">Status</th>
-                <th className="border border-gray-300 p-2">View Details</th>
-                <th className="border border-gray-300 p-2">Actions</th>
+              <tr className='rounded-lg border-collapse border  bg-sky-100'>
+                <th className="border border-gray-300 p-4">No</th>
+                <th className="border border-gray-300 p-4">Name</th>
+                <th className="border border-gray-300 p-4">Email</th>
+                <th className="border border-gray-300 p-4">Mobile</th>
+                <th className="border border-gray-300 p-4">Status</th>
+                <th className="border border-gray-300 p-4">View Details</th>
+                <th className="border border-gray-300 p-4">Actions</th>
               </tr>
             </thead>
             <tbody>
               {theatreData?.length > 0 ? (
                 theatreData.map((theatre, index) => (
-                  <tr key={theatre._id} className="border-t">
+                  <tr key={theatre._id} className="border-t bg-white rounded-lg">
                     <td className="p-3 text-center">{index + 1}</td>
                     <td className="p-3">{theatre.name}</td>
                     <td className="p-3">{theatre.email}</td>
@@ -109,7 +109,7 @@ const handlePreviousPage = () => {
                         <span className="text-yellow-500">Pending Approval</span>
                       )}
                     </td>
-                    <td className='p-3'><button className="px-4 py-2 min-h-8 bg-blue-500 text-white rounded-lg" onClick={() => openModal(theatre)}>View Details</button></td>
+                    <td className='p-3'><button className="px-2 py-1 min-h-8 w-fit h-fit bg-blue-500 text-white rounded-lg" onClick={() => openModal(theatre)}>View Details</button></td>
                     <td className="p-3 flex items-center gap-2">
                       
                       {theatre.is_approved === "Pending" ? (
@@ -131,7 +131,7 @@ const handlePreviousPage = () => {
                         </>
                       ) : (
                         <button
-                          className={`min-h-8 mx-8 px-6 py-2 ${
+                          className={`min-h-8 mx-8 h-fit px-2 py-1 ${
                             theatre.is_blocked ? 'bg-green-500' : 'bg-red-500'
                           } text-white rounded-lg`}
                           onClick={() => handleBlockUnblock(theatre._id, theatre.is_blocked)}
@@ -153,7 +153,7 @@ const handlePreviousPage = () => {
             <button
               onClick={handlePreviousPage}
               disabled={currentPage === 1}
-              className="px-4 py-2 mx-2 min-h-8 bg-blue-500 text-white rounded  cursor-pointer hover:bg-blue-800"
+              className="px-2 py-1 mx-2 min-h-8 bg-blue-500 text-white rounded  cursor-pointer hover:bg-blue-800"
             >
               Previous
             </button>
@@ -161,7 +161,7 @@ const handlePreviousPage = () => {
             <button
               onClick={handleNextPage}
               disabled={currentPage >= Math.ceil(theatreData?.length / usersPerPage)}
-              className="px-4 py-2 mx-2 min-h-8 bg-blue-500  text-white rounded cursor-pointer hover:bg-blue-800"
+              className="px-2 py-1 mx-2 min-h-8 bg-blue-500  text-white rounded cursor-pointer hover:bg-blue-800"
             >
               Next
             </button>

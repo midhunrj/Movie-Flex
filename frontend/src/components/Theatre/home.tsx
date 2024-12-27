@@ -14,6 +14,7 @@ import { Bar, Line } from "react-chartjs-2";
 import { RootState } from "@/redux/store/store";
 import { io } from "socket.io-client";
 import { theatreUrl, userUrl } from "@/utils/axios/config/urlConfig";
+import { BookingType } from "@/types/bookingOrderTypes";
 export interface BookingTrend {
   _id: string;
   totalBookings: number;
@@ -37,6 +38,42 @@ const TheatreHome = () => {
         console.log("ok bye bye i am going see you soon");
         navigate('/theatre')
     } 
+
+    const [bookingData, setBookingData] = useState<BookingType[]>([])
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [loading, setLoading] = useState(false);
+  
+    const itemsPerPage = 10; // Number of rows per page
+  
+    useEffect(() => {
+      fetchBookings(currentPage);
+    }, [currentPage]);
+  
+    const fetchBookings = async (page: number) => {
+      setLoading(true);
+      try {
+        const response = await theatreAuthenticate.get("/bookings", {
+          params: {
+            page,
+            limit: itemsPerPage,
+            theatreId:theatre?._id
+          },
+        });
+       console.log(response.data.bookings,"booking history");
+       
+        setBookingData(response.data.bookings);
+        setTotalPages(response.data.totalPages);
+      } catch (error) {
+        console.error("Error fetching bookings:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    const handlePageChange = (page: number) => {
+      setCurrentPage(page);
+    };
     useEffect(() => {
       const socket = io(userUrl); 
   
@@ -73,9 +110,11 @@ fetchRevenueTrends()
       setRevenues(response.data.revenueTrend);
   
     };
+    
+    const paginate = (pageNumber:number) => setCurrentPage(pageNumber)
     return (
         <>
-        <div className=" min-h-screen"style={{backgroundColor:"#FEE685"}} >
+        <div className=" min-h-screen bg-gray-100" >
         <header className=" from-yellow-200 via-blue-950  bg-gradient-to-tr to-[#091057] text-white">
           <div className="flex justify-between items-center p-4">
          
@@ -90,8 +129,14 @@ fetchRevenueTrends()
 
             
             <div className="flex space-x-6">
+            <Link
+                to="/theatre/home"
+                className="hover:bg-gray-700 p-4 rounded transition"
+              >
+                Home
+              </Link>
               <Link
-                to="theatre/movies"
+                to="/theatre/movies"
                 className="hover:bg-gray-700 p-4 rounded transition"
               >
                 Movies
@@ -163,8 +208,8 @@ fetchRevenueTrends()
             <option value="Yearly">Yearly</option>
           </select>
         </div> 
-         <div className="mt-8 mx-8 bg-white  grid  gap-12 grid-cols-2">
-            <div>
+         <div className="mt-8 mx-8   grid  gap-12 grid-cols-2">
+            <div className="bg-white p-2 rounded-md shadow-lg">
           <h2 className="text-xl font-bold">Booking Trends</h2>
 
           {/* <Bar data={data} options={options} /> */}
@@ -193,7 +238,7 @@ fetchRevenueTrends()
         </div>  
 
         
-         <div>
+         <div className="bg-white p-2 rounded-md shadow-lg">
           <h2 className="text-xl font-bold">Revenue Trends</h2>
           {revenues.length > 0 && (
   <Bar
@@ -213,7 +258,7 @@ fetchRevenueTrends()
         </div> 
         </div>
 
-</div>
+
         {/* <div className="flex justify-center mt-12 pb-8"> */}
           {/* <div className="grid grid-cols-8 gap-4">
             <div className="col-start-2 col-span-2 w-full text-center text-white  text-opacity-80 bg-gradient-to-r mx-8 h-fit border-b-black rounded-md bg-indigo-950" >
@@ -246,6 +291,63 @@ fetchRevenueTrends()
         </div> */} 
       {/* </div> */}
 
+      {loading ? (
+          <p>Loading...</p>
+        ) :bookingData.length>0? (
+          <div className="mx-8">
+            <h2 className="text-2xl text-center font-bold my-4">Order History</h2>
+            <table className="min-w-full bg-white  gap-4 shadow-md rounded-md mt-6">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2 text-lg text-left">Movie </th>
+                  <th className="px-4 py-2  text-lg text-left">User</th>
+                  <th className="px-4 py-2  text-lg text-left">Booking Date</th>
+                  <th className="px-4 py-2  text-lg text-left">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {bookingData.map((booking) => (
+                  <tr key={booking._id} className="border-t">
+                    <td className="px-4 py-2">{booking.movieId.title}</td>
+                    <td className="px-4 py-2">{booking.userId?booking.userId?.name!:booking.screenData?.screenName}</td>
+                    <td className="px-4 py-2">{new Date(booking.createdAt).toLocaleDateString()}</td>
+                    <td className="px-4 py-2">{booking.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div className="flex justify-center items-center gap-2 my-4">
+            <button
+    onClick={() => paginate(currentPage - 1)}
+    disabled={currentPage === 1}
+    className={`px-4 py-1  rounded-lg min-h-8  ${currentPage === 1 ? 'bg-gray-300 text-gray-500 cursor-not-allowed hidden' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+  >
+    Prev
+  </button>
+
+  {Array.from({ length: totalPages }, (_, index)=>index+1).filter((page)=>page==currentPage||page==currentPage-1||page==currentPage+1).map(page => (
+    <button
+      key={page}
+      onClick={() => paginate(page)}
+      className={`p-2 rounded-lg  min-h-8 ${currentPage === page  ? 'bg-blue-600 text-white' : 'bg-gray-300 hover:bg-blue-500 hover:text-white'}`}
+    >
+      {page}
+    </button>
+  ))}
+
+  <button
+    onClick={() => paginate(currentPage + 1)}
+    disabled={currentPage === totalPages}
+    className={`px-4 py-1 rounded-lg min-h-8 ${currentPage === totalPages ? 'bg-gray-300 text-gray-500 cursor-not-allowed hidden' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+  >
+    Next
+  </button>
+            </div>
+            </div>
+            
+        ):(<div className="text-center flex justify-center items-center mx-auto  text-black">No history found</div>)}
+</div>
         <Footer/>
 
         </>

@@ -2,7 +2,7 @@ import React,{useState,useEffect} from "react";
 import { useSelector,useDispatch } from "react-redux";
 import { BrowserRouter,useNavigate } from "react-router-dom";
 import './css/login.css'
-import { toast } from "react-toastify";
+import { Toaster, toast } from "sonner";
 // import { forgotPass } from "../../services/api";
 import { forgotPass } from "../../redux/user/userThunk";
 import { AppDispatch, RootState } from "@/redux/store/store";

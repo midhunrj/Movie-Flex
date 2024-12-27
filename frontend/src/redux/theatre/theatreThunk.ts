@@ -15,7 +15,9 @@ import {
   RollingMoviesData,
   updateScreenData,
   moviesRollinShowtime,
-  removeShow
+  removeShow,
+  deleteMovieFromScreen
+  
 } from './theatreService';
 
 // Types for input and output data
@@ -53,6 +55,7 @@ interface OtpPayload {
 // }
 import { ScreenDatas, Tier } from '@/types/theatreTypes';
 import { MovieType } from '@/types/movieTypes';
+import { message } from 'antd';
 
 interface MoviesPayload {
   movie: MovieType;
@@ -252,3 +255,17 @@ export const removeShowtime = createAsyncThunk <{ message: string; screenData: a
     }
   }
 );
+
+export const deleteEnrolledMovie=createAsyncThunk<{message:string,screenData:any},{
+  movieId:string,screenId:string},
+  {rejectValue:string}>('screen/deleteEnrolledMovie',
+    async({movieId,screenId},thunkAPI)=>{
+     try {
+      return await deleteMovieFromScreen(movieId,screenId)
+     } 
+      catch (error: any) {
+        return thunkAPI.rejectWithValue(error.response?.data || 'Failed to remove showtime');
+      }
+     
+    }
+  )

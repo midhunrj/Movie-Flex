@@ -3,9 +3,10 @@ import { useNavigate } from "react-router";
 import './css/login.css'
 // import { newPassVerify } from "../../services/api";
 import { newPassVerify } from "../../redux/theatre/theatreThunk";
-import { toast } from "react-toastify";
+//import { Toaster, toast } from "sonner";
 import { useDispatch,useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store/store";
+import { Toaster, toast } from "sonner";
 const TheatrePassVerify=()=>{
     const [otp,setOtp]=useState("")
     //const [confirmPass,setConfirmPass]=useState("")

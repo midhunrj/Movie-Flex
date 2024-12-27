@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import Header from './header';
 import Footer from './footer';
@@ -11,6 +11,7 @@ import { BookingType } from '@/types/bookingOrderTypes';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store/store';
 import { format } from 'date-fns';
+import BookingCard from './bookingCard';
 
 const BookingOrders = () => {
   const [bookings, setBookings] = useState<Partial<BookingType[]>>([]);
@@ -18,17 +19,25 @@ const BookingOrders = () => {
   const[selectedBooking,setSelectedBooking]=useState<Partial<BookingType|null>>(null)
   const { user } = useSelector((state: RootState) => state.user);
   const userId = user?._id!;
-
+  const [totalPages, setTotalPages] = useState(1)
+ const [currentPage,setCurrentPage]=useState(1)
+//  const [hasMore, setHasMore] = useState(true); // Tracks if there's more data to load
+ const observer = useRef<IntersectionObserver | null>(null);
+const limit=12
+ const paginate=(page:number)=>setCurrentPage(page)
   const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
   const fetchBookings = async () => {
     try {
       const response = await userAuthenticate.get('/bookings-history', {
-        params: { userId },
+        params: { userId,page:currentPage,limit},
       });
       console.log(response.data, "response from movies orders");
 
-      setBookings(response.data.bookingData);
+      const newBookings = response.data.bookingData;
+      setBookings(newBookings)
+      setTotalPages(response.data.totalPages);
+      //setHasMore(newBookings.length === limit); 
     } catch (error) {
       console.error('Error fetching bookings:', error);
     } finally {
@@ -38,7 +47,7 @@ const BookingOrders = () => {
 
   useEffect(() => {
     fetchBookings();
-  }, []);
+  }, [currentPage]);
 
   const cancelBooking = async (bookingId: string,refundAmount:number) => {
         console.log(bookingId,"bookingId going through,qyery");
@@ -149,6 +158,22 @@ const downloadInvoice = async (booking: BookingType) => {
       return false
     }
   }
+
+  // const lastBookingRef = useCallback(
+  //   (node:any) => {
+  //     if (loading) return;
+  //     if (observer.current) observer.current.disconnect();
+
+  //     observer.current = new IntersectionObserver((entries) => {
+  //       if (entries[0].isIntersecting && hasMore) {
+  //         setCurrentPage((prevPage) => prevPage + 1);
+  //       }
+  //     });
+
+  //     if (node) observer.current.observe(node);
+  //   },
+  //   [loading, hasMore]
+  // );
   
   return (
     <>
@@ -160,9 +185,22 @@ const downloadInvoice = async (booking: BookingType) => {
         ) : bookings.length === 0 ? (
           <p>No bookings found.</p>
         ) : (
+          <>
           <div className="grid grid-cols-1 md:grid-cols-3  lg:grid-cols-3 gap-6 w-full  max-w-[90rem]">
-            {bookings.slice().reverse().map((booking) => (
-              <div key={booking?._id} className="bg-white   shadow-md rounded-lg p-4 h-[32rem]  hover:scale-105 cursor-pointer transition-all"
+            {/* {bookings.slice().reverse().map((booking,index) => {
+              if (index === bookings.length - 1) {
+                return (
+                  <div
+                    ref={lastBookingRef}
+                    key={booking?._id}
+                    className="bg-white shadow-md rounded-lg p-4"
+                  >
+                    {/* Booking details go here */}
+                  {/* </div>
+                );
+              }
+              else{
+              return (<div key={booking?._id} className="bg-white   shadow-md rounded-lg p-4 h-[32rem]  hover:scale-105 cursor-pointer transition-all"
              >
                 <img
                   src={`${TMDB_IMAGE_BASE_URL}/${booking!.movieId.poster_path!}`}
@@ -187,9 +225,9 @@ const downloadInvoice = async (booking: BookingType) => {
                 <p>
                   <strong>Seats:</strong> {booking?.screenData?.tierName} &nbsp; {booking?.selectedSeats.join(', ')}
                 </p>
-                </div>
+                </div> */}
                  {/* {console.log(booking?._id,"booking")}  */}
-                <div className="flex justify-end flex-col">
+                {/* <div className="flex justify-end flex-col">
                   
                     <QRCode.QRCodeSVG
                       value={`Booking ID: ${booking?._id}\nMovie: ${booking?.movieId?.title}\nTheatre: ${booking?.theatreDetails?.name}\n Seats:${booking?.screenData?.tierName}  ${booking?.selectedSeats.join(',')}  \nShowtime: ${booking?.showtimeId?.showtime }`}
@@ -208,8 +246,8 @@ const downloadInvoice = async (booking: BookingType) => {
                     Cancel Booking
                   </button>
                   </div>
-                  
-                ):( booking?.status === 'Cancelled' ? (
+                   */}
+                {/* ):( booking?.status === 'Cancelled' ? (
                   <div className=' flex justify-center'>
                   <span className=" text-red-500 rounded-md  bg-yellow-200 w-fit min-h-8 transition  p-1 font-semibold">Ticket is Cancelled</span></div>)
                   : <div className=' flex justify-center'>
@@ -218,12 +256,49 @@ const downloadInvoice = async (booking: BookingType) => {
               <span className='text-sm '>Booking date and time: {format(new Date(booking?.createdAt!), 'PPpp')}</span>
               </div>
               </div>
-              
-            ))}
+               */}
+            {/* )}})}  */}
+            {bookings.map((booking, index) => (
+    <BookingCard
+      key={index}
+      booking={booking as BookingType}
+      isLast={index === bookings.length - 1}
+     // lastBookingRef={index === bookings.length - 1 ? lastBookingRef : null}
+      canCancelBooking={canCancelBooking}
+      cancelBooking={cancelBooking}
+      setSelectedBooking={setSelectedBooking}
+    />
+  ))}
+</div>
+<div className="flex justify-center items-center gap-2 mt-4">
+            <button
+    onClick={() => paginate(currentPage - 1)}
+    disabled={currentPage === 1}
+    className={`px-4 py-1  rounded-lg min-h-8  ${currentPage === 1 ? 'bg-gray-300 text-gray-500 cursor-not-allowed hidden' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+  >
+    Prev
+  </button>
 
+  {Array.from({ length: totalPages }, (_, index)=>index+1).filter((page)=>page==currentPage||page==currentPage-1||page==currentPage+1).map(page => (
+    <button
+      key={page}
+      onClick={() => paginate(page)}
+      className={`p-2 rounded-lg  min-h-8 ${currentPage === page  ? 'bg-blue-600 text-white' : 'bg-gray-300 hover:bg-blue-500 hover:text-white'}`}
+    >
+      {page}
+    </button>
+  ))}
+
+  <button
+    onClick={() => paginate(currentPage + 1)}
+    disabled={currentPage === totalPages}
+    className={`px-4 py-1 rounded-lg min-h-8 ${currentPage === totalPages ? 'bg-gray-300 text-gray-500 cursor-not-allowed hidden' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+  >
+    Next
+  </button>
+            </div>
             
-            
-          </div>
+          </>
           
         )}
     {/* <div style={{ height: "auto", margin: "0 auto", maxWidth: 64, width: "100%" }}>

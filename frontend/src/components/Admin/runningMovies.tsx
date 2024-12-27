@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import SidebarMenu from './sidebarMenu';
-import 'react-toastify/dist/ReactToastify.css';
+
 import { Link } from 'react-router-dom';
 import { blockMovie, deleteMovie, fetchMovies } from '../../redux/admin/adminThunk';
-import {ToastContainer, toast } from 'react-toastify';
+import { toast } from 'sonner';
 import Swal from 'sweetalert2'
 import './css/login.css'
 import { AppDispatch, RootState } from '@/redux/store/store';
@@ -99,14 +99,23 @@ const RunningMovies = () => {
           ) : movies.length > 0 ? (
             movies.map((movie:MovieType,index:number) => (
               <div key={movie.id||index} className="bg-white shadow-md rounded-lg p-4 flex flex-col justify-between">
-                <div>
+                <div className='relative'>
                   {/* Movie Poster */}
                   <img
                     src={movie.poster_path ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}` : 'banner img brand.jpeg'}
                     alt={movie.title}
                     className="w-full h-72 object-cover rounded-md mb-4"
                   />
-
+                     {movie.video_link && movie.video_link.includes('youtube.com') && (
+                      <div className="absolute  inset-0 z-10 flex items-center justify-center ">
+                    <button
+                      onClick={() => setSelectedMovie(movie)}
+                      className="text-white bg-black bg-opacity-40 hover:bg-opacity-50 transition-all font-bold  border border-white p-2 h-fit rounded-lg w-fit  text-sm mt-2"
+                    >
+                      play Trailer
+                    </button>
+                    </div>
+                  )}
                   {/* Movie Title */}
                   <h2 className="text-lg font-bold text-gray-800 mb-2">{movie.title}</h2>
 
@@ -134,14 +143,7 @@ const RunningMovies = () => {
                 //     />
                 //   )} */}
 
-                {movie.video_link && movie.video_link.includes('youtube.com') && (
-                    <button
-                      onClick={() => setSelectedMovie(movie)}
-                      className="text-blue-500 hover:underline text-sm mt-2"
-                    >
-                      Watch Trailer
-                    </button>
-                  )}
+               
                 </div>
 
                 {/* Actions */}

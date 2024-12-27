@@ -3,7 +3,7 @@
 // import { useNavigate } from "react-router";
 // import './css/login.css'
 // import { userVerify } from "../../redux/user/userThunk";
-// import { toast } from "react-toastify";
+// import { Toaster, toast } from "sonner";
 // const VerifyUser=()=>{
 //     const [otp,setOtp]=useState("")
 //     //const [confirmPass,setConfirmPass]=useState("")
@@ -59,7 +59,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 //import { userVerify, resendOtp } from "../../redux/user/userThunk"; // Assume resendOtp is defined in userThunk
-import { toast } from "react-toastify";
+import { Toaster, toast } from "sonner";
 import { userVerify,resendOtp } from "../../redux/user/userThunk";
 import { AppDispatch, RootState } from "@/redux/store/store";
 

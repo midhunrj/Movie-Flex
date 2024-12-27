@@ -54,12 +54,14 @@ interface EnrolledMovie {
 
 interface Showtime {
   _id?:string
-  movieId: string;
+  movieId: string|null;
   time: string;
+  expiryDate?:Date|null
 }
 
 export interface Screen {
   id?: string; 
+  _id?:string;
   theatreId: Types.ObjectId;
   screenName: string;
   screenType: string;

@@ -1,10 +1,10 @@
-import { iScreenRepository } from "../repositories/iScreenRepository";
+import { IScreenRepository } from "../repositories/iScreenRepository";
 import { Screen } from '../../Domain/entities/screens';
-import { iShowRepository } from "../repositories/iShowRepository";
+import { IShowRepository } from "../repositories/iShowRepository";
 import { UserCoordinates } from "../../Domain/entities/user";
 
 export class ScreenUseCase {
-  constructor(private screenRepository: iScreenRepository,private showRepository:iShowRepository) {}
+  constructor(private screenRepository: IScreenRepository,private showRepository:IShowRepository) {}
 
   async addNewScreen(screenData: Screen): Promise<Screen> {
     return await this.screenRepository.create(screenData);
@@ -84,9 +84,29 @@ export class ScreenUseCase {
     }
   }
 
+  async updateShowtimeFromScreen(screenId:string,prevTime:string,newTime:string):Promise<Screen|null>{
+    try {
+      // console.log(showData,"in usecase");
+      // const showtime= await this.screenRepository.getShowtime(screenId,showtimeId)
+      //console.log(screenDeta,"in usecase");
+
+      const showtimeDatas=await this.showRepository.updateShowtimes(prevTime,screenId,newTime)
+   
+      const screenData=await this.screenRepository.updateShowFromScreen(screenId,prevTime,newTime)
+      
+      return screenData
+    } catch (error) {
+      console.log(error,"error");
+      return null
+    }
+  }
   async getTheatresWithScreens(userCoords:UserCoordinates) {
     // Call the repository to fetch data
     const theatres = await this.screenRepository.fetchTheatresWithScreens(userCoords);
     return theatres;
+  }
+  async removeMovieFromEnroll(movieId:string,screenId:string){
+    const screenData=await this.screenRepository.removeMovieFromScreen(movieId,screenId)
+    return screenData
   }
 }

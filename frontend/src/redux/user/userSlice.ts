@@ -324,6 +324,7 @@ const userSlice = createSlice({
         
       })
       .addCase(fetchTheatres.fulfilled, (state, action) => {
+        console.log(action.payload,"action thaeatre");
         
         state.isLoading=false;
         state.isSuccess=true;
