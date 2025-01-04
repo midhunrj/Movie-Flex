@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon --exec ts-node src/app.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rimraf dist && npx tsc"
+    "build": "rimraf dist && tsc"
   },
   "keywords": [],
   "author": "",
@@ -53,7 +53,8 @@
     "@types/nodemon": "^1.19.6",
     "@types/redis": "^4.0.11",
     "@types/uuid": "^10.0.0",
-    "rimraf": "^6.0.1"
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.2"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8",
