@@ -1,0 +1,28 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+    const generatePageNumbers = () => {
+        const pages = [];
+        // Show the first page if the current page is greater than 5
+        if (currentPage > 5) {
+            pages.push(1);
+            pages.push('...');
+        }
+        // Show 3 pages close to the current page
+        for (let i = Math.max(1, currentPage - 2); i <= Math.min(currentPage + 2, totalPages); i++) {
+            pages.push(i);
+        }
+        // Show the last page if the current page is not too close to the end
+        if (currentPage < totalPages - 2) {
+            pages.push('...');
+            pages.push(totalPages);
+        }
+        return pages;
+    };
+    const handlePageClick = (page) => {
+        if (typeof page === 'number') {
+            onPageChange(page);
+        }
+    };
+    return (_jsxs("div", { className: "flex justify-center items-center mt-4", children: [_jsx("button", { className: "px-2 py-1 border rounded mx-1", disabled: currentPage === 1, onClick: () => onPageChange(currentPage - 1), children: "Previous" }), generatePageNumbers().map((page, index) => (_jsx("button", { className: `px-2 py-1 border rounded mx-1 ${page === currentPage ? 'bg-blue-500 text-white' : ''}`, disabled: page === currentPage || page === '...', onClick: () => handlePageClick(page), children: page }, index))), _jsx("button", { className: "px-2 py-1 border rounded mx-1", disabled: currentPage === totalPages, onClick: () => onPageChange(currentPage + 1), children: "Next" })] }));
+};
+export default Pagination;

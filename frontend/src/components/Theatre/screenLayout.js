@@ -1,0 +1,11 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+const ScreenLayout = ({ screenData }) => {
+    if (!screenData || !screenData.tiers)
+        return _jsx("div", { children: "Loading..." });
+    return (_jsxs("div", { className: "mx-4 mt-4", children: [_jsxs("h2", { className: "text-lg font-semibold", children: [screenData.screenName, " - Screen Layout"] }), _jsx("div", { className: "mt-4", children: [...screenData.tiers].reverse().map((tier, tierIndex) => (_jsxs("div", { className: "mb-6", children: [_jsxs("h3", { className: "font-medium text-center mb-2 text-yellow-500", children: [tier.name, " - \u20B9", tier.ticketRate] }), [...(tier?.seatLayout ?? [])]?.reverse().map((row, rowIndex) => (_jsx("div", { className: "flex justify-center gap-1 mb-1 flex-wrap", children: row.map((seat) => (_jsx("div", { className: `md:w-10 md:h-10 sm:w-5 sm:h-5 flex items-center justify-center md:text-sm  text-xs rounded-md sm:rounded-md ${seat.isPartition
+                                    ? 'bg-transparent border-none'
+                                    : seat.isFilled
+                                        ? 'bg-yellow-200 text-blue-950'
+                                        : 'bg-green-200'} border border-gray-400`, children: seat.isPartition ? '' : seat.label }, seat.label))) }, rowIndex))), tierIndex < screenData.tiers.length - 1 && (_jsx("div", { className: "h-2 bg-gray-200 my-4" }))] }, tierIndex))) }), _jsxs("div", { className: "relative w-[75%] mx-auto h-8 bg-gray-700 rounded-t-xl overflow-hidden", children: [_jsx("div", { className: "absolute inset-0 w-full h-full bg-gradient-to-r from-gray-600 to-gray-400 opacity-60" }), _jsx("p", { className: "text-center text-white text-xs uppercase tracking-wider absolute inset-0 flex items-center justify-center", children: "Screen" })] }), _jsx("h3", { className: "mt-6 font-medium text-center", children: "Speakers Layout" }), _jsx("div", { className: "flex flex-wrap justify-around mt-2", children: screenData.speakers.map((speaker, index) => (_jsxs("div", { className: "text-center w-full sm:w-auto", children: [_jsxs("div", { className: "w-20 h-20 border border-gray-300 bg-gray-200 flex items-center justify-center", children: ["Speaker ", index + 1] }), _jsx("span", { className: "text-sm", children: speaker.type })] }, index))) })] }));
+};
+export default ScreenLayout;

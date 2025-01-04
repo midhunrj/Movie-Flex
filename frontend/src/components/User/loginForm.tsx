@@ -16,7 +16,6 @@ interface ValidationErrors {
   
 const LoginForm:React.FC = () => {
     const [email, setEmail] = useState<string>("");
-    
     const [password, setPassword] = useState<string>("");
     const {user,token,isLoading,isSuccess,isError,message}=useSelector((state:RootState)=>state.user)
     const navigate=useNavigate()
