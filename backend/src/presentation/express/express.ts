@@ -12,7 +12,7 @@ import cookieParser from 'cookie-parser';
 const expressConfig=(app:Application)=>{
     console.log(configKeys.CLIENT_URL,"dffdfde");
     const corsOptions={
-        origin:'*',   
+        origin:configKeys.CLIENT_URL,   
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
     };
