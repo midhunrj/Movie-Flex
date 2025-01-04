@@ -16,7 +16,7 @@ userAuthenticate.interceptors.request.use(
             request.headers.Authorization = `Bearer ${userAccessToken}`;
         }
         return request;
-    },
+    },  
     (error) => {
         return Promise.reject(error);
     }
