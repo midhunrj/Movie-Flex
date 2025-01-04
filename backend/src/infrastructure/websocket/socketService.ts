@@ -1,6 +1,7 @@
 import {Server,Socket} from 'socket.io'
 import { Server as HttpServer } from 'http'
 import Notification, { NotificationStatus } from '../database/models/notficationModel'
+import configKeys from '../config/config'
 
 class SocketService{
     private io:Server|null=null
@@ -9,7 +10,7 @@ init(httpServer:HttpServer)
 {
     this.io=new Server(httpServer,{
         cors:{
-            origin:"http://localhost:5173",
+            origin:[configKeys.CLIENT_URL||"http://localhost:5173"],
             methods:['GET','POST']
         }
     })
