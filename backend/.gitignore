@@ -10,4 +10,4 @@ build/
 # Ignore log files
 *.log
 # Ignore Firebase service account key
-
+src/infrastructure/firebase/serviceAccountkey.json
