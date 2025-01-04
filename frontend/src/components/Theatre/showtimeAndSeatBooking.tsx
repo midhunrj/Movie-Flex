@@ -61,13 +61,14 @@ const ShowtimeAndSeatBooking: React.FC<{ screenId: string }> = ({ screenId }) =>
   const [selectedSeats, setSelectedSeats] = useState<number>(0);
   const [currentBoat,setCurrentBoat]=useState<string>('movies')
   const [showconfirmModal, setShowConfirmModal] = useState<boolean>(false);
+  const[seatConfirmed,setSeatConfirmed]=useState<boolean>(false)
   // Date-related states
   const [dates] = useState<string[]>(generateDates()); // Assuming this generates next 7 days
   const [selectedDate, setSelectedDate] = useState<string>(dates[0]);
   const [dateIndex, setDateIndex] = useState(0);
   const datesToShow = dates.slice(dateIndex, dateIndex + 3);
  console.log(selectedSeats,"selected Seats");
- 
+  
 
  const slideUpVariants = {
     hidden: { y: "100%", opacity: 0 },
@@ -136,11 +137,14 @@ const ShowtimeAndSeatBooking: React.FC<{ screenId: string }> = ({ screenId }) =>
     }
   };
   useEffect(()=>{
-  const fetchSeatData=async()=>{
-    await fetchSeatLayout(selectedShowtime?._id!)
-  }
-  fetchSeatData()
-  },[selectedShowtime])
+  // const fetchSeatData=async()=>{
+     fetchSeatLayout(selectedShowtime?._id!)
+  // }
+  //fetchSeatData()
+  setSeatConfirmed(false)
+  console.log("seatconfirmed sfkjns");
+  
+  },[selectedShowtime,seatConfirmed])
   // Fetch data when date or screen changes
   useEffect(() => {
     fetchShowtimes();
@@ -276,7 +280,10 @@ const ShowtimeAndSeatBooking: React.FC<{ screenId: string }> = ({ screenId }) =>
       toast.success('Tickets booked successfully');
       // Reset selections or navigate to confirmation
       setSelectedSeats(0);
-      setSelectedShowtime(null);
+      setShowConfirmModal(false)
+      setSeatNames([])
+      setSeatConfirmed(true)
+      //setSelectedShowtime(null);
     } catch (err) {
       toast.error('Booking failed');
       console.error(err);
@@ -287,10 +294,11 @@ const ShowtimeAndSeatBooking: React.FC<{ screenId: string }> = ({ screenId }) =>
     <div className="bg-slate-900 min-h-screen text-white">
       {/* Date Selection Tabs */}
       <div className="mt-4 w-fit ">
-      <div className=" flex  justify-center items-center  mb-4 p-2 rounded-lg bg-gray-300">
+      <div className=" flex  justify-center items-center  mb-4 p-2 rounded-lg bg-gray-200">
       <button
           disabled={dateIndex === 0}
           onClick={() => setDateIndex(dateIndex - 1)}
+          className='text-slate-950'
         >
           {'<'}
         </button>
@@ -319,6 +327,7 @@ const ShowtimeAndSeatBooking: React.FC<{ screenId: string }> = ({ screenId }) =>
         <button
           disabled={dateIndex + 3 >= dates.length}
           onClick={() => setDateIndex(dateIndex + 1)}
+          className='text-slate-950'
         >
           {'>'}
         </button>

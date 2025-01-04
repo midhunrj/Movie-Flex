@@ -30,7 +30,7 @@ import BannerCarousel from "./bannerCarousel";
 import { AppDispatch, RootState } from "@/redux/store/store";
 import { MovieType } from "@/types/movieTypes";
 import { useLocalizationContext } from "@mui/x-date-pickers/internals";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import { userUrl } from "@/utils/axios/config/urlConfig";
 import { AiOutlineClose } from "react-icons/ai";
 // import { Theatre } from "@/types/admintypes";
@@ -130,7 +130,7 @@ const HomePage = () => {
     return () => {
       socket.disconnect();
     };
-  }, [userId, role]);
+  }, [userId, role,Socket]);
   const handleCitySelection = async (city: string) => {
     if (city == currentLocation) {
       await getUserLocation();
@@ -319,7 +319,8 @@ const HomePage = () => {
     <>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center  justify-center bg-black bg-opacity-50">
-          <div className="relative bg-white rounded-lg shadow-lg w-1/2 max-w-7xl mx-auto">
+<div className="relative bg-white rounded-lg shadow-lg w-full max-w-7xl mx-4 sm:w-4/5 md:w-2/3 lg:w-1/2 ">
+
             <div className="flex justify-between items-center bg-blue-600 text-white p-4 rounded-t-lg">
               <h3 className="text-lg font-semibold ml-12">
                 Select Your Location
@@ -473,7 +474,7 @@ const HomePage = () => {
               />
             </div>
 
-            <div className="flex items-center bg-white w-fit rounded p-2 text-black">
+            <div className="flex items-center cursor-pointer bg-white w-fit rounded p-2 text-black">
               <BiMap size={24} onClick={() => setIsOpen(true)} />
               <span
                 className="ml-1 flex items-center cursor-pointer"

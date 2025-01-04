@@ -38,6 +38,8 @@ export const register = createAsyncThunk(
   'user/register',
   async ({ name, email, mobile, password }: RegisterPayload, thunkAPI) => {
     try {
+      console.log(name,email);
+      
       return await registerUser(name, email, mobile, password);
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message || 'Something went wrong');

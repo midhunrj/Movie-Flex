@@ -24,6 +24,7 @@ import {
 import { toast } from 'sonner';
 import { RollingMoviesData } from './theatreService';
 import { ScreenDatas, TheatreType } from '@/types/theatreTypes';
+import { MovieType } from '@/types/movieTypes';
 //import { log } from 'util';
 // interface Theatre {
 //   _id: string;
@@ -54,7 +55,7 @@ interface TheatreState {
   otpToken: string | null;
   isProfileComplete: boolean;
   screens: ScreenDatas[]|[];
-  movies: Movie[]|[];
+  movies: MovieType[]|[];
 }
 
 // Load initial state from localStorage
@@ -337,7 +338,7 @@ const theatreSlice = createSlice({
         state.isError = false;
         state.message = '';
       })
-      .addCase(fetchMovies.fulfilled, (state, action: PayloadAction<{ movieData: Movie[]; message: string }>) => {
+      .addCase(fetchMovies.fulfilled, (state, action: PayloadAction<{ movieData: MovieType[]; message: string }>) => {
         console.log(action,"Action datas");
         
         state.isLoading = false;

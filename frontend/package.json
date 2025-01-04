@@ -34,6 +34,7 @@
     "firebase": "^10.13.1",
     "flowbite": "^2.5.1",
     "flowbite-react": "^0.10.1",
+    "formik": "^2.4.6",
     "framer-motion": "^11.15.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.2",
@@ -58,7 +59,8 @@
     "sonner": "^1.7.1",
     "sweetalert2": "^11.6.13",
     "vite": "^5.4.10",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "yup": "^1.6.1"
   },
   "scripts": {
     "dev": "vite",
@@ -86,7 +88,7 @@
   "devDependencies": {
     "@types/antd": "^0.12.32",
     "@types/chart.js": "^2.9.41",
-    "@types/node": "^22.9.0",
+    "@types/node": "^22.10.2",
     "@types/qrcode.react": "^1.0.5",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",

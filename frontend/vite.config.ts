@@ -4,6 +4,10 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+  },
   resolve: {
     alias: {
       '@components': '/src/components',

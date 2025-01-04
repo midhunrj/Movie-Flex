@@ -1,6 +1,7 @@
 // BannerCarousel.js
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router';
 type BannerCarouselProps = {
   images: string[]; // Define the type for images as an array of strings
 };
@@ -20,6 +21,7 @@ const BannerCarousel:React.FC<BannerCarouselProps> = ({ images }) => {
       prevIndex === 0 ? images.length - 1 : prevIndex - 1
     );
   };
+  const navigate=useNavigate()
 
   useEffect(() => {
     const interval = setInterval(nextSlide, 5000);
@@ -27,8 +29,21 @@ const BannerCarousel:React.FC<BannerCarouselProps> = ({ images }) => {
   }, [images.length,nextSlide,prevSlide]);
 
   return (
-    <div className="relative  mb-4 overflow-hidden flex justify-center group">
-    <AnimatePresence initial={false} custom={direction}>
+    <div className="relative h-[28rem] mb-4 overflow-hidden flex items-center justify-between bg-sky-100 rounded-sm shadow-lg">
+            <AnimatePresence initial={false} custom={direction}>
+      <motion.div className="flex flex-col justify-center px-8 text-slate-950 w-1/2">
+        <h1 className="text-4xl lg:text-6xl font-bold leading-tight mb-4">
+          Explore Your Movies
+        </h1>
+        <p className="text-lg lg:text-xl font-light mb-6">
+          Discover and book tickets for your favorite movies effortlessly.
+        </p>
+        <button className="px-6 py-3 w-fit h-fit bg-red-600 text-white text-lg font-semibold rounded-lg hover:bg-red-700 transition" onClick={()=>navigate('/now-showing')}>
+          Book Now
+        </button>
+      </motion.div>
+
+
         {images.map((image, index) =>
           index === currentIndex ? (
             <motion.img
@@ -51,10 +66,10 @@ const BannerCarousel:React.FC<BannerCarouselProps> = ({ images }) => {
                 x: direction === "right" ? "-100%" : "100%",
               }}
               transition={{
-                duration: 0.2,
-                ease: "easeIn",
+                duration: 0.5,
+                ease: "easeInOut",
               }}
-              className="h-[28rem] object-fill w-full rounded-sm shadow-lg"
+              className="h-[24rem] w-fit object-fill m-8  rounded-lg"
             />
           ) : null
         )}

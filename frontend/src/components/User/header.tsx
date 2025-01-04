@@ -122,7 +122,7 @@ import { useNavigate } from 'react-router';
 import { logout } from '../../redux/user/userSlice';
 import { Link } from 'react-router-dom';
 import { RootState } from '@/redux/store/store';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { userUrl } from '@/utils/axios/config/urlConfig';
 const Header = () => {
     const dispatch=useDispatch()
@@ -151,7 +151,7 @@ const Header = () => {
       return () => {
         socket.disconnect();
       };
-    }, [userId, role]);
+    }, [userId, role,Socket]);
     const handleLogout = async () => {
         dispatch(logout());
         console.log("ok bye bye i am going see you soon");

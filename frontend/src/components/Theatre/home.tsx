@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 import { theatreAuthenticate } from "@/utils/axios/theatreInterceptor";
 import { Bar, Line } from "react-chartjs-2";
 import { RootState } from "@/redux/store/store";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import { theatreUrl, userUrl } from "@/utils/axios/config/urlConfig";
 import { BookingType } from "@/types/bookingOrderTypes";
 export interface BookingTrend {
@@ -75,7 +75,7 @@ const TheatreHome = () => {
       setCurrentPage(page);
     };
     useEffect(() => {
-      const socket = io(userUrl); 
+      const socket = io(theatreUrl); 
   
       
       socket.emit("subscribe", userId, role);
@@ -90,7 +90,7 @@ const TheatreHome = () => {
       return () => {
         socket.disconnect();
       };
-    }, [userId, role]);
+    }, [userId, role,Socket]);
 
     useEffect(()=>{
 fetchBookingTrends()
@@ -174,7 +174,7 @@ fetchRevenueTrends()
 </div>
 
              
-              <div className="text-sm text-gray-200"><BiMap size={24} className="text-white" />kochi</div>
+              {/* <div className="text-sm text-gray-200"><BiMap size={24} className="text-white" />kochi</div> */}
               <Link to="/theatre/profile" className="flex items-center">
                         <FaUserCircle size={28} className="text-white" />
                      </Link>

@@ -103,7 +103,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
       {booking && canCancelBooking(booking?.showtimeId?.showtime, booking?.showtimeId?.date) && booking?.status !== 'Cancelled' ? (
         <button
           onClick={() => cancelBooking(booking?._id!, booking.totalPrice!)}
-          className="bg-gradient-to-r from-red-500 to-indigo-500 text-white w-fit px-4 py-2 transition-all rounded-md hover:bg-red-600"
+          className="bg-gradient-to-r from-red-500 to-indigo-500 text-white w-fit h-fit px-4 py-2 transition-all rounded-md hover:bg-red-600"
         >
           Cancel Booking
         </button>

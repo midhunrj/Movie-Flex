@@ -27,6 +27,7 @@ interface User {
   email?: string;
   mobile?: string;
   is_verified?: boolean;
+  is_blocked?:boolean
 }
 interface Coordinates{
   latitude?:number;

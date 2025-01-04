@@ -16,7 +16,7 @@ const TheatreHeader = () => {
     const [unreadCount,setUnreadCount]=useState<number>(0)
     const userId=theatre?._id
     useEffect(() => {
-      const socket = io(userUrl); 
+      const socket = io(theatreUrl); 
   
       
       socket.emit("subscribe", userId, role);

@@ -16,7 +16,7 @@ import BookingCard from './bookingCard';
 const BookingOrders = () => {
   const [bookings, setBookings] = useState<Partial<BookingType[]>>([]);
   const [loading, setLoading] = useState(true);
-  const[selectedBooking,setSelectedBooking]=useState<Partial<BookingType|null>>(null)
+  const[selectedBooking,setSelectedBooking]=useState<Partial<BookingType>|null>(null)
   const { user } = useSelector((state: RootState) => state.user);
   const userId = user?._id!;
   const [totalPages, setTotalPages] = useState(1)
@@ -75,7 +75,11 @@ const limit=12
   //   }
   // };
   const qrRef = useRef<HTMLCanvasElement>(null);
-const downloadInvoice = async (booking: BookingType) => {
+const downloadInvoice = async (booking:BookingType) => {
+  if(booking==undefined)
+  {
+    return
+  }
   const pdf = new jsPDF();
 
   // Define convenience rate and calculate the final amount

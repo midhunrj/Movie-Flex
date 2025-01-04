@@ -55,13 +55,13 @@ useEffect(()=>{
         <h1 className='text-blue-500 text-nowrap font-bold'>UserList</h1>
         <table className="min-w-full  border-collapse  bg-white rounded-lg shadow-lg  mt-4">
             <thead>
-              <tr className='rounded-lg border-collapse border  bg-sky-100'>
-                <th className=" border border-gray-300 p-4">No</th>
-                <th className="border border-gray-300  p-4">Name</th>
-                <th className="border  border-gray-300  p-4">Email</th>
-                <th className="border border-gray-300  p-4">Mobile</th>
-                <th className=" border border-gray-300 p-4">status</th>
-                <th className="border border-gray-300  p-4">Action</th>
+              <tr className='rounded-lg border-collapse border  bg-slate-100'>
+                <th className="  border-gray-300 p-4">No</th>
+                <th className=" border-gray-300  p-4">Name</th>
+                <th className="  border-gray-300  p-4">Email</th>
+                <th className=" border-gray-300  p-4">Mobile</th>
+                <th className=" border-gray-300 p-4">status</th>
+                <th className=" border-gray-300  p-4">Action</th>
               </tr>
             </thead>
             <tbody className='space-y-2'>
