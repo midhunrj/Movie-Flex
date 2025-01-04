@@ -8,7 +8,7 @@ export const adminAuthenticate = axios.create({
   },
   withCredentials: true,
 });
-const API_BASE_URL = "http://localhost:7486";
+const API_BASE_URL = "api.movie-flex.site";
 
 adminAuthenticate.interceptors.request.use(
   (request) => {

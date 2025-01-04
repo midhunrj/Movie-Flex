@@ -1,6 +1,6 @@
 
 import axios from "axios";
-const API_BASE_URL = "http://localhost:7486";
+const API_BASE_URL = "api.movie-flex.site";
 
 export const register = async (name, email,mobile, password) => {
     try {

@@ -3,7 +3,7 @@ import  axiosUrl  from '../../utils/axios/baseUrl';
 import { userAuthenticate } from '../../utils/axios/userInterceptor';
 import { FavouritePayload, ratingPayload } from './userThunk';
 
-const API_BASE_URL = "http://localhost:7486";
+const API_BASE_URL = "api.movie-flex.site";
 
 
 export const registerUser = async (name:string, email:string, mobile:string, password:string) => {

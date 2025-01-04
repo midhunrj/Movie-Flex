@@ -54,7 +54,7 @@ export enum NotificationType {
     };
   
     useEffect(() => {
-      const socket = io("http://localhost:7486");
+      const socket = io("http://localhost:748);
       socket.emit("subscribe", userId, role);
   
       socket.on("initialNotifications", (pastNotifications: Notification[]) => {

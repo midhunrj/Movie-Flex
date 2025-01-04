@@ -1,7 +1,7 @@
 import axios, { Axios } from 'axios';
 import  axiosUrl  from '../../utils/axios/baseUrl';
 import { adminAuthenticate } from '../../utils/axios/adminInterceptor';
-const API_BASE_URL = "http://localhost:7486";
+const API_BASE_URL = 'api.movie-flex.site';
 
 
 export const registerUser = async (name, email, mobile, password) => {

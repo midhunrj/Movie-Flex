@@ -11,17 +11,50 @@ import MovieList from "../components/Admin/movieManagement";
 import RunningMovies from "../components/Admin/runningMovies";
 import Dashboard from "../components/Admin/home";
 
-
 export const AdminRoute = () => {
   return (
     <Routes>
       <Route path="/" element={<AdminLoginForm />} />
-      <Route path="/home" element={<AdminProtected><Dashboard/></AdminProtected>}/>
-            <Route path="/users" element={<AdminProtected><UserList/></AdminProtected>}/>
-            <Route path="/theatre" element={<AdminProtected><TheatreList/></AdminProtected>}/>
-            <Route path="/movies" element={<AdminProtected><MovieList/></AdminProtected>}/>
-            <Route path="/running-movies" element={<AdminProtected><RunningMovies/></AdminProtected>}/>
-            
+      <Route
+        path="/home"
+        element={
+          <AdminProtected>
+            <Dashboard />
+          </AdminProtected>
+        }
+      />
+      <Route
+        path="/users"
+        element={
+          <AdminProtected>
+            <UserList />
+          </AdminProtected>
+        }
+      />
+      <Route
+        path="/theatre"
+        element={
+          <AdminProtected>
+            <TheatreList />
+          </AdminProtected>
+        }
+      />
+      <Route
+        path="/movies"
+        element={
+          <AdminProtected>
+            <MovieList />
+          </AdminProtected>
+        }
+      />
+      <Route
+        path="/running-movies"
+        element={
+          <AdminProtected>
+            <RunningMovies />
+          </AdminProtected>
+        }
+      />
     </Routes>
   );
 };

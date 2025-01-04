@@ -8,6 +8,7 @@ import { RootState } from "@/redux/store/store";
 
 import TheatreHeader from "./TheatreHeader";
 import Footer from "../User/footer";
+import { theatreUrl } from "@/utils/axios/config/urlConfig";
 export enum NotificationType {
     BOOKING_CONFIRMATION = "Booking Confirmation",
     REMINDER_ALERT = "Reminder Alert",
@@ -53,7 +54,7 @@ const Notifications = () => {
 
     //fetchNotifications();
 
-    const socket = io("http://localhost:7486"); 
+    const socket = io(theatreUrl); 
     socket.emit("subscribe", userId, role);
    console.log("sssd");
    

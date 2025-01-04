@@ -1,5 +1,5 @@
 
-export const adminUrl='http://localhost:7486/admin'
-export const userUrl='http://localhost:7486/'
-export const theatreUrl='http://localhost:7486/theatre'
+export const adminUrl='api.movie-flex.site/admin'
+export const userUrl='api.movie-flex.site/'
+export const theatreUrl='api.movie-flex.site/theatre'
 export const tmdbApiKey='de211859fbf9be075be8898c50affa35'
