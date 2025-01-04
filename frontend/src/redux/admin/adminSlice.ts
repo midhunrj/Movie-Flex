@@ -2,11 +2,11 @@ import { createSlice,PayloadAction } from '@reduxjs/toolkit';
 import {
  // register,
   login,
-  googleLogin,
-  forgotPass,
-  resetPass,
+
+
+
   //userVerify,
-  newPassVerify,
+
   //logout
   fetchUsers,
   fetchTheatres,
@@ -141,23 +141,23 @@ const adminSlice = createSlice({
       
       
       
-      .addCase(resetPass.pending, (state) => {
-        state.isLoading = true;
-        state.isSuccess = false;
-        state.isError = false;
-        state.message = '';
-      })
-      .addCase(resetPass.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.isSuccess = true;
-        state.message = action.payload.message;
-      })
-      .addCase(resetPass.rejected, (state, action) => {
-        state.isLoading = false;
-        state.isSuccess = false;
-        state.isError = true;
-        state.message = action.payload as string;
-      })
+      // .addCase(resetPass.pending, (state) => {
+      //   state.isLoading = true;
+      //   state.isSuccess = false;
+      //   state.isError = false;
+      //   state.message = '';
+      // })
+      // .addCase(resetPass.fulfilled, (state, action) => {
+      //   state.isLoading = false;
+      //   state.isSuccess = true;
+      //   state.message = action.payload.message;
+      // })
+      // .addCase(resetPass.rejected, (state, action) => {
+      //   state.isLoading = false;
+      //   state.isSuccess = false;
+      //   state.isError = true;
+      //   state.message = action.payload as string;
+      // })
       // .addCase(userVerify.pending, (state) => {
       //   state.isLoading = true;
       //   state.isSuccess = false;

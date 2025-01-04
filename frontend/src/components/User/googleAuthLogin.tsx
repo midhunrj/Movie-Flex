@@ -6,9 +6,10 @@ import { signInWithPopup } from "firebase/auth";
 import { useDispatch,useSelector } from "react-redux";
 import { auth, googleProvider } from "../../services/firebase/firebase";
 // import { googleLogin } from "../../services/api";
-import { googleLogin } from "../../redux/admin/adminThunk";
+
 import { Toaster, toast } from "sonner";
 import { AppDispatch, RootState } from "@/redux/store/store";
+import { googleLogin } from "@/redux/user/userThunk";
 
 const GoogleLogin = () => {
     const navigate = useNavigate();
