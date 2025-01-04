@@ -4,7 +4,7 @@ import { theatreAuthenticate } from '../../utils/axios/theatreInterceptor';
 import { ScreenDatas, Tier } from '@/types/theatreTypes';
 import { MovieType } from '@/types/movieTypes';
 
-const API_BASE_URL = "api.movie-flex.site";
+const API_BASE_URL = "https://api.movie-flex.site";
 
 interface RegisterUserParams {
   name: string;

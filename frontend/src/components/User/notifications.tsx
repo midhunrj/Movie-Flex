@@ -54,7 +54,7 @@ export enum NotificationType {
     };
   
     useEffect(() => {
-      const socket = io("http://localhost:748);
+      const socket = io("https://api.movie-flex.site");
       socket.emit("subscribe", userId, role);
   
       socket.on("initialNotifications", (pastNotifications: Notification[]) => {

@@ -1,8 +1,8 @@
 
 import axios from "axios";
-const API_BASE_URL = "api.movie-flex.site";
+const API_BASE_URL = "https://api.movie-flex.site";
 
-export const register = async (name, email,mobile, password) => {
+export const register = async (name:string, email:string,mobile:number, password:string) => {
     try {
         const response = await axios.post(`${API_BASE_URL}/register`, { name, email,mobile, password });
         console.log(response);
@@ -16,7 +16,7 @@ export const register = async (name, email,mobile, password) => {
     }
 };
 
-export const login = async (email, password) => {
+export const login = async (email:string, password:string) => {
     try {
         const response = await axios.post(`${API_BASE_URL}/login`, { email, password }); // No need for full URL
         return response.data;
@@ -38,7 +38,7 @@ export const login = async (email, password) => {
 // }
 
 
-export const googleLogin = async (token) => {
+export const googleLogin = async (token:string) => {
     try {
         
         const response = await axios.post(`${API_BASE_URL}/auth/google`, { token });
@@ -49,7 +49,7 @@ export const googleLogin = async (token) => {
     }
 };
 
-export const forgotPass=async(email)=>{
+export const forgotPass=async(email:string)=>{
     try {
          
         const response=await axios.post(`${API_BASE_URL}/forgot-password`,{email})
@@ -62,7 +62,7 @@ export const forgotPass=async(email)=>{
 }
 
 
-export const resetPass=async(newPassword)=>{
+export const resetPass=async(newPassword:string)=>{
     try {
          
         const response=await axios.post(`${API_BASE_URL}/reset-password`,{newPassword})
@@ -76,7 +76,7 @@ export const resetPass=async(newPassword)=>{
 
 
 
-export const userVerify=async(otp)=>{
+export const userVerify=async(otp:number)=>{
     try {
         let token=localStorage.getItem("otpToken")
         const response=await axios.post(`${API_BASE_URL}/verify-user`,{token,otp})
@@ -88,7 +88,7 @@ export const userVerify=async(otp)=>{
     }
 }
 
-export const newPassVerify=async(otp)=>{
+export const newPassVerify=async(otp:number)=>{
     try {
          let token=localStorage.getItem('token')
         const response=await axios.post(`${API_BASE_URL}/verify-otp`,{token,otp})

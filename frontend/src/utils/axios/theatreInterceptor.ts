@@ -11,7 +11,7 @@ export const theatreAuthenticate = axios.create({
     withCredentials: true 
 });
 
-const API_BASE_URL = "api.movie-flex.site";
+const API_BASE_URL = "https://api.movie-flex.site";
 
 
 theatreAuthenticate.interceptors.request.use(

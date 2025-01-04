@@ -1,12 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import {
-  registerUser,
+  
   loginUser,
-  googleLoginUser,
-  forgotPassword,
-  resetPassword,
-  verifyUser,
-  verifyNewPassword,
+  
   fetchUserData,
   fetchTheatresData,
   blockUserActive,
@@ -94,61 +90,61 @@ export const login = createAsyncThunk(
 //     }
 // )
 
-export const googleLogin = createAsyncThunk(
-  'user/googleLogin',
-  async (token:string, thunkAPI) => {
-    try {
+// export const googleLogin = createAsyncThunk(
+//   'user/googleLogin',
+//   async (token:string, thunkAPI) => {
+//     try {
 
-      return await googleLoginUser(token);
-    } catch (error:any) {
-      return thunkAPI.rejectWithValue(error.message||"something went wrong");
-    }
-  }
-);
+//       return await googleLoginUser(token);
+//     } catch (error:any) {
+//       return thunkAPI.rejectWithValue(error.message||"something went wrong");
+//     }
+//   }
+// );
 
-export const forgotPass = createAsyncThunk(
-  'user/forgotPass',
-  async (email, thunkAPI) => {
-    try {
-      return await forgotPassword(email);
-    } catch (error:any) {
-      return thunkAPI.rejectWithValue(error.message||"something went wrong");
-    }
-  }
-);
+// export const forgotPass = createAsyncThunk(
+//   'user/forgotPass',
+//   async (email, thunkAPI) => {
+//     try {
+//       return await forgotPassword(email);
+//     } catch (error:any) {
+//       return thunkAPI.rejectWithValue(error.message||"something went wrong");
+//     }
+//   }
+// );
 
-export const resetPass = createAsyncThunk(
-  'user/resetPass',
-  async (newPassword, thunkAPI) => {
-    try {
-      return await resetPassword(newPassword);
-    } catch (error:any) {
-      return thunkAPI.rejectWithValue(error.message||"something went wrong");
-    }
-  }
-);
+// export const resetPass = createAsyncThunk(
+//   'user/resetPass',
+//   async (newPassword, thunkAPI) => {
+//     try {
+//       return await resetPassword(newPassword);
+//     } catch (error:any) {
+//       return thunkAPI.rejectWithValue(error.message||"something went wrong");
+//     }
+//   }
+// );
 
-export const userVerify = createAsyncThunk(
-  'user/userVerify',
-  async (otp, thunkAPI) => {
-    try {
-      return await verifyUser(otp);
-    } catch (error:any) {
-      return thunkAPI.rejectWithValue(error.message||"something went wrong");
-    }
-  }
-);
+// export const userVerify = createAsyncThunk(
+//   'user/userVerify',
+//   async (otp, thunkAPI) => {
+//     try {
+//       return await verifyUser(otp);
+//     } catch (error:any) {
+//       return thunkAPI.rejectWithValue(error.message||"something went wrong");
+//     }
+//   }
+// );
 
-export const newPassVerify = createAsyncThunk(
-  'user/newPassVerify',
-  async (otp, thunkAPI) => {
-    try {
-      return await verifyNewPassword(otp);
-    } catch (error:any) {
-      return thunkAPI.rejectWithValue(error.message||"something went wrong");
-    }
-  }
-);
+// export const newPassVerify = createAsyncThunk(
+//   'user/newPassVerify',
+//   async (otp, thunkAPI) => {
+//     try {
+//       return await verifyNewPassword(otp);
+//     } catch (error:any) {
+//       return thunkAPI.rejectWithValue(error.message||"something went wrong");
+//     }
+//   }
+// );
 
 export const fetchUsers=createAsyncThunk<FetchUsersResponse, void, { rejectValue: string }>('admin/users',
 async(_,thunkAPI)=>{

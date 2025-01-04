@@ -1,21 +1,22 @@
 import axios, { Axios } from 'axios';
 import  axiosUrl  from '../../utils/axios/baseUrl';
 import { adminAuthenticate } from '../../utils/axios/adminInterceptor';
-const API_BASE_URL = 'api.movie-flex.site';
+import { MovieType } from '@/types/movieTypes';
+const API_BASE_URL = 'https://api.movie-flex.site';
 
 
-export const registerUser = async (name, email, mobile, password) => {
-    try {
-        const response = await axios.post(`${API_BASE_URL}/register`, { name, email, mobile, password });
+// export const registerUser = async (name, email, mobile, password) => {
+//     try {
+//         const response = await axios.post(`${API_BASE_URL}/register`, { name, email, mobile, password });
 
-        localStorage.setItem("otpToken", response.data);
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-};
+//         localStorage.setItem("otpToken", response.data);
+//         return response.data;
+//     } catch (error) {
+//         throw error;
+//     }
+// };
 
-export const loginUser = async (email, password) => {
+export const loginUser = async (email:string, password:string) => {
     try {
         console.log(email,password,"login enter")
         const response = await axios.post(`${API_BASE_URL}/admin/login`, { email, password },{withCredentials:true});
@@ -24,7 +25,7 @@ export const loginUser = async (email, password) => {
         localStorage.setItem('role', response.data.role);
         console.log(response,"response from backend");
         return response.data;
-    } catch (error) {
+    } catch (error:any) {
         console.error("Error during login", error.response?.data || error.message);
         const errorMessage = error.response?.data?.message ||error.response?.data?.error|| "Login failed!";
         return Promise.reject(new Error(errorMessage));
@@ -40,18 +41,18 @@ export const loginUser = async (email, password) => {
 //     }
 // }
 
-export const googleLoginUser = async (token) => {
-    try {
-        const response = await axios.post(`${API_BASE_URL}/auth/google`, { token });
-        console.log(response);
+// export const googleLoginUser = async (token) => {
+//     try {
+//         const response = await axios.post(`${API_BASE_URL}/auth/google`, { token });
+//         console.log(response);
         
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-};
+//         return response.data;
+//     } catch (error) {
+//         throw error;
+//     }
+// };
 
-export const forgotPassword = async (email) => {
+export const forgotPassword = async (email:string) => {
     try {
         const response = await axios.post(`${API_BASE_URL}/forgot-password`, { email });
         return response.data;
@@ -60,35 +61,35 @@ export const forgotPassword = async (email) => {
     }
 };
 
-export const resetPassword = async (newPassword) => {
-    try {
-        const response = await axios.post(`${API_BASE_URL}/reset-password`, { newPassword });
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-};
+// export const resetPassword = async (newPassword) => {
+//     try {
+//         const response = await axios.post(`${API_BASE_URL}/reset-password`, { newPassword });
+//         return response.data;
+//     } catch (error) {
+//         throw error;
+//     }
+// };
 
-export const verifyUser = async (otp) => {
-    try {
-        const token = localStorage.getItem("otpToken");
-        const response = await axios.post(`${API_BASE_URL}/verify-user`, { token, otp });
+// export const verifyUser = async (otp) => {
+//     try {
+//         const token = localStorage.getItem("otpToken");
+//         const response = await axios.post(`${API_BASE_URL}/verify-user`, { token, otp });
         
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-};
+//         return response.data;
+//     } catch (error) {
+//         throw error;
+//     }
+// };
 
-export const verifyNewPassword = async (otp) => {
-    try {
-        const token = localStorage.getItem('token');
-        const response = await axios.post(`${API_BASE_URL}/verify-otp`, { token, otp });
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-};
+// export const verifyNewPassword = async (otp) => {
+//     try {
+//         const token = localStorage.getItem('token');
+//         const response = await axios.post(`${API_BASE_URL}/verify-otp`, { token, otp });
+//         return response.data;
+//     } catch (error) {
+//         throw error;
+//     }
+// };
 
 export const homePage=async ()=>{
     try{
@@ -141,7 +142,7 @@ export const fetchTheatresData=async ()=>{
     }
 }
 
-export const blockUserActive = async (userId) => {
+export const blockUserActive = async (userId:string) => {
     try {
       console.log("block user in service");
       const response = await adminAuthenticate.patch(`/block-user/${userId}`, {});
@@ -152,7 +153,7 @@ export const blockUserActive = async (userId) => {
     }
   };
   
-  export const unblockUserActive = async (userId) => {
+  export const unblockUserActive = async (userId:string) => {
     try {
       console.log("unblock user in service");
       const response = await adminAuthenticate.patch(`/unblock-user/${userId}`, {});
@@ -163,7 +164,7 @@ export const blockUserActive = async (userId) => {
     }
   };
   
-export const blockTheatreActive = async (theatreId) => {
+export const blockTheatreActive = async (theatreId:string) => {
     try {
       console.log("block theatre in service");
       const response = await adminAuthenticate.patch(`/block-theatre/${theatreId}`, {});
@@ -174,7 +175,7 @@ export const blockTheatreActive = async (theatreId) => {
     }
   };
   
-  export const unblockTheatreActive = async (theatreId) => {
+  export const unblockTheatreActive = async (theatreId:string) => {
     try {
       console.log("unblock theatre in service");
       const response = await adminAuthenticate.patch(`/unblock-theatre/${theatreId}`, {});
@@ -185,12 +186,12 @@ export const blockTheatreActive = async (theatreId) => {
     }
   };
 
-  export const approveTheatreAction = async (theatreId) => {
+  export const approveTheatreAction = async (theatreId:string) => {
     try {
       const response = await adminAuthenticate.patch(`/approve-theatre/${theatreId}`);
       console.log(response.data);
       return response.data;
-    } catch (error) {
+    } catch (error:any) {
       console.error("Error approving theatre:", error.response?.data || error.message);
       
       const errorMessage = error.response?.data?.message || "Failed to approve theatre. Please try again later.";
@@ -199,12 +200,12 @@ export const blockTheatreActive = async (theatreId) => {
     }
   };
   
-  export const declineTheatreAction = async (theatreId) => {
+  export const declineTheatreAction = async (theatreId:string) => {
     try {
       const response = await adminAuthenticate.patch(`/decline-theatre/${theatreId}`);
       console.log(response.data);
       return response.data;
-    } catch (error) {
+    } catch (error:any) {
       console.error("Error declining theatre:", error.response?.data || error.message);
   
       const errorMessage = error.response?.data?.message || "Failed to decline theatre. Please try again later.";
@@ -213,13 +214,13 @@ export const blockTheatreActive = async (theatreId) => {
     }
   };
 
-  export const AddMovies=async(movieData)=>{
+  export const AddMovies=async(movieData:MovieType)=>{
     try {
       console.log(movieData,"movie details before storing");
       
        const response=await adminAuthenticate.post('/Add-movies',{movieData})
        return response.data
-    } catch (error) {
+    } catch (error:any) {
       console.error("Error during addmovies", error.response?.data || error.message);
         const errorMessage = error.response?.data?.message ||error.response?.data?.error|| "Login failed!";
         return Promise.reject(new Error(errorMessage));
@@ -236,7 +237,7 @@ export const blockTheatreActive = async (theatreId) => {
      localStorage.setItem('movieData',response.data.movieData)
      return response.data
     }
-    catch(error)
+    catch(error:any)
     {
       console.error("Error during fetching movies", error.response?.data || error.message);
         const errorMessage = error.response?.data?.message ||error.response?.data?.error|| "Login failed!";
@@ -244,14 +245,14 @@ export const blockTheatreActive = async (theatreId) => {
     }
   }
 
-  export const blockMovieData=async({movieId,isBlocked})=>{
+  export const blockMovieData=async({movieId,isBlocked}:{movieId:string,isBlocked:boolean})=>{
     try{
       console.log({movieId,isBlocked},"log for block");
       
      const response=await adminAuthenticate.patch(`/block-movie`,{movieId,isBlocked})
      return response.data
     }
-    catch(error)
+    catch(error:any)
     {
       console.error("Error during fetching movies", error.response?.data || error.message);
         const errorMessage = error.response?.data?.message ||error.response?.data?.error|| "Login failed!";
@@ -259,12 +260,12 @@ export const blockTheatreActive = async (theatreId) => {
     }
   }
 
-  export const deleteMovieData=async(movieid)=>{
+  export const deleteMovieData=async(movieid:string)=>{
     try{
      const response=await adminAuthenticate.patch(`/delete-movie/${movieid}`)
      return response.data
     }
-    catch(error)
+    catch(error:any)
     {
       console.error("Error during fetching movies", error.response?.data || error.message);
         const errorMessage = error.response?.data?.message ||error.response?.data?.error|| "Login failed!";
