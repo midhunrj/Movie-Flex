@@ -6,7 +6,7 @@ export interface IScreenRepository{
      findByTheatre(theatreId:string):Promise<Screen[]|null>
      update(screenId: string, screenData: Partial<Screen>): Promise<Screen | null> 
     updateTierData(screenId:string,tierId:string,tierData:any):Promise<Screen|null>
-    updateExpiredMovieFromScreen()
+    updateExpiredMovieFromScreen():Promise<void>
        delete(screenId: string): Promise<void> 
        findMoviesInScreen(screenId:string,movieId:string):Promise<boolean>
        enrollMovieData(screenId:string,movie:any):Promise<Screen|null>
@@ -14,7 +14,7 @@ export interface IScreenRepository{
        RollinMoviesToShow(screenId:string,movieId:string,showtime:string):Promise<Screen|null>
        getShowtime(showtimeId:string,screenId:string):Promise<string>
        removeShowFromScreen(showtimeId:string,screenId:string):Promise<Screen|null>
-       fetchTheatresWithScreens(userCoords:UserCoordinates)
+       fetchTheatresWithScreens(userCoords:UserCoordinates):Promise<any>
        removeMovieFromScreen(movieId:string,screenId:string):Promise<Screen|null>
        updateShowFromScreen(screenId:string,prevTime:string,newTime:string):Promise<Screen|null>
 }

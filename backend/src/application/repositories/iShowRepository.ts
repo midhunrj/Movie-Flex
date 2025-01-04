@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { Showtime, TierData } from "../../Domain/entities/shows";
 import { UserCoordinates } from "../../Domain/entities/user";
-import { IShowtime } from "../../infrastructure/database/models/showModel";
+import { IShowtime, ITier } from "../../infrastructure/database/models/showModel";
 
 export interface IShowRepository{
     createShowtimes(showData:any):Promise<void>
@@ -15,7 +15,7 @@ export interface IShowRepository{
       ): Promise<IShowtime[]>  
       removeShowtimes(showtime:string,screenId:string):Promise<void>
       listTheatreShowtimes(screenId:string,date:string):Promise<IShowtime[]>
-      getSeatlayout(showtimeId:string):Promise<TierData[]|null>
+      getSeatlayout(showtimeId:string):Promise<ITier[]|null>
       resetSeatValues(showtimeId:Types.ObjectId,selectedSeats:string[]):Promise<IShowtime>
-      updateShowtimes(prevTime:string,screenId:string,newTime:string)
+      updateShowtimes(prevTime:string,screenId:string,newTime:string):Promise<void>
 }

@@ -273,7 +273,7 @@ export class ShowRepository implements IShowRepository {
     
    }
 
-   async getSeatlayout( showtimeId: string): Promise<TierData[]|null> {
+   async getSeatlayout( showtimeId: string): Promise< ITier[]|null> {
     const showtime=await showModel.findById(showtimeId)
     if(showtime)
     {

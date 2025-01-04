@@ -113,7 +113,7 @@ async enrollMovieData(screenId:string,movie:any):Promise<Screen|null>
   return updatedScreen;
  }
 
- async fetchTheatresWithScreens(userCoords: UserCoordinates) {
+ async fetchTheatresWithScreens(userCoords: UserCoordinates):Promise<any>{
   const { longitude, latitude } = userCoords;
 console.log('coordinatesssss',longitude,latitude);
 

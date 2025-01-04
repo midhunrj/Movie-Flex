@@ -1,6 +1,6 @@
 import { TierData } from "../../Domain/entities/shows";
 import { Theatre } from "../../Domain/entities/theatre";
-import { IShowtime } from "../../infrastructure/database/models/showModel";
+import { IShowtime, ITier } from "../../infrastructure/database/models/showModel";
 import { ShowRepository } from "../../infrastructure/repositories/showRepository";
 import { HashService } from "../../infrastructure/services/hashService";
 import { JWTService } from "../../infrastructure/services/jwtService";
@@ -188,7 +188,7 @@ async getTheatreShowtimes(screenId:string,date:string):Promise<IShowtime[]>
       {
         return await this.showRepository.listTheatreShowtimes(screenId,date)
       }
-      async showtimeSeats(showtimeId:string):Promise<TierData[]|null>
+      async showtimeSeats(showtimeId:string):Promise<ITier[]|null>
       {
         return await this.showRepository.getSeatlayout(showtimeId)
       }

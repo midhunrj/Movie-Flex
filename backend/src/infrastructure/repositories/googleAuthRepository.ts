@@ -60,7 +60,7 @@ import { IAuthRepository } from '../../application/repositories/authRepository';
 
 // Initialize Firebase Admin SDK with the service account key
 console.log(__dirname);
-const serviceAccount = require('../firebase/serviceAccountkey.json');
+const serviceAccount = require('../firebase/serviceAccountkey.json')
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });

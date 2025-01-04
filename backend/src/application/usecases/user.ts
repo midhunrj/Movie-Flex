@@ -5,7 +5,7 @@ import { User, UserCoordinates } from "../../Domain/entities/user";
  import { HashService } from "../../infrastructure/services/hashService";
 import { JWTService } from "../../infrastructure/services/jwtService";
 import { Movie } from "../../Domain/entities/movies";
-import { IShowtime } from "../../infrastructure/database/models/showModel";
+import { IShowtime, ITier } from "../../infrastructure/database/models/showModel";
 import { IShowRepository } from "../repositories/iShowRepository";
 import { Types } from "mongoose";
 import { TierData } from "../../Domain/entities/shows";
@@ -224,7 +224,7 @@ async updateProfile(userId: string | undefined, profileData: any): Promise<User 
         return await this.showRepository.listTheatreShowtimes(screenId,date)
       }
 
-      async showtimeSeats(showtimeId:string):Promise<TierData[]|null>
+      async showtimeSeats(showtimeId:string):Promise<ITier[]|null>
       {
         return await this.showRepository.getSeatlayout(showtimeId)
       }
