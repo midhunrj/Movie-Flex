@@ -23,7 +23,7 @@ const DateShows = () => {
     // State for filters
     const [priceRange, setPriceRange] = useState(500);
     const [timeFilter, setTimeFilter] = useState('all');
-    const { upcomingMovies, nowShowingMovies } = useSelector((state) => state.user);
+    const { upcomingMovies, nowShowingMovies,userCoordinates } = useSelector((state) => state.user);
     const languageMap = {
         hi: 'Hindi',
         ma: 'Malayalam',
@@ -33,20 +33,20 @@ const DateShows = () => {
     const [dateIndex, setDateIndex] = useState(0);
     const datesToShow = dates.slice(dateIndex, dateIndex + 3);
     // Fetch showtimes when the selected date changes
-    useEffect(() => {
-        setLoading(true);
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position) => {
-                setUserCoords({
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                });
-            }, (error) => {
-                console.error("Error getting location:", error);
-            });
-        }
-    }, []);
-    //   useEffect(() => {
+    // useEffect(() => {
+    //     setLoading(true);
+    //     if (navigator.geolocation) {
+    //         navigator.geolocation.getCurrentPosition((position) => {
+    //             setUserCoords({
+    //                 latitude: position.coords.latitude,
+    //                 longitude: position.coords.longitude,
+    //             });
+    //         }, (error) => {
+    //             console.error("Error getting location:", error);
+    //         });
+    //     }
+    // }, []);
+    // //   useEffect(() => {
     //     if (movieId) {
     //       localStorage.setItem('movieId', movieId);
     //     }
@@ -60,8 +60,8 @@ const DateShows = () => {
         setLoading(true);
         try {
             const response = await userAuthenticate.get('/showtimes', {
-                params: { movieId, date: selectedDate, latitude: userCoords?.latitude,
-                    longitude: userCoords?.longitude, },
+                params: { movieId, date: selectedDate, latitude: userCoordinates?.latitude,
+                    longitude: userCoordinates?.longitude, },
             });
             console.log(response.data, "response data");
             setShowtimes(response.data.showtimes);

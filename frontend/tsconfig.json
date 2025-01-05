@@ -16,8 +16,10 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "noEmit": true,
+    "allowJs": false
   },
   "include": ["src"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules","**/*.js"]
 }
