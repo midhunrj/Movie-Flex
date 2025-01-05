@@ -71,7 +71,7 @@ const DateShows: React.FC = () => {
 
     //setUserCoords(userCoordinates)
     
-   console.log(userCoordinates?.latitude,userCoordinates?.longitude,"usercoord and longi");
+   //console.log(userCoordinates?.latitude,userCoordinates?.longitude,"usercoord and longi");
   }, []);
 
 //   useEffect(() => {
@@ -83,6 +83,7 @@ const DateShows: React.FC = () => {
     if (selectedDate && userCoords) {
       fetchShowtimes();
     }
+    console.log(userCoordinates?.latitude,userCoordinates?.longitude,"usercoord and longi");
   }, [selectedDate, priceRange, timeFilter, userCoords]);
 
   
