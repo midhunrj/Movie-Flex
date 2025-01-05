@@ -1,5 +1,5 @@
 import express,{Application} from 'express'
-import cors from 'cors'
+import cors, { CorsOptions } from 'cors'
 import '../../infrastructure/services/cronJobService'
 import authRoutes from '../webserver/routes/authRoutes'
 import userRoute from '../webserver/routes/userRouter'
@@ -13,14 +13,14 @@ const expressConfig=(app:Application)=>{
     console.log(configKeys.CLIENT_URL,"dffdfde");
     console.log(configKeys.SERVER_URL,"server url");
     
-    const corsOptions={
-        origin:configKeys.CLIENT_URL,   
+    const corsOptions:CorsOptions={
+        origin:[configKeys.CLIENT_URL!,"http://localhost:5173"],   
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
     };
     console.log("ftyhfygyj");
     app.use(cors(corsOptions))
-    app.options('*', cors(corsOptions))
+    // app.options( cors(corsOptions))
     app.use(cookieParser());
     app.use(express.json())
     app.use(express.urlencoded({extended:true}))
