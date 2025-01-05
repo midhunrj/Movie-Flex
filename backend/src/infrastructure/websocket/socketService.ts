@@ -5,7 +5,7 @@ import configKeys from '../config/config'
 
 class SocketService{
     private io:Server|null=null
-
+  
 init(httpServer:HttpServer)
 {
     this.io=new Server(httpServer,{
