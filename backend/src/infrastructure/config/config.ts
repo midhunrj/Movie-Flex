@@ -9,6 +9,7 @@ const configKeys={
     PORT:process.env.PORT,
     JWT_SECRET:process.env.JWT_SECRET as string,
     CLIENT_URL:process.env.CLIENT_URL,
+    SERVER_URL:process.env.SERVER_URL,
     SERVER_EMAIL:process.env.USER,
     SERVER_PASS:process.env.PASS,
     FIREBASE_TYPE:process.env.FIREBASE_TYPE,

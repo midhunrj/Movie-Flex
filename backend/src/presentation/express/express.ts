@@ -11,6 +11,8 @@ import cookieParser from 'cookie-parser';
 
 const expressConfig=(app:Application)=>{
     console.log(configKeys.CLIENT_URL,"dffdfde");
+    console.log(configKeys.SERVER_URL,"server url");
+    
     const corsOptions={
         origin:configKeys.CLIENT_URL,   
         allowedHeaders: ['Content-Type', 'Authorization'],
