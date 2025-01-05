@@ -40,7 +40,7 @@ const DateShows: React.FC = () => {
   const [priceRange, setPriceRange] = useState<number>(500);
   const [timeFilter, setTimeFilter] = useState('all');
   
-  const {upcomingMovies,nowShowingMovies}=useSelector((state:RootState)=>state.user)
+  const {upcomingMovies,nowShowingMovies,userCoordinates}=useSelector((state:RootState)=>state.user)
  
   const languageMap: { [key: string]: string } = {
     hi: 'Hindi',
@@ -55,19 +55,21 @@ const DateShows: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserCoords({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-        }
-      );
-    }
+    // if (navigator.geolocation) {
+    //   navigator.geolocation.getCurrentPosition(
+    //     (position) => {
+    //       setUserCoords({
+    //         latitude: position.coords.latitude,
+    //         longitude: position.coords.longitude,
+    //       });
+    //     },
+    //     (error) => {
+    //       console.error("Error getting location:", error);
+    //     }
+    //   );
+    // }
+
+    //setUserCoords(userCoordinates)
   }, []);
 
 //   useEffect(() => {
@@ -87,8 +89,8 @@ const DateShows: React.FC = () => {
     setLoading(true);
     try {
       const response = await userAuthenticate.get('/showtimes', {
-        params: { movieId, date: selectedDate, latitude: userCoords?.latitude,
-            longitude: userCoords?.longitude, },
+        params: { movieId, date: selectedDate, latitude: userCoordinates?.latitude,
+            longitude: userCoordinates?.longitude, },
 
       });
       console.log(response.data,"response data")
