@@ -322,7 +322,7 @@ const downloadInvoice = async (booking:BookingType) => {
               <Button
                 key="download"
                 className='min-h-8 w-fit'
-                onClick={() => downloadInvoice(selectedBooking)}
+                onClick={() =>selectedBooking && downloadInvoice(selectedBooking as BookingType)}
                 type="primary"
               >
                 Download Invoice

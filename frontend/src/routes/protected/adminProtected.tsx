@@ -1,9 +1,10 @@
-import React,{useState,useEffect} from 'react'
+import { RootState } from '@/redux/store/store'
+import React,{useState,useEffect, ReactNode} from 'react'
 import { useDispatch,useSelector } from 'react-redux'
 import { Navigate, useNavigate } from 'react-router'
-const AdminProtected = ({children}) => {
+const AdminProtected: React.FC<{ children: ReactNode }> = ({children}) => {
     const navigate=useNavigate()
-    const {admin,token}=useSelector((state)=>state.admin)
+    const {admin,token}=useSelector((state:RootState)=>state.admin)
     useEffect(()=>{
      if(!token)
      {

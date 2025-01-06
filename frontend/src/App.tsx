@@ -6,6 +6,7 @@ import { AdminRoute } from "./routes/adminRoute";
 import { DndProvider } from "react-dnd";
 import {Toaster} from 'sonner'
 import { HTML5Backend } from "react-dnd-html5-backend";
+
 // import { ChakraProvider, extendTheme } from '@chakra-ui/react'
 
 // Optional: Customize the theme if needed

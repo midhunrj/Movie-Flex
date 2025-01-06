@@ -1,7 +1,7 @@
 // previousPathUtil.js
-let previousPath = null;
+let previousPath:string|null = null;
 
-export const setPreviousPath = (path) => {
+export const setPreviousPath = (path:string|null) => {
   previousPath = path;
 };
 

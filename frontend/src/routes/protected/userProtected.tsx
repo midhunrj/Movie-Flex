@@ -1,8 +1,8 @@
 import { RootState } from '@/redux/store/store'
-import React,{useState,useEffect} from 'react'
+import React,{useState,useEffect, ReactNode} from 'react'
 import { useDispatch,useSelector } from 'react-redux'
 import { Navigate, useNavigate } from 'react-router'
-const UserProtected = ({children}) => {
+const UserProtected: React.FC<{ children: ReactNode }>= ({children}) => {
     const navigate=useNavigate()
     const {user,token}=useSelector((state:RootState)=>state.user)
     console.log(user,"userdata");

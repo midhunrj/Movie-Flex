@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@chakra-ui/react": "^3.2.3",
+    "@chakra-ui/react": "^3.2.5",
     "@coreui/coreui": "^5.2.0",
     "@coreui/coreui-pro": "^5.8.0",
     "@coreui/react-pro": "^5.10.0",
@@ -23,7 +23,6 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/socket.io-client": "^1.4.36",
-    "@vitejs/plugin-react": "^4.3.3",
     "antd": "^5.22.4",
     "axios": "^1.7.5",
     "axios-retry": "^4.5.0",
@@ -58,14 +57,15 @@
     "socket.io-client": "^4.8.1",
     "sonner": "^1.7.1",
     "sweetalert2": "^11.6.13",
-    "vite": "^5.4.10",
+    "vite-plugin-commonjs": "^0.10.4",
     "web-vitals": "^2.1.4",
     "yup": "^1.6.1"
   },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint src/**/*.{js,jsx,ts,tsx}"
   },
   "eslintConfig": {
     "extends": [
@@ -86,16 +86,28 @@
     ]
   },
   "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@originjs/vite-plugin-commonjs": "^1.0.3",
     "@types/antd": "^0.12.32",
     "@types/chart.js": "^2.9.41",
-    "@types/node": "^22.10.2",
+    "@types/node": "^22.10.5",
     "@types/qrcode.react": "^1.0.5",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@types/react-redux": "^7.1.34",
+    "@typescript-eslint/eslint-plugin": "^8.19.0",
+    "@typescript-eslint/parser": "^8.19.0",
+    "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "esbuild": "^0.24.2",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react": "^7.37.3",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "globals": "^15.14.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.19.0",
+    "vite": "^6.0.7"
   }
 }

@@ -1,3 +1,28 @@
+// {
+//   "compilerOptions": {
+//     "target": "esnext",
+//     "module": "esnext",
+//     "jsx": "react-jsx",
+//     "strict": true,
+//     "esModuleInterop": true,
+//     "forceConsistentCasingInFileNames": true,
+//     "moduleResolution": "node",
+//     "skipLibCheck": true,
+//     "allowSyntheticDefaultImports": true,
+//     "resolveJsonModule": true,
+//     "types": ["tailwindcss", "node"],
+//     "baseUrl": "./",
+//     "paths": {
+//       "@/*": ["src/*"]
+//     },
+//     "outDir": "./dist",
+//     "allowJs": false
+//   },
+//   "include": ["src"],
+//   "exclude": ["node_modules", "**/*.js"]
+// }
+
+
 {
   "compilerOptions": {
     "target": "esnext",
@@ -16,10 +41,10 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "outDir": "./dist",
+    "outDir": "dist",
     "noEmit": true,
     "allowJs": false
   },
-  "include": ["src"],
+"include": ["src", "node_modules/@types"],
   "exclude": ["node_modules","**/*.js"]
 }

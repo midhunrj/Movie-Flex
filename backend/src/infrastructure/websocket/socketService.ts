@@ -10,7 +10,7 @@ init(httpServer:HttpServer)
 {
     this.io=new Server(httpServer,{
         cors:{
-            origin:[configKeys.CLIENT_URL||"http://localhost:5173"],
+            origin:[configKeys.CLIENT_URL!,"http://localhost:5173"],
             methods:['GET','POST']
         }
     })
