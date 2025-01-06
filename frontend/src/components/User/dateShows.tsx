@@ -45,7 +45,7 @@ const DateShows: React.FC = () => {
   const languageMap: { [key: string]: string } = {
     hi: 'Hindi',
     ma: 'Malayalam',
-    ta: 'Tamil',
+    ta: 'Tamil',   
     te: 'Telugu',
   };
   const [dateIndex, setDateIndex] = useState(0);
