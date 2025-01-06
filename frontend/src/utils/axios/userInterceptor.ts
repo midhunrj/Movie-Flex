@@ -1,5 +1,6 @@
 import axios from "axios";
 import { userUrl } from "./config/urlConfig";
+console.log(userUrl,"userurl");
 
 export const userAuthenticate = axios.create({
     baseURL: userUrl, 

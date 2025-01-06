@@ -317,6 +317,8 @@ async listShowtimes(req:Request,res:Response,next:NextFunction){
     const { movieId, date,userCoords } = req.query;
   try {
     console.log(req.query,"jhjjk");
+    console.log("nlm,m");
+    
     const userCoords: UserCoordinates = {
         latitude: parseFloat(req.query.latitude as string),
         longitude: parseFloat(req.query.longitude as string),

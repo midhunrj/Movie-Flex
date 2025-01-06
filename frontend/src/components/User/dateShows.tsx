@@ -68,9 +68,10 @@ const DateShows: React.FC = () => {
     //     }
     //   );
     // }
-
-    //setUserCoords(userCoordinates)
-    
+    if(userCoordinates?.latitude&&userCoordinates.longitude)
+{
+    setUserCoords({latitude:userCoordinates?.latitude,longitude:userCoordinates?.longitude})
+}   
    //console.log(userCoordinates?.latitude,userCoordinates?.longitude,"usercoord and longi");
   }, []);
 
@@ -79,6 +80,31 @@ const DateShows: React.FC = () => {
 //       localStorage.setItem('movieId', movieId);
 //     }
 //   }, [movieId]);
+
+   
+const fetchShowtimes = async () => {
+  setLoading(true);
+  try {
+    const response = await userAuthenticate.get('/showtimes', {
+      params: { movieId, date: selectedDate, latitude: userCoords?.latitude,
+          longitude: userCoords?.longitude, },
+
+    });
+    console.log(response.data,"response data")
+    
+    setShowtimes(response.data.showtimes);
+    
+      setMovieId(response.data.showtimes[0].movieId);
+    
+    console.log(showtimes,"showtimes after setting");
+    
+  } catch (error) {
+    console.error('Error fetching showtimes:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
   useEffect(() => {
     if (selectedDate && userCoords) {
       fetchShowtimes();
@@ -87,29 +113,6 @@ const DateShows: React.FC = () => {
   }, [selectedDate, priceRange, timeFilter, userCoords]);
 
   
-   
-  const fetchShowtimes = async () => {
-    setLoading(true);
-    try {
-      const response = await userAuthenticate.get('/showtimes', {
-        params: { movieId, date: selectedDate, latitude: userCoordinates?.latitude,
-            longitude: userCoordinates?.longitude, },
-
-      });
-      console.log(response.data,"response data")
-      
-      setShowtimes(response.data.showtimes);
-      
-        setMovieId(response.data.showtimes[0].movieId);
-      
-      console.log(showtimes,"showtimes after setting");
-      
-    } catch (error) {
-      console.error('Error fetching showtimes:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     
