@@ -1,6 +1,6 @@
 
 import axios from "axios";
-const API_BASE_URL = "https://api.movie-flex.site";
+const API_BASE_URL = import.meta.env.VITE_USER_URL;
 
 export const register = async (name:string, email:string,mobile:number, password:string) => {
     try {

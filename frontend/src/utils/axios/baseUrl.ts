@@ -1,7 +1,7 @@
 import axios  from "axios"
 
  const axiosUrl=axios.create({
-    baseURL:'https://api.movie-flex.site/',
+    baseURL:import.meta.env.VITE_USER_URL,
     headers:{
         "Content-Type":"application/json"
     },

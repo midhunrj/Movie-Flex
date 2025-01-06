@@ -2,7 +2,7 @@ import axios, { Axios } from 'axios';
 import  axiosUrl  from '../../utils/axios/baseUrl';
 import { adminAuthenticate } from '../../utils/axios/adminInterceptor';
 import { MovieType } from '@/types/movieTypes';
-const API_BASE_URL = 'https://api.movie-flex.site';
+const API_BASE_URL = import.meta.env.VITE_ADMIN_URL;
 
 
 // export const registerUser = async (name, email, mobile, password) => {

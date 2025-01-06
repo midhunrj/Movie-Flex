@@ -32,7 +32,7 @@ const Notifications = () => {
         setNotifications((prev) => prev.map((n) => (n._id === id ? { ...n, status: NotificationStatus.READ } : n)));
     };
     useEffect(() => {
-        const socket = io("https://api.movie-flex.site");
+        const socket = io(import.meta.env.VITE_USER_URL);
         socket.emit("subscribe", userId, role);
         socket.on("initialNotifications", (pastNotifications) => {
             setNotifications(pastNotifications);

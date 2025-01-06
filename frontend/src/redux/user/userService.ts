@@ -3,7 +3,7 @@ import  axiosUrl  from '../../utils/axios/baseUrl';
 import { userAuthenticate } from '../../utils/axios/userInterceptor';
 import { FavouritePayload, ratingPayload } from './userThunk';
 
-const API_BASE_URL = "https://api.movie-flex.site";
+const API_BASE_URL = import.meta.env.VITE_USER_URL;
 
 
 export const registerUser = async (name:string, email:string, mobile:string, password:string) => {

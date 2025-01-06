@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { userAuthenticate } from '../../utils/axios/userInterceptor';
-const API_BASE_URL = "https://api.movie-flex.site";
+const API_BASE_URL = import.meta.env.VITE_USER_URL;
 export const registerUser = async (name, email, mobile, password) => {
     try {
         const response = await axios.post(`${API_BASE_URL}/register`, { name, email, mobile, password });
