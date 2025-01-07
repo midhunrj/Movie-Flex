@@ -6,8 +6,8 @@ export class MailService{
     private transporter:Transporter
 constructor(){
 this.transporter=nodemailer.createTransport({
-    service:'gmail',
-    type:'SMTP',
+    // service:'gmail',
+    // type:'SMTP',
     host:'smtp.gmail.com',
     port:587,
     secure: false,
