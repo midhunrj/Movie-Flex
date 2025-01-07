@@ -9,13 +9,13 @@ export class PaymentRepository implements IPaymentRepository
     constructor(){
         this.razorpayInstance=new Razorpay({
               key_id: process.env.RAZORPAY_ID_KEY as string,
-              key_secret: process.env.Razorsecret_Key,
+              key_secret: process.env.Razorsecret_Key as string,
             })
         }
             
            
     async createOrder(currency: string, amount: number, receipt: string): Promise<Payment> {
-     const order=await this.razorpayInstance.orders.create({
+      try { const order=await this.razorpayInstance.orders.create({
         amount,
         receipt,
         currency
@@ -28,7 +28,11 @@ export class PaymentRepository implements IPaymentRepository
         receipt,
         currency
      }
-        
+    }
+    catch (error: any) {
+      console.error("Error creating Razorpay order:", error);
+      throw new Error("Failed to create payment order. Please check your configuration.");
+  }   
     }
 
     verifyPayment(orderId: string, paymentId: string, signature: string): boolean {
