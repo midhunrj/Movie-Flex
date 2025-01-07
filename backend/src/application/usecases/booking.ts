@@ -26,6 +26,8 @@ export class BookingMovies {
     {
         return null
     }
+    console.log(booking,"booking payment");
+    
     return await this.paymentRepo.createOrder( currency,amount, receipt);
   }
 

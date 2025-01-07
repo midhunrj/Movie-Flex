@@ -8,7 +8,7 @@ export class PaymentRepository implements IPaymentRepository
 
     constructor(){
         this.razorpayInstance=new Razorpay({
-              key_id: process.env.RAZORPAY_ID_KEY!,
+              key_id: process.env.RAZORPAY_ID_KEY as string,
               key_secret: process.env.Razorsecret_Key,
             })
         }
@@ -20,7 +20,8 @@ export class PaymentRepository implements IPaymentRepository
         receipt,
         currency
      })
-
+       console.log(order,"fkjdnfkj");
+       
      return {
         orderId:order.id,
         amount,
