@@ -16,7 +16,7 @@ this.transporter=nodemailer.createTransport({
         user:configKeys.SERVER_EMAIL,
         pass:configKeys.SERVER_PASS
     }
-}as any)}
+})}
 
 async sendMail(username:string,email:string,otp:string):Promise<any>
 {
