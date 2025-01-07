@@ -3,14 +3,14 @@ import nodemailer,{Transporter} from 'nodemailer'
 import configKeys from '../config/config'
 
 export class MailService{
-    private transporter:Transporter
+    private transporter:nodemailer.Transporter
 constructor(){
 this.transporter=nodemailer.createTransport({
-    service:'gmail',
+    //service:'gmail',
     // type:'SMTP',
-    // host:'smtp.gmail.com',
-    // port:587,
-    // secure: false,
+     host:'smtp.gmail.com',
+     port:587,
+     secure: false,
 
     auth:{
         user:configKeys.SERVER_EMAIL,
