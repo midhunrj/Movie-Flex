@@ -9,10 +9,13 @@ this.transporter=nodemailer.createTransport({
      host:'smtp.gmail.com',
      port:587,
      secure: false,
+
     auth:{
         user:configKeys.SERVER_EMAIL,
         pass:configKeys.SERVER_PASS
-    }
+    },
+    debug: true,  // Enable debugging output
+    logger: true,
 })}
 
 async sendMail(username:string,email:string,otp:string):Promise<any>
