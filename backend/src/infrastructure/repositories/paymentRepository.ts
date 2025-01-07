@@ -10,7 +10,7 @@ export class PaymentRepository implements IPaymentRepository
   
     constructor(){
         this.razorpayInstance=new Razorpay({
-              key_id: process.env.RAZORPAY_ID_KEY as string,
+              key_id: process.env.Razorpay_id_Key as string,
               key_secret: process.env.Razorsecret_Key as string,
             })
         }
