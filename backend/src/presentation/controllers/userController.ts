@@ -394,7 +394,7 @@ async bookMovieTickets(req:Request,res:Response){
     
     try {
 
-      console.log(process.env.Razorsecret_Key,process.env.Razorpay_id_Key,"razorsecrets");
+      
       console.log(req.body,"booking data from frontend")
       const {amount,currency,receipt,bookingId}=req.body
 
