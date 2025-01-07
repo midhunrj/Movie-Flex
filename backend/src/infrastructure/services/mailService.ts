@@ -20,6 +20,8 @@ this.transporter=nodemailer.createTransport({
 
 async sendMail(username:string,email:string,otp:string):Promise<any>
 {
+    console.log(email,configKeys.SERVER_EMAIL,"email to and from");
+    
     const mailOptions={
         from:configKeys.SERVER_EMAIL,
         to:email,
