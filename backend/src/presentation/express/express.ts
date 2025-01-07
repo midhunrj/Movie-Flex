@@ -15,7 +15,7 @@ const expressConfig=(app:Application)=>{
     
     const corsOptions:CorsOptions={
         origin:[configKeys.CLIENT_URL!,"http://localhost:5173"],   
-        allowedHeaders: ['Content-Type', 'Authorization'],
+        // allowedHeaders: ['Content-Type', 'Authorization','*'],
         credentials: true,
     };
     console.log("ftyhfygyj");

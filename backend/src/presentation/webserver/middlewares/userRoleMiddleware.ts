@@ -44,11 +44,12 @@ export class AuthHandler {
 
     async userLogin(req: Request, res: Response, next: NextFunction) {
         try {
+            // console.log(req.query,"ggs")
             const token = req.headers?.["authorization"]?.split(' ')[1];
             if (!token) {
                 throw new HttpError("No access token found", 403);
             }
-
+   
             const decodeToken = await this.jwtService.verifyAccessToken(token);
             if (!decodeToken) {
                 throw new HttpError("Token is not valid", 401);
