@@ -11,7 +11,7 @@ export class PaymentRepository implements IPaymentRepository
     constructor(){
         this.razorpayInstance=new Razorpay({
               key_id: process.env.Razorpay_id_Key as string,
-              key_secret: process.env.RAZORPAY_SECRET_ID as string,
+              key_secret: process.env.Razorsecret_Key as string,
             })
         }
             
@@ -39,7 +39,7 @@ export class PaymentRepository implements IPaymentRepository
 
     verifyPayment(orderId: string, paymentId: string, signature: string): boolean {
         const generatedSignature = crypto
-      .createHmac("sha256", process.env.RAZORPAY_SECRET_ID!)
+      .createHmac("sha256", process.env.Razorsecret_key!)
       .update(`${orderId}|${paymentId}`)
       .digest("hex");
 
