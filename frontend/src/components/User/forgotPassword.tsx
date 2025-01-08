@@ -50,8 +50,10 @@ const ForgotRoute=()=>{
         <h2 className="text-xl font-bold  text-center text-amber-400 align-text-bottom mt-8">Forgot Password</h2>
         <form id="loginForm" onSubmit={handleSubmit} className="space-y-4 text-center">
         <input type='text' value={email} placeholder="enter email" onChange={(e)=>setEmail(e.target.value)}
+        className="w-full mx-8 px-4 justify-center py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-4"
+               
         />
-        <button type='submit'>submit</button>
+        <button type='submit' className="max-w-max py-2 min-h-8 px-4 rounded-md transition duration-300 bg-blue-500 text-white  hover:bg-blue-700 ">Submit</button>
             </form>
             </div>
             </div>

@@ -85,13 +85,14 @@ const VerifyTheatre=()=>{
   
         <h1 className="text-2xl font-bold  align-text-top text-red-500 " >Welcome to Movie Ticket Booking</h1>
         <h2 className="text-xl font-bold  text-center text-amber-400 align-text-bottom mt-8">Otp Verification</h2>
-          <form onSubmit={handleSubmit} className="space-y-4 text-center">
+          <form id="loginForm" onSubmit={handleSubmit} className="space-y-4 text-center">
             <input
               type="text"
               value={otp}
               placeholder="Enter OTP"
               onChange={(e) => setOtp(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full mx-8 px-4 justify-center py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-4"
+           
             />
             <button
               type="submit"

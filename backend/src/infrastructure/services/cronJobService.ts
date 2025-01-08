@@ -29,8 +29,9 @@ cron.schedule('0 0 * * *', async ()=>{
     const currentDate=new Date()
     const yesterday = new Date(currentDate);
 yesterday.setDate(currentDate.getDate() - 1);
+console.log(`Running cleanup job. Current Date: ${currentDate.toDateString()}, Yesterday: ${yesterday.toDateString()}`);
 
-   await showRepository.deleteExpiredShowtimes(currentDate)
+   await showRepository.deleteExpiredShowtimes(yesterday)
 
    await screenRepository.updateExpiredMovieFromScreen()
    console.log(`showtimes of yesterday ${yesterday.toDateString()} has been deleted successfully`);

@@ -42,7 +42,7 @@ export const register = createAsyncThunk(
       
       return await registerUser(name, email, mobile, password);
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.message || 'Something went wrong');
+      return thunkAPI.rejectWithValue(error.response.data.message ||error.message ||"something went wrong in server");
     }
   }
 );

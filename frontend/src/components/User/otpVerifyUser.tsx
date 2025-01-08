@@ -89,7 +89,6 @@ const VerifyUser = () => {
     }
   };
 
-  // Timer logic
   useEffect(() => {
     if (timer > 0) {
       const countdown = setTimeout(() => {
@@ -98,7 +97,7 @@ const VerifyUser = () => {
 
       return () => clearTimeout(countdown);
     } else {
-      setIsResendDisabled(false); // Enable resend OTP after timer ends
+      setIsResendDisabled(false); 
     }
   }, [timer]);
 
@@ -139,14 +138,14 @@ const VerifyUser = () => {
         {/* <form id="registerForm"  className="mt-12" onSubmit={handleSubmit}> */}
        
         {/* <h1 className="text-2xl font-bold mb-4 text-center">Enter OTP</h1> */}
-        <form onSubmit={handleSubmit} className="space-y-4 text-center">
+        <form id="loginForm" onSubmit={handleSubmit} className="space-y-4 text-center">
           <input
             type="text"
             value={otp}
             placeholder="Enter OTP"
             onChange={(e) => setOtp(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+            className="w-full mx-8 px-4 justify-center py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-4"
+            />
           <button
             type="submit"
             className="max-w-max py-2 min-h-8 px-4 rounded-md transition duration-300 bg-blue-500 text-white  hover:bg-blue-700 "
@@ -162,7 +161,7 @@ const VerifyUser = () => {
           ) : (
             <button
               onClick={handleResendOtp}
-              className={`max-w-max py-2 min-h-8 px-4 rounded-md transition duration-300 ${
+              className={`max-w-max py-1 min-h-8 px-2 w-fit h-fit rounded-md transition duration-300 ${
                 isResendDisabled
                   ? "bg-gray-400 text-gray-300 cursor-not-allowed"
                   : "bg-green-500 text-white hover:bg-green-600"

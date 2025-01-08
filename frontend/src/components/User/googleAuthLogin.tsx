@@ -47,6 +47,7 @@ const GoogleLogin = () => {
 
     return (
         <button
+        type="button"
         onClick={googleSignIn}
         className="flex items-center justify-center w-48 px-4 py-2 mt-4  min-h-11 space-x-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
       >

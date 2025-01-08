@@ -47,6 +47,8 @@ const TheatreShows: React.FC = () => {
   const fetchTheatreShowtimes = async () => {
     setLoading(true);
     try {
+      console.log(selectedDate,"selectedDate");
+      
       const response = await userAuthenticate.get('/theatre-showtimes', {
         params: { screenId ,date: selectedDate },
       });

@@ -257,9 +257,10 @@ export class ShowRepository implements IShowRepository {
     const currentTime = currentDate.toISOString();
     console.log(currentTime, "current timee");
     const showtimes = await showModel.find({ screenId,date: new Date(date) }).populate('movieId').populate('screenId').populate('theatreId');
+    console.log(showtimes,"today showtimes");
     
     const filteredShowtimes = showtimes.filter((show) => {
-      if (date === today) {
+      if (new Date(date).toISOString().split('T')[0]==today) {
         const [hour, minute] = show.showtime.split(':').map(Number);
         const showtimeDate = new Date(show.date); 
         showtimeDate.setHours(hour, minute, 0, 0); 
