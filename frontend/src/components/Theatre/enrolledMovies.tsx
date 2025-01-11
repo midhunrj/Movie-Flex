@@ -37,10 +37,10 @@ const EnrolledMovies: React.FC<EnrolledMoviesProps> = ({
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => setSelectedDate(e.target.value);
   const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => setSelectedEndDate(e.target.value);
-
+//const[movieReleaseDate,setMovieReleaseDate]=useState<Date|null>(null)
   const handleMovietoShow = (movie: EnrolledMovie) => {
     setSelectedMovie(movie);
-    setShowModal(true); // Show modal when movie is selected
+    setShowModal(true); 
   };
 
   const handleShowtimeSelect = (showtime: Showtime) => {
@@ -153,6 +153,7 @@ const EnrolledMovies: React.FC<EnrolledMoviesProps> = ({
           handleAddMovieToShowtime={handleAddMovieToShowtime}
           availableShowtimes={screenData.showtimes || []}
           handleNewShowtime={handleNewShowtime}
+          movieReleaseDate={selectedMovie.releaseDate}
         />
       )}
     </div>

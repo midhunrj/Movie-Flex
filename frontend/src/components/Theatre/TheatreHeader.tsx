@@ -69,12 +69,12 @@ const TheatreHeader = () => {
               >
                 Screens
               </Link>
-              <Link
+              {/* <Link
                 to="/theatre/profile"
                 className="hover:bg-gray-700 p-4 rounded transition"
               >
                 profile
-              </Link>
+              </Link> */}
             </div>
 
            
@@ -93,7 +93,6 @@ const TheatreHeader = () => {
 </div>
 
              
-              <div className="text-sm text-gray-200"><BiMap size={24} className="text-white" />kochi</div>
               <Link to="/theatre/profile" className="flex items-center">
                         <FaUserCircle size={28} className="text-white" />
                      </Link>

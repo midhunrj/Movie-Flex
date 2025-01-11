@@ -254,6 +254,15 @@ async updateProfile(userId: string | undefined, profileData: any): Promise<User 
       
         await this.walletRepo.updateWallet(userId, amount, transaction);
       }
+
+      async WalletTransaction(userId:string,page:number,limit:number)
+      {
+        const wallet = await this.walletRepo.getWalletByUser(userId,page,limit);
+        // if (!wallet) {
+        //   return { balance: 0, transactions: [] };
+        // }
+        return wallet;
+      }
 }
 
 

@@ -55,7 +55,7 @@ useEffect(()=>{
         <h1 className='text-blue-500 text-nowrap font-bold'>UserList</h1>
         <table className="min-w-full  border-collapse  bg-white rounded-lg shadow-lg  mt-4">
             <thead>
-              <tr className='rounded-lg border-collapse border  bg-slate-100'>
+              <tr className='rounded-lg border-collapse border  border-gray-400 border-opacity-30 bg-slate-100'>
                 <th className="  border-gray-300 p-4">No</th>
                 <th className=" border-gray-300  p-4">Name</th>
                 <th className="  border-gray-300  p-4">Email</th>

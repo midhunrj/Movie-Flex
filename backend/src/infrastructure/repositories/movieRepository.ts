@@ -127,6 +127,8 @@ export class MongoMovieRepository implements MovieRepository {
       }
     
     async createMovie(movie: Movie): Promise<Movie> {
+      console.log(movie,"movie details");
+      
       const existingMovie = await MovieModel.findOne({ movie_id: movie.movie_id });
   
        console.log(movie.rating,"movie rating");

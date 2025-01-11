@@ -52,7 +52,7 @@ const FavouriteMovies = () => {
 
   return (
     <>
-      <Header />
+      <Header searchQuery="" setSearchQuery={()=>{}} />
       <div className="flex flex-col items-center bg-gray-200 min-h-screen p-4">
         <h1 className="text-2xl font-bold mb-6">My Favorite Movies</h1>
         {loading ? (
@@ -75,7 +75,7 @@ const FavouriteMovies = () => {
                   />
                   <button
                     onClick={() => handleRemoveFavorite(favorite.movieId._id!)}
-                    className="absolute top-4 right-0  text-3xl text-red-500 hover:text-red-700 focus:outline-none"
+                    className="absolute top-3 right-3 w-fit  text-3xl text-red-500 hover:text-red-700 focus:outline-none"
                     aria-label="Toggle favorite"
                   >
                     {favorites.some(fav => fav.movieId._id === favorite.movieId._id) ? (
@@ -90,7 +90,7 @@ const FavouriteMovies = () => {
                 <p className="mb-4">{favorite.movieId.description}</p>
 
                 {/* Favorite Caption */}
-                <div className='flex justify-end items-end'>
+                <div className='flex justify-end self-end '>
                 <span className="text-white bg-red-500    rounded-lg py-1 px-3 text-sm" onClick={() => handleRemoveFavorite(favorite.movieId._id!)}> Mark UnFavorite</span>
                 </div>
               </div>

@@ -9,6 +9,7 @@ import { ScreenData } from '@/types/theatre';
 import { ScreenDatas, TheatreState, TheatreType } from '@/types/theatreTypes';
 import { MovieType } from '@/types/movieTypes';
 import { FaAngleLeft } from 'react-icons/fa';
+import Header from './header';
 
 interface IShowtime {
   movieId: MovieType;
@@ -126,9 +127,11 @@ const groupedShowtimes: GroupedShowtimes = showtimes.reduce((acc, show) => {
     return acc;
   }, {} as GroupedShowtimes);
   return (
-    <div className="p-4">
+    <>
+      <Header searchQuery="" setSearchQuery={()=>{}}/>
+      <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-      <div className="absolute top-5 left-4 z-50">
+      <div className="absolute top-25 left-2 z-50">
         <button className="bg-opacity-40 min-h-8 text-opacity-100 text-gray-600 w-fit hover:text-slate-800 hover:bg-transparent rounded-md" onClick={() => navigate(-1)}>
           <FaAngleLeft size={30} />
         </button>
@@ -178,17 +181,17 @@ const groupedShowtimes: GroupedShowtimes = showtimes.reduce((acc, show) => {
       {loading? 
     (<p>Loading showtimes...</p>):(Object.keys(groupedShowtimes).length > 0 ? (
         Object.entries(groupedShowtimes).map(([movieId, details]) => (
-          <div key={movieId} className="border p-4 rounded-lg shadow-md bg-white mb-4">
+          <div key={movieId} className="border p-4 rounded-lg shadow-md bg-gray-100 mb-4">
             <h3 className="font-semibold text-lg text-blue-800 mb-2">
               {details.title}
             </h3>
             {Object.entries(details.screens).map(([screenId, screen]) => (
               <div key={screenId}>
-                <h4 className="font-medium">{screen.screenName}</h4>
+                <h4 className="font-medium mb-2">{screen.screenName}</h4>
                 <div className="flex flex-wrap gap-5">
                   {screen.times.map((time: string) => (
                     <button key={time}
-                     className="border border-black min-h-8 text-slate-800 border-separate rounded-sm transition px-3 py-1 hover:bg-slate-900 hover:text-white"
+                     className="border border-black  shadow-2xl min-h-8 text-green-600 border-separate  bg-white rounded-sm transition px-3 py-1 hover:bg-slate-900 hover:text-white"
                       onClick={() => handleShowtimeClick(showtimes.find(s => s.showtime === time)!, time)}
                     >
                       {time}
@@ -203,6 +206,7 @@ const groupedShowtimes: GroupedShowtimes = showtimes.reduce((acc, show) => {
         <p>No shows available for the selected date.</p>
       ))}
     </div>
+    </>
   );
 };
 

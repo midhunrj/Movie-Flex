@@ -35,7 +35,7 @@ const MovieSchema: Schema = new Schema({
   genre: [{ type: String, required: true }],      
   posterUrl: { type: String, required: true },    
   isApproved: { type: Boolean, default: false },  
-  movie_id: { type: String, required: true },     
+  movie_id: { type: Number, required: true },     
   language: { type: String, required: true },     
   overview: { type: String, required: true },     
   popularity: { type: Number, required: true },   
@@ -66,7 +66,7 @@ export interface IMovie extends Document {
   genre: string[];         
   posterUrl: string;      
   isApproved: boolean;    
-  movie_id: string;       
+  movie_id: number;       
   language: string;       
   overview: string;       
   popularity: number;     

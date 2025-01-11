@@ -8,7 +8,7 @@ import { RootState } from "@/redux/store/store";
 
 import TheatreHeader from "./TheatreHeader";
 import Footer from "../User/footer";
-import { theatreUrl } from "@/utils/axios/config/urlConfig";
+import { theatreUrl, userUrl } from "@/utils/axios/config/urlConfig";
 export enum NotificationType {
     BOOKING_CONFIRMATION = "Booking Confirmation",
     REMINDER_ALERT = "Reminder Alert",
@@ -55,7 +55,7 @@ const Notifications = () => {
     //fetchNotifications();
 
     const socket = io(theatreUrl); 
-    socket.emit("subscribe", userId, role);
+    socket.emit("subscribe", theatre?._id, role);
    console.log("sssd");
    
     socket.on("initialNotifications", (pastNotifications: Notification[]) => {
@@ -78,7 +78,7 @@ const Notifications = () => {
   return (
     <>
     <TheatreHeader/>
-    <div className="p-4 w-full max-w-full mx-auto bg-white rounded-lg shadow-md">
+    <div className="p-4 w-full max-w-full mx-auto min-h-screen bg-white rounded-lg shadow-md">
       <h2 className="text-xl font-bold text-gray-800 mb-4">Notifications</h2>
       <ul className="space-y-4">
         {notifications.map((notification) => (

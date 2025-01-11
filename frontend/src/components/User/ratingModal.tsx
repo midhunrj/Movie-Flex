@@ -15,7 +15,7 @@ const RatingModal: React.FC<RatingModalProps> = ({
   onSubmit,
   movieId,
 }) => {
-  const [rating, setRating] = useState<number>(5);
+  const [rating, setRating] = useState<number>(0);
 
   if (!isOpen) return null;
 

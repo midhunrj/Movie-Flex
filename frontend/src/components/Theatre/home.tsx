@@ -147,12 +147,12 @@ fetchRevenueTrends()
               >
                 Screens
               </Link>
-              <Link
+              {/* <Link
                 to="/theatre/profile"
                 className="hover:bg-gray-700 p-4 rounded transition"
               >
                 profile
-              </Link>
+              </Link> */}
             </div>
 
            
@@ -208,7 +208,7 @@ fetchRevenueTrends()
             <option value="Yearly">Yearly</option>
           </select>
         </div> 
-         <div className="mt-8 mx-8   grid  gap-12 grid-cols-2">
+         <div className="mt-8 mx-8   grid  gap-12 grid-cols-1 md:grid-cols-2">
             <div className="bg-white p-2 rounded-md shadow-lg">
           <h2 className="text-xl font-bold">Booking Trends</h2>
 
@@ -259,38 +259,7 @@ fetchRevenueTrends()
         </div>
 
 
-        {/* <div className="flex justify-center mt-12 pb-8"> */}
-          {/* <div className="grid grid-cols-8 gap-4">
-            <div className="col-start-2 col-span-2 w-full text-center text-white  text-opacity-80 bg-gradient-to-r mx-8 h-fit border-b-black rounded-md bg-indigo-950" >
-              
-              <img
-                src="/now showing 3.jpg"
-                alt="Now Showing Movie 1"
-                className="rounded h-80 w-full"
-              />
-
-    <div className="flex justify-between items-center px-4 py-2">
-        <span className="text-lg font-semibold">Screen 1</span>
-        <span className="text-sm cursor-pointer mt-4 hover:text-opacity-100">Edit</span>
-      </div>
-            </div>
-            <div className="col-start-5  w-full col-span-2 text-center text-white  text-opacity-80 bg-gradient-to-r mx-8 h-fit border-x-black rounded-md bg-indigo-950" >
-              
-              <img
-                src="/now showing 2.jpg"
-                alt="Now Showing Movie 2"
-                className=" rounded h-80 w-full"
-              />
-              {/* <span className="block">Screen 2</span> */}
-              {/* <div className="flex justify-between items-center px-4 py-2">
-        <span className="text-lg font-semibold">Screen 2</span>
-        <span className="text-sm cursor-pointer mt-4  hover:text-opacity-100">Edit</span>
-      </div>
-            </div>
-          </div>
-        </div> */} 
-      {/* </div> */}
-
+        
       {loading ? (
           <p>Loading...</p>
         ) :bookingData.length>0? (
@@ -355,3 +324,36 @@ fetchRevenueTrends()
 };
 
 export default TheatreHome;
+
+
+{/* <div className="flex justify-center mt-12 pb-8"> */}
+          {/* <div className="grid grid-cols-8 gap-4">
+            <div className="col-start-2 col-span-2 w-full text-center text-white  text-opacity-80 bg-gradient-to-r mx-8 h-fit border-b-black rounded-md bg-indigo-950" >
+              
+              <img
+                src="/now showing 3.jpg"
+                alt="Now Showing Movie 1"
+                className="rounded h-80 w-full"
+              />
+
+    <div className="flex justify-between items-center px-4 py-2">
+        <span className="text-lg font-semibold">Screen 1</span>
+        <span className="text-sm cursor-pointer mt-4 hover:text-opacity-100">Edit</span>
+      </div>
+            </div>
+            <div className="col-start-5  w-full col-span-2 text-center text-white  text-opacity-80 bg-gradient-to-r mx-8 h-fit border-x-black rounded-md bg-indigo-950" >
+              
+              <img
+                src="/now showing 2.jpg"
+                alt="Now Showing Movie 2"
+                className=" rounded h-80 w-full"
+              />
+              {/* <span className="block">Screen 2</span> */}
+              {/* <div className="flex justify-between items-center px-4 py-2">
+        <span className="text-lg font-semibold">Screen 2</span>
+        <span className="text-sm cursor-pointer mt-4  hover:text-opacity-100">Edit</span>
+      </div>
+            </div>
+          </div>
+        </div> */} 
+      {/* </div> */}

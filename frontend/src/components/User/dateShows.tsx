@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store/store';
 import { MovieType } from '@/types/movieTypes';
 import { FaAngleLeft } from 'react-icons/fa';
+import Header from './header';
 
 interface IShowtime {
     movieId:string
@@ -190,9 +191,12 @@ const fetchShowtimes = async () => {
     });
   };
   return (
+    <>
+    <Header searchQuery="" setSearchQuery={()=>{}}/>
     <div className="p-4">
+      
       {/* Date Tabs */}
-      <div className="absolute top-5 left-4 z-50">
+      <div className="absolute top-25 left-4 z-50">
         <button className="bg-opacity-40 min-h-8 text-opacity-100 text-slate-800 w-fit hover:text-black hover:bg-transparent rounded-md" onClick={() => navigate(-1)}>
           <FaAngleLeft size={30} />
         </button>
@@ -277,8 +281,8 @@ const fetchShowtimes = async () => {
         </select>
       </div>
       </div>
-      {/* Showtimes Section */}
-      {loading ? (
+ 
+      {userCoordinates?.latitude==undefined?(<p>No showtimes available for this Location. Kindly please look on another location</p>):loading ? (
   <p>Loading showtimes...</p>
 ) : Object.keys(groupedShowtimes).length > 0 ? (
   Object.entries(groupedShowtimes).map(([key, details]) => (
@@ -315,7 +319,6 @@ const fetchShowtimes = async () => {
 )}
 
 
-      {/* Screen Info Modal */}
       {selectedScreen && (
         <Modal open={showModal} onClose={() => setShowModal(false)}>
         <div className="p-6 bg-white rounded shadow-md">
@@ -333,6 +336,7 @@ const fetchShowtimes = async () => {
       
       )}
     </div>
+    </>
   );
 };
 

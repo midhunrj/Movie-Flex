@@ -8,7 +8,7 @@ export class Movie {
       public genre: string[],  
       public posterUrl: string,  
       public isApproved: boolean = false,  
-      public movie_id: string,  
+      public movie_id: number,  
       public language: string,  
       public overview: string,  
       public popularity: number,  

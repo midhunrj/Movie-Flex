@@ -82,6 +82,8 @@ const EditScreen = () => {
     
     
   const [timeValue, setTimeValue] = useState<Dayjs>(dayjs());
+  const [isSticky, setIsSticky] = useState<boolean>(false);
+
   const [screenData, setScreenData] = useState<ScreenData>({
     screenName: '',
     screenType: '',
@@ -119,7 +121,18 @@ const EditScreen = () => {
   }, [screens]);
   console.log(screenData,"screen Data in edit screen");
   const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
-
+   useEffect(()=>{
+    const handleScroll=()=>{
+      const tabsElement=document.querySelector('.tabs')
+      if(tabsElement)
+      {
+        const offSet=tabsElement.getBoundingClientRect().top
+        setIsSticky(offSet<=0)
+      }
+    }
+    window.addEventListener('scroll',handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll);
+   })
 
   const handleChange = (e:React.ChangeEvent<HTMLInputElement|HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -376,7 +389,7 @@ const EditScreen = () => {
 </Modal>
          {/* Form for adding screen configuration */}
           <form className="mx-4 space-y-4 mt-4" onSubmit={handleSubmit} encType='multipart/form-data'>
-            <div className='flex justify-between gap-12'>
+            <div className='flex flex-wrap gap-4'>
               <div className='flex-1 flex items-center gap-4'>
                 <label htmlFor="screenName" className="text-md min-w-fit mb-2 font-medium">Screen Name</label>
                 <input
@@ -420,7 +433,7 @@ const EditScreen = () => {
         
             {screenData?.showtimes && screenData.showtimes.length > 0 && (
               <>
-                <div className="grid grid-cols-3 grid-rows-2 gap-4 "> 
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  grid-rows-2 gap-4 "> 
     {screenData.showtimes.map((showtime, index) => (
       <div key={index} className="flex flex-col items-center  gap-2 mb-4 group">
         <div className="relative flex items-center gap-2 p-4 rounded bg-black text-amber-500 cursor-pointer w-auto">
@@ -524,7 +537,7 @@ const EditScreen = () => {
 
             <h3 className='text-2xl text-left p-2'>Speakers Configuration</h3>
             <div className=' flex justify-start  p-2 mx-2 gap-2'>
-            <button type="button" onClick={handleAddSpeaker} className="px-4 py-2 z-30  w-fit h-fit min-h-8 bg-lime-700 text-white relative font-semibold after:-z-20 after:absolute after:h-1 after:w-1 after:bg-lime-600 after:left-5 overflow-hidden after:bottom-0 after:translate-y-full after:rounded-md after:hover:scale-[300] after:hover:transition-all after:hover:duration-700 after:transition-all after:duration-700 transition-all duration-700  hover:[text-shadow:2px_2px_2px_#fda4af] text-base rounded-lg">
+            <button type="button" onClick={handleAddSpeaker} className="px-4 py-2   w-fit h-fit min-h-8 bg-lime-700 text-white relative font-semibold after:-z-20 after:absolute after:h-1 after:w-1 after:bg-lime-600 after:left-5 overflow-hidden after:bottom-0 after:translate-y-full after:rounded-md after:hover:scale-[300] after:hover:transition-all after:hover:duration-700 after:transition-all after:duration-700 transition-all duration-700  hover:[text-shadow:2px_2px_2px_#fda4af] text-base rounded-lg">
               Add Speaker
             </button>
             </div>
@@ -599,9 +612,10 @@ default:return null
     <>
     <TheatreHeader/>
     
-    <div className="bg-white min-h-screen flex flex-col">
-  {/* Sticky Tabs */}
-  <div className="tabs sticky top-0 z-10 bg-slate-900 shadow-lg mt-2">
+    <div className="bg-gray-100 min-h-screen w-full flex flex-col">
+  
+  
+  <div className={`tabs sticky w-full top-0 z-10 border border-gray shadow-lg  ${isSticky?'bg-gray-800  border border-white border-opacity-10  h-fit w-full ':'bg-gray-200'} transition-colors duration-300 mt-2`}>
     <div className="flex justify-around p-2">
       <button
         className={`p-2 min-h-12 w-fit rounded-md transition-colors duration-200 ease-in-out 
@@ -635,7 +649,7 @@ default:return null
   </div>
 
   {/* Main content container */}
-  <div className="flex-1 p-2 m-4 bg-slate-900 mx-20 w-auto justify-center items-center  rounded-lg text-white">
+  <div className="flex-1 p-2 m-4 bg-slate-900 mx-4 md:mx-20 w-auto justify-center items-center  rounded-lg text-white">
     <div className='tab-content'>
       {renderTabComponent()}
     </div>

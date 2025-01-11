@@ -45,6 +45,7 @@ export interface EnrolledMovie {
   movie_id:string;
   language: string;
   rating: number;
+  releaseDate:Date;
   backdrop_path?: string;  
   poster_path?: string; 
   startDate?: Date; 

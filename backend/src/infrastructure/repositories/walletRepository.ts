@@ -17,7 +17,7 @@ export class WalletRepository implements IWalletRepository
         }
 
         //const walletData = await wlletModel.findOne({ userId: user.user.id });
-        return await walletModel.findOne({ userId });
+        return await walletModel.findOne({ userId }).sort({date:-1});
       }
     
       async updateWallet(userId: string, amount: number, transaction: WalletTransaction): Promise<void> {
@@ -37,5 +37,33 @@ export class WalletRepository implements IWalletRepository
         console.log(wallet,"wallet");
       }
 
-      
+      async getWalletByUser(userId: string, page: number, limit: number): Promise<Wallet | null> {
+         const skip=(page-1)*limit
+        // const wallet = await walletModel.findOne({ userId});
+        // if (!wallet) {
+        //     const isValid=await userModel.findById(userId)
+        //     if(isValid)
+        //     {
+        //     const newWallet = new walletModel({ userId:userId });
+        //     await newWallet.save();
+        //     }
+        // }
+
+        //const walletData = await wlletModel.findOne({ userId: user.user.id });
+        const wallet = await walletModel.aggregate([
+          { $match: { userId } }, // Match the wallet by userId
+          {
+              $project: {
+                  _id: 1,
+                  userId: 1,
+                  balance: 1,
+                  transactions: {
+                      $slice: ['$transactions', skip, limit], // Paginate transactions array
+                  },
+              },
+          },
+      ]);
+  
+      return wallet.length > 0 ? wallet[0] : null; 
+      }
 }

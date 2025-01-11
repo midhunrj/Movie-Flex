@@ -20,7 +20,7 @@ interface ShowtimeModalProps {
   selectedEndDate: string;
   handleDateChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleEndDateChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  
+  movieReleaseDate:Date
 }
 
 const ShowtimeModal: React.FC<ShowtimeModalProps> = ({
@@ -35,9 +35,16 @@ const ShowtimeModal: React.FC<ShowtimeModalProps> = ({
   selectedEndDate,
   handleDateChange,
   handleEndDateChange,
+  movieReleaseDate
   
 }) => {
   const handleOverwriteShowtime = (showtime: Showtime) => {
+    const today = new Date().toISOString().split('T')[0]; 
+  if (movieReleaseDate && new Date(movieReleaseDate) > new Date()) {
+    toast.error('Movie release date is in the future. Cannot add to showtime.');
+    return; // Prevent further execution
+  }
+    else{
     Swal.fire({
       title: 'Confirm Overwrite',
       text: 'This showtime already has a movie assigned. Do you want to overwrite it?',
@@ -56,11 +63,18 @@ const ShowtimeModal: React.FC<ShowtimeModalProps> = ({
        // toast.success('Showtime overwritten successfully.', 'success');
       }
     });
+  }
   };
-
+   console.log(movieReleaseDate,"movieReleaseDate");
+   
   const handleConfirmShowtime = () => {
+    
     const today = new Date().toISOString().split('T')[0]; 
-    if (selectedDate === today && selectedShowtime?.movieId) {
+    if (movieReleaseDate && new Date(movieReleaseDate) > new Date()) {
+      toast.error('Movie release date is in the future. Cannot add to showtime.');
+      return
+    }
+    else if (selectedDate === today && selectedShowtime?.movieId) {
       toast.error(' Movies cannot be added to showtimes starting today it will be done only from tomorrow.');
     } else {
       handleAddMovieToShowtime();

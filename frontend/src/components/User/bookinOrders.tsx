@@ -29,6 +29,7 @@ const limit=12
 
   const fetchBookings = async () => {
     try {
+       setLoading(true)
       const response = await userAuthenticate.get('/bookings-history', {
         params: { userId,page:currentPage,limit},
       });
@@ -46,7 +47,9 @@ const limit=12
   };
 
   useEffect(() => {
-    fetchBookings();
+   fetchBookings();
+   if(!loading)
+    window.scrollTo(0,0)
   }, [currentPage]);
 
   const cancelBooking = async (bookingId: string,refundAmount:number) => {
@@ -181,7 +184,7 @@ const downloadInvoice = async (booking:BookingType) => {
   
   return (
     <>
-      <Header />
+      <Header  searchQuery="" setSearchQuery={()=>{}}/>
       <div className="flex flex-col items-center bg-gray-200 min-h-screen  p-4">
         <h1 className="text-2xl font-bold mb-6">Order History</h1>
         {loading ? (

@@ -133,7 +133,7 @@ const LoginForm:React.FC = () => {
                         className="w-fit px-4  min-h-8 mt-4 bg-blue-700 text-gray-300 rounded-lg font-semibold hover:bg-blue-900 hover:text-white transition duration-300"
                     >
                     Login</button>
-            <span onClick={getSignup} className="text-pretty text-opacity-80 text-white cursor-pointer">New user?Signup</span>
+            <span onClick={getSignup} className="text-pretty text-opacity-80 text-white cursor-pointer">New user ? Signup</span>
 
             {/* <span>signin using google</span>
             <Link to></a> */}

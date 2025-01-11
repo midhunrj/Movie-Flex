@@ -49,7 +49,7 @@ const ScreensList = () => {
           Welcome to Movie Ticket Booking
         </h1>
         <div className="flex mt-12 pb-8 gap-5 items-center justify-center">
-          <div className="grid grid-cols-4 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
             {screens &&
               screens.length > 0 &&
               screens.map((screen, index) => (

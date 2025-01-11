@@ -613,8 +613,12 @@ async bookMovieTickets(req:Request,res:Response){
 
     try {
       const userId:string=req.user?.id!
+      const { page, limit } = req.query;
+      const pages=Number(page)
+      const limits=Number(limit)
       console.log(userId,req.params,"user with params")
-      const wallet = await this.userUseCases.walletByUser(userId);
+      // const wallet = await this.userUseCases.walletByUser(userId)
+      const wallet=await this.userUseCases.WalletTransaction(userId,pages,limits)
       res.status(200).json(wallet);
     } catch (error) {
       console.error(error);

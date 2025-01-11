@@ -155,7 +155,7 @@ const UserProfile: React.FC = () => {
 
   return (
     <>
-      <Header />
+      <Header searchQuery="" setSearchQuery={()=>{}} />
       <div className="bg-gray-100 min-h-screen flex items-center justify-center p-4">
         <div className="bg-white p-6 rounded-lg  shadow-lg w-full min-h-max max-w-md ">
           <h2 className="text-2xl font-semibold mb-4 text-center">

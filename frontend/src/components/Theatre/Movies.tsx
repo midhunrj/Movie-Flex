@@ -24,6 +24,8 @@ const RollingMovies: React.FC = () => {
   }, [dispatch]);
 
   const handleAddToScreen = async (movie: MovieType) => {
+    console.log(movie,"movieDetails");
+    
     const updatedMovies: EnrolledMovie[] = [
       ...enrolledMovies,
       {
@@ -32,14 +34,18 @@ const RollingMovies: React.FC = () => {
         title: movie.title,
         duration: movie.runtime,
         genre: movie.genre,
+        releaseDate:movie.releaseDate,
         language: movie.language,
         rating: movie.rating,
         backdrop_path: movie.backdrop_path,
         poster_path: movie.poster_path,
         cast: movie.cast,
       },
+      
+      
     ];
-
+     console.log(enrolledMovies,"enrolledMovie");
+     
     if (screenId) {
       const result = await Swal.fire({
         title: 'Add this movie to the screen?',
@@ -82,7 +88,7 @@ const RollingMovies: React.FC = () => {
       <div className="min-h-screen bg-gray-100">
         <TheatreHeader />
         <h1 className="text-blue-800 text-3xl mt-4 font-medium text-center">Available Movies</h1>
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-28 mx-20 my-6">
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-28 mx-20 my-6">
           {isLoading ? (
             <p>Loading movies...</p>
           ) : isError ? (
@@ -99,7 +105,7 @@ const RollingMovies: React.FC = () => {
                 <p className="text-sm text-gray-600 mb-1">Language: {movie.language}</p>
                 <p className="text-sm text-gray-600 mb-1">Release Date: {new Date(movie.releaseDate).toDateString()}</p>
                 <p className="text-sm text-gray-600 mb-1">Rating: {movie.rating}</p>
-                <div className="mt-4 flex justify-center">
+               {screenId &&( <div className="mt-4 flex justify-center">
                   <button
                     onClick={() => handleAddToScreen(movie)}
                     className="text-zinc-200 min-h-8 min-w-fit px-2 bg-blue-600 text-sm cursor-pointer hover:bg-blue-800 hover:text-white hover:text-base transition-all"
@@ -107,6 +113,7 @@ const RollingMovies: React.FC = () => {
                     Add to Movie Screen
                   </button>
                 </div>
+               )}
               </div>
             ))
           ) : (

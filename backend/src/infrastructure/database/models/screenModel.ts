@@ -7,6 +7,7 @@ export interface EnrolledMovie {
   genre: string[];
   movie_id:string;
   language: string;
+  releaseDate:Date;
   rating: number;
   backdrop_path: string;  
   poster_path: string; 
@@ -65,6 +66,7 @@ const enrolledMovieSchema = new Schema({
   movie_id:{type:String,required:true},
   language: { type: String, required: true },
   rating: { type: Number, required: true },
+  releaseDate:{type:Date,required:true},
   poster_path:{type:String,required:true},
   backdrop_path:{type:String,required:true},
   cast: Array<{ name: string; character: string; image: string }>,  

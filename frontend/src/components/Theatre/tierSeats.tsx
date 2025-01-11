@@ -504,7 +504,7 @@ const Seat = React.memo(({ row, col, isFilled, isPartition,className }:Seat) => 
                             <button
                                 type="button"
                                 onClick={openConfigModal}
-                                className="bg-amber-400 min-h-8 text-indigo-950 rounded p-2 hover:bg-yellow-500"
+                                className="bg-amber-400 min-h-8 w-fit h-fit text-indigo-950 rounded p-2 hover:bg-yellow-500"
                             >
                                 identifier configure
                             </button>

@@ -288,7 +288,7 @@ const Dashboard = () => {
             <option value="Yearly">Yearly</option>
           </select>
         </div> 
-         <div className="mt-8  grid  gap-12 grid-cols-2">
+         <div className="mt-8  grid  gap-12 grid-cols-1 md:grid-cols-2">
             <div>
           <h2 className="text-xl font-bold">Booking Trends</h2>
 

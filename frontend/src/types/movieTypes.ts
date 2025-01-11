@@ -9,7 +9,7 @@ export interface MovieType {
        genre: string[],  
        posterUrl?: string,  
        isApproved: boolean   
-       movie_id: string,  
+       movie_id:number,  
        language: string,  
        overview: string,  
        popularity: number,  
@@ -64,9 +64,10 @@ export interface MovieType {
     title: string;
     duration: number; 
     genre: string[];
-    movie_id:string;
+    movie_id:number;
     language: string;
     rating: number;
+    releaseDate:Date;
     backdrop_path: string;  
     poster_path: string; 
     startDate?: Date; 

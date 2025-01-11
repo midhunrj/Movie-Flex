@@ -386,16 +386,17 @@ const TheatreBooking: React.FC = () => {
       
 
       <Modal open={showconfirmModal} onClose={() => setShowModal(false)}>
-        <div className="p-6 bg-white rounded shadow-md w-96 mx-auto mt-24">
-          <h2 className="text-lg font-bold mb-4">Confirm Booking</h2>
-          <p>Selected Seats: {selectedSeats}</p>
-          <p>Total Price: ₹{calculateTotalCost()}</p>
-          <button
+        <div className="p-6 bg-white flex flex-col justify-center rounded shadow-md w-96 mx-auto mt-24">
+          <h2 className="text-lg text-center font-bold mb-4">Confirm Booking</h2>
+         <div className="flex justify-between font-medium text-lg"> <p className=" text-start">Selected Seats : </p> <span className="text-end">{selectedSeats}</span></div>
+          <div className="flex justify-between font-medium text-lg"><p className="font-medium text-lg">Total Price : </p> <span className="text-end">₹{calculateTotalCost()}</span></div>
+          <div className="flex justify-end"><button
             onClick={handleConfirmBooking}
-            className="mt-4 bg-green-600 text-white min-h-8 py-2 px-4 rounded hover:bg-green-700"
+            className="mt-4 bg-green-600 w-fit h-fit text-end text-white min-h-8 py-2 px-4 rounded hover:bg-green-700"
           >
-            Confirm
+            Confirm Booking
           </button>
+          </div>
         </div>
       </Modal>
     </div>

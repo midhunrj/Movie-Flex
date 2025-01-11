@@ -221,40 +221,99 @@ export class UserRepository implements IuserRepository {
       return await MovieModel.countDocuments(query);  // Return total count
     }
 
-    async newRating(movieId: string, rating: number,userId:string): Promise<Movie|null> {
+  //   async newRating(movieId: string, rating: number,userId:string): Promise<Movie|null> {
         
       
-      const movieData=await MovieModel.findById(movieId)
+  //     const movieData=await MovieModel.findById(movieId)
 
 
-      const existingRating = movieData?.ratings?movieData.ratings.find((r) => r.userId === userId):null;
-
-  
-  if (existingRating) {
-    // If user already rated, calculate the new average by replacing the old rating
-    const totalRating = 
-      movieData?.rating! * movieData?.ratingCount! - existingRating.rating + rating;
-    const newRating = totalRating / movieData?.ratingCount!;
-
-
-    await MovieModel.updateOne({_id:movieId,'ratings.userId': userId},{$set:{rating:newRating,'ratings.$.rating': rating},})
-
-  } else {
-    // If new rating, add to the ratings array
-    movieData?.ratings.push({ userId, rating });
+  //     const existingRating = movieData?.ratings?movieData.ratings.find((r) => r.userId === userId):null;
 
   
-    const totalRating = movieData?.rating! * movieData?.ratingCount! + rating;
-    const count=(movieData?.ratingCount!)+1;
-    //movieData?.ratingCount +=1
-    const newRating = totalRating /count;
+  // if (existingRating) {
+  //   // If user already rated, calculate the new average by replacing the old rating
+  //   const totalRating = 
+  //     movieData?.rating! * movieData?.ratingCount! - existingRating.rating + rating;
+  //   const newRating = totalRating / movieData?.ratingCount!;
+
+
+  //   await MovieModel.updateOne({_id:movieId,'ratings.userId': userId},{$set:{rating:newRating,'ratings.$.rating': rating},})
+
+  // } else {
+  //   // If new rating, add to the ratings array
+  //   movieData?.ratings.push({ userId, rating });
+
+  
+  //   const totalRating = movieData?.rating! * movieData?.ratingCount! + rating;
+  //   const count=(movieData?.ratingCount!)+1;
+  //   //movieData?.ratingCount +=1
+  //   const newRating = totalRating /count;
   
 
-      await MovieModel.updateOne({_id:movieId},{$set:{rating:newRating},$push:{ratings:{userId,rating}},$inc:{ratingCount:1}})
+  //     await MovieModel.updateOne({_id:movieId},{$set:{rating:newRating},$push:{ratings:{userId,rating}},$inc:{ratingCount:1}})
 
+  //   }
+
+  //   return await MovieModel.findById(movieId)
+  
+  //   }
+
+  async newRating(movieId: string, rating: number, userId: string): Promise<Movie | null> {
+    const MovRate=await MovieModel.findById(movieId)
+    if(MovRate?.rating==0)
+    {
+      MovRate.ratingCount=0
     }
-
-    return await MovieModel.findById(movieId)
-  
+    if(!MovRate)
+    {
+      throw new Error("movie error")
     }
+    await MovRate.save()
+    const movieData = await MovieModel.findById(movieId);
+  
+    if (!movieData) {
+      throw new Error('Movie not found');
+    }
+  
+    const existingRating = movieData.ratings
+      ? movieData.ratings.find((r) => r.userId === userId)
+      : null;
+  
+    if (existingRating) {
+      // If user already rated, calculate the new average by replacing the old rating
+      const totalRating =
+        movieData.rating * movieData.ratingCount - existingRating.rating + rating;
+      const newRating = totalRating / movieData.ratingCount;
+  
+      await MovieModel.updateOne(
+        { _id: movieId, 'ratings.userId': userId },
+        { $set: { rating: newRating, 'ratings.$.rating': rating } }
+      );
+    } else {
+      // If new rating, add to the ratings array
+      const isFirstRating = movieData.rating === 0 && movieData.ratingCount === 0;
+  
+      const totalRating = isFirstRating
+        ? rating // Start the total rating with the first rating
+        : movieData.rating * movieData.ratingCount + rating;
+  
+      const count = isFirstRating
+        ? 1 // Start count from 1 for the first rating
+        : movieData.ratingCount + 1;
+  
+      const newRating = totalRating / count;
+  
+      await MovieModel.updateOne(
+        { _id: movieId },
+        {
+          $set: { rating: newRating },
+          $push: { ratings: { userId, rating } },
+          $inc: { ratingCount: 1 },
+        }
+      );
+    }
+  
+    return await MovieModel.findById(movieId);
+  }
+  
 }

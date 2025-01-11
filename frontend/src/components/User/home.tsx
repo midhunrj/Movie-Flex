@@ -33,6 +33,8 @@ import { useLocalizationContext } from "@mui/x-date-pickers/internals";
 import { io, Socket } from "socket.io-client";
 import { userUrl } from "@/utils/axios/config/urlConfig";
 import { AiOutlineClose } from "react-icons/ai";
+import { FaUserCheck, FaUserCircle } from "react-icons/fa";
+import Header from "./header";
 // import { Theatre } from "@/types/admintypes";
 //import {refreshPage} from '../../redux/user/userThunk'
 // import {toas}
@@ -90,7 +92,7 @@ const HomePage = () => {
   const [browseMode, setBrowseMode] = useState<"movies" | "theatres">("movies");
   const [selectedTheatre, setSelectedTheatre] = useState<string>("");
   const [unreadCount, setUnreadCount] = useState(0);
-
+  const [dropdownOpen,setDropdownOpen]=useState<boolean>(false)
   const [suggestedCities, setSuggestedCities] = useState<string[]>([
     "Ernakulam",
     "Bangalore",
@@ -256,7 +258,9 @@ const HomePage = () => {
       setCurrentLocation("Geolocation not supported");
     }
   };
-
+  const handleMovieClick = (id:string) => {
+    navigate(`/movies/${id}`);
+  };
   const sanitizeString = (str: string) => {
     return str.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
   };
@@ -297,7 +301,7 @@ const HomePage = () => {
       dragConstraints={{ right: 0, left: -300 }}
     >
       {movies.slice(0, 8).map((movie) => (
-        <motion.div key={movie._id} className=" flex-none w-80">
+        <motion.div key={movie._id} className=" flex-none w-80"  onClick={() => handleMovieClick(movie?.id??'')}>
           <img
             src={
               movie.poster_path
@@ -319,7 +323,7 @@ const HomePage = () => {
     <>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center  justify-center bg-black bg-opacity-50">
-<div className="relative bg-white rounded-lg shadow-lg w-full max-w-7xl mx-4 sm:w-4/5 md:w-2/3 lg:w-1/2 ">
+<div className="relative bg-white rounded-lg shadow-lg w-full max-w-4xl mx-4 sm:w-4/5 md:w-2/3 lg:w-1/2 ">
 
             <div className="flex justify-between items-center bg-blue-600 text-white p-4 rounded-t-lg">
               <h3 className="text-lg font-semibold ml-12">
@@ -413,103 +417,7 @@ const HomePage = () => {
       )}
 
       <div className=" bg-gray-100 text-slate-950">
-        <header className="flex items-center justify-between w-full bg-blue-950 text-white  p-4">
-          <div className="flex items-center">
-            <img
-              src="movielogo 2.jpeg"
-              alt="Movie Site Logo"
-              className="h-12 w-12 mr-4"
-            />
-            <h1 className="text-2xl font-bold">Movie Flex</h1>
-          </div>
-
-          {/* Center: Navbar Links */}
-          <div className="flex space-x-8">
-            <Link
-              to="/"
-              className={`hover:bg-amber-400 px-4 py-2 rounded ${
-                isActive("/home")
-                  ? "bg-yellow-500 text-blue-950"
-                  : "hover:bg-gray-700 hover:text-white"
-              }`}
-            >
-              Home
-            </Link>
-            <Link
-              to="/profile"
-              className={`hover:bg-gray-700 px-4 py-2 rounded ${
-                isActive("/profile")
-                  ? "bg-yellow-500 text-blue-950"
-                  : "hover:bg-gray-700 hover:text-white"
-              }`}
-            >
-              Profile
-            </Link>
-            <Link to="/orders" className="hover:bg-gray-700 px-4 py-2 rounded">
-              Your Orders
-            </Link>
-            <Link
-              to="/favourites"
-              className="hover:bg-gray-700 px-4 py-2 rounded"
-            >
-              Favourites
-            </Link>
-            <Link to="/wallet" className="hover:bg-gray-700 px-4 py-2 rounded">
-              wallet
-            </Link>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="p-2 rounded bg-gray-700 text-white pl-10"
-              />
-              <BiSearch
-                className="absolute left-2 top-2 text-gray-300"
-                size={24}
-              />
-            </div>
-
-            <div className="flex items-center cursor-pointer bg-white w-fit rounded p-2 text-black">
-              <BiMap size={24} onClick={() => setIsOpen(true)} />
-              <span
-                className="ml-1 flex items-center cursor-pointer"
-                onClick={() => setIsOpen(true)}
-              >
-                {location
-                  ? location
-                  : userCurrentLocation
-                  ? userCurrentLocation
-                  : "Fetching Location..."}
-                <BiChevronDown size={20} className="ml-1" />
-              </span>
-            </div>
-
-            <BiBell
-              size={24}
-              className="text-white cursor-pointer"
-              onClick={() => navigate("/Notification")}
-            />
-            {unreadCount > 0 ? (
-              <span className="absolute top-6 right-[7rem] translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1">
-                {unreadCount}
-              </span>
-            ) : (
-              <></>
-            )}
-
-            <button
-              className="bg-red-600 min-h-8 text-white rounded px-4 py-1 hover:bg-red-700 transition"
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
-          </div>
-        </header>
+       <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery}/>
 
         {browseMode === "movies" ? (
           <>

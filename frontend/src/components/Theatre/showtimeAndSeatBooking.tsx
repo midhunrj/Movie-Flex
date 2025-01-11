@@ -293,8 +293,8 @@ const ShowtimeAndSeatBooking: React.FC<{ screenId: string }> = ({ screenId }) =>
   return (
     <div className="bg-slate-900 min-h-screen text-white">
       {/* Date Selection Tabs */}
-      <div className="mt-4 w-fit ">
-      <div className=" flex  justify-center items-center  mb-4 p-2 rounded-lg bg-gray-200">
+      <div className="mt-4 w-full md:w-fit  ">
+      <div className=" flex  justify-center items-center  mb-4 p-2 rounded-lg bg-slate-200">
       <button
           disabled={dateIndex === 0}
           onClick={() => setDateIndex(dateIndex - 1)}
@@ -310,13 +310,13 @@ const ShowtimeAndSeatBooking: React.FC<{ screenId: string }> = ({ screenId }) =>
                 setCurrentBoat("movies");
               }}}
             className={`
-              flex flex-col mx-1 min-h-12 min-w-fit p-2 rounded-lg 
+              flex flex-col mx-1 min-h-12 min-w-fit  p-2 rounded-lg 
               ${selectedDate === date 
                 ? 'bg-amber-500 text-gray-900' 
                 : 'bg-gray-700 hover:bg-gray-600'}
             `}
           >
-            <CalendarDays className="mr-2 inline-block" />
+            {/* <CalendarDays className="mr-2 inline-block" /> */}
             {new Date(date).toLocaleDateString('en-US', { 
               weekday: 'short', 
               month: 'short', 
@@ -335,7 +335,7 @@ const ShowtimeAndSeatBooking: React.FC<{ screenId: string }> = ({ screenId }) =>
 </div>
       {/* Main Booking Layout */}
 
-      <div className="grid md:grid-cols-1 grid-cols-4 sm:grid-cols-1 gap-4 p-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-1 gap-4 p-4">
         {/* Movie Selection Column */}
         {currentBoat=='movies' &&
         <div className="space-y-4">
@@ -345,7 +345,7 @@ const ShowtimeAndSeatBooking: React.FC<{ screenId: string }> = ({ screenId }) =>
           ) : error ? (
             <div className="text-red-500">{error}</div>
           ) : (
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               {uniqueMovies.map(movie => (
                 <div 
                   key={movie._id}
@@ -478,16 +478,17 @@ const ShowtimeAndSeatBooking: React.FC<{ screenId: string }> = ({ screenId }) =>
   </motion.div>
 ):<></>}
             <Modal open={showconfirmModal} onClose={() => setShowConfirmModal(false)}>
-        <div className="p-6 bg-white rounded shadow-md w-96 mx-auto mt-24">
-          <h2 className="text-lg font-bold mb-4">Confirm Booking</h2>
-          <p>Selected Seats: {selectedSeats}</p>
-          <p>Total Price: ₹{calculateTotalPrice()}</p>
-          <button
+            <div className="p-6 bg-white flex flex-col justify-center rounded shadow-md w-96 mx-auto mt-24">
+          <h2 className="text-lg text-center font-bold mb-4">Confirm Booking</h2>
+         <div className="flex justify-between font-medium text-lg"> <p className=" text-start">Selected Seats : </p> <span className="text-end">{selectedSeats}</span></div>
+          <div className="flex justify-between font-medium text-lg"><p className="font-medium text-lg">Total Price : </p> <span className="text-end">₹{calculateTotalPrice()}</span></div>
+          <div className="flex justify-end"><button
             onClick={handleProceedToBooking}
-            className="mt-4 bg-green-600 text-white min-h-8 py-2 px-4 rounded hover:bg-green-700"
+            className="mt-4 bg-green-600 w-fit h-fit text-end text-white min-h-8 py-2 px-4 rounded hover:bg-green-700"
           >
-            Confirm
+            Confirm Booking
           </button>
+          </div>
         </div>
       </Modal>
           </div>

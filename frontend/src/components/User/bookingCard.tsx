@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {QRCodeCanvas, QRCodeSVG} from 'qrcode.react';
 import { format } from 'date-fns';
 import { BookingType } from '@/types/bookingOrderTypes';
-import { QRCode } from 'antd';
+import { Button, QRCode } from 'antd';
+import { Modal } from 'antd';
 
 type BookingProps = {
   _id?: string;
@@ -48,7 +49,12 @@ const BookingCard: React.FC<BookingCardProps> = ({
   cancelBooking,
   setSelectedBooking,
 }) => {
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const formattedDate = format(new Date(booking?.createdAt), 'PPpp');
+  const handleCancel = () => {
+    cancelBooking(booking?._id!, booking.totalPrice!);
+    setIsModalVisible(false); // Close modal after confirmation
+  };
   const qrValue = `
     Booking ID: ${booking?._id}
     Movie: ${booking?.movieId?.title}
@@ -60,12 +66,12 @@ const BookingCard: React.FC<BookingCardProps> = ({
   return (
     <div
       //ref={isLast ? lastBookingRef : null}
-      className="bg-white shadow-md rounded-lg p-4 h-[32rem] hover:scale-105 cursor-pointer transition-all"
+      className="bg-white shadow-md rounded-lg p-4 h-[34rem] hover:scale-105 cursor-pointer transition-all"
     >
       <img
         src={`${TMDB_IMAGE_BASE_URL}/${booking?.movieId?.poster_path || 'fallback.jpg'}`}
         alt={booking?.movieId?.title || 'Movie Poster'}
-        className="w-full h-48 object-fill rounded-md mb-4"
+        className="w-full h-60  object-fill rounded-md mb-4"
       />
       <div className="flex justify-between gap-4">
         <div className="flex flex-col">
@@ -102,7 +108,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
       </div>
       {booking && canCancelBooking(booking?.showtimeId?.showtime, booking?.showtimeId?.date) && booking?.status !== 'Cancelled' ? (
         <button
-          onClick={() => cancelBooking(booking?._id!, booking.totalPrice!)}
+          onClick={() => setIsModalVisible(true)}
           className="bg-gradient-to-r from-red-500 to-indigo-500 text-white w-fit h-fit px-4 py-2 transition-all rounded-md hover:bg-red-600"
         >
           Cancel Booking
@@ -123,6 +129,42 @@ const BookingCard: React.FC<BookingCardProps> = ({
       <div className="flex justify-start mt-4">
         <span className="text-sm">Booking date and time: {formattedDate}</span>
       </div>
+
+      <Modal
+        title="Cancel Booking"
+        visible={isModalVisible}
+        footer={[
+          <Button
+            key="no"
+            onClick={() => setIsModalVisible(false)}
+            // style={{ backgroundColor: '#f0f0f0', color: '#000' }}
+            className='bg-red-500 text-white w-fit h-fit hover:text-gray-100 hover:bg-blue-600'
+         >
+            No, Keep Booking
+          </Button>,
+          <Button
+            key="yes"
+            onClick={handleCancel}
+            // style={{ backgroundColor: '#ff4d4f', color: '#fff' }}
+          className='bg-blue-500 text-white hover:bg-blue-600 hover:text-gray-100'
+          >
+            Yes, Cancel
+          </Button>,
+        ]}
+
+        centered
+        className='w-fit h-fit'
+        
+        // cancelText="No, Keep Booking"
+      >
+        <p>Are you sure you want to cancel this booking?</p>
+        <p>
+          <strong>Movie:</strong> {booking?.movieId?.title}
+        </p>
+        <p>
+          <strong>Theatre:</strong> {booking?.theatreDetails?.name}
+        </p>
+      </Modal>
     </div>
   );
 };

@@ -80,7 +80,7 @@ const handlePreviousPage = () => {
           </div>
           <table className="min-w-full border-collapse border rounded-lg shadow-lg border-gray-200 mt-4">
             <thead>
-              <tr className='rounded-lg border-collapse border border-gray-400  bg-slate-100'>
+              <tr className='rounded-lg border-collapse border border-opacity-30 border-gray-400  bg-slate-100'>
                 <th className=" border-gray-300 p-4">No</th>
                 <th className=" border-gray-300 p-4">Name</th>
                 <th className=" border-gray-300 p-4">Email</th>

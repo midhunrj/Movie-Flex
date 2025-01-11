@@ -359,7 +359,7 @@ return (
     <TheatreHeader />
 
     <div className="min-h-screen flex bg-gray-200" >
-      <div className="flex-col p-2 m-4 bg-indigo-950 w-full mx-20 rounded-lg justify-between text-white">
+      <div className="flex-col p-2 m-4 bg-slate-900 w-full mx-4 md:mx-20 rounded-lg justify-between text-white">
         <div>
           <h1 className="p-2 justify-center text-center text-2xl">
             Screen Management
@@ -437,7 +437,7 @@ return (
             {/* Display selected showtimes */}
             {showtimes.length > 0 && (
               <>
-                <div className="grid grid-cols-3 grid-rows-2 gap-4"> {/* Using Grid with two columns and two rows */}
+                <div className="grid grid-cols-1 md:grid-cols-3 grid-rows-2 gap-4"> {/* Using Grid with two columns and two rows */}
     {showtimes.map((showtime, index) => (
       <div key={index} className="flex flex-col items-center  gap-2 mb-4">
         <div className="flex items-center gap-2 p-3 rounded bg-black text-amber-500 w-auto">

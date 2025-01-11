@@ -24,12 +24,14 @@ cron.schedule('* * * * *', () => {
   });
 
 
-cron.schedule('0 0 * * *', async ()=>{
+cron.schedule('0 0 0 * * * *', async ()=>{
     try{
     const currentDate=new Date()
     const yesterday = new Date(currentDate);
-yesterday.setDate(currentDate.getDate() - 1);
-console.log(`Running cleanup job. Current Date: ${currentDate.toDateString()}, Yesterday: ${yesterday.toDateString()}`);
+    yesterday.setUTCDate(currentDate.getUTCDate() - 1); // Subtract 1 day in UTC
+    yesterday.setUTCHours(0, 0, 0, 0); 
+//yesterday.setHours(0,0,0,0)
+console.log(`Running cleanup job. Current Date: ${currentDate.toISOString()}, Yesterday:${yesterday}  ${yesterday.toISOString()}`);
 
    await showRepository.deleteExpiredShowtimes(yesterday)
 
@@ -42,6 +44,10 @@ console.log(`Running cleanup job. Current Date: ${currentDate.toDateString()}, Y
         console.log(error,"error in deleting yesterday showtimes from database");
         
     }
+},
+{
+  scheduled: true,
+  timezone: "Asia/Kolkata" 
 })
  
 

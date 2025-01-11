@@ -53,6 +53,7 @@ const handleRateMovie = async (movieId:string, rating:number) => {
   setIsModelOpen(false)
 };
   useEffect(() => {
+    window.scrollTo(0,0)
     dispatch(fetchMovies());
     fetchFavourites()
   
@@ -237,14 +238,14 @@ const upcoming=new Date(movie.releaseDate)<new Date()?true:false
             <h1 className="text-4xl font-bold">
               {movie.title} ({new Date(movie.releaseDate).getFullYear()})
             </h1>
-            <p className="text-lg flex p-2 w-fit bg-gray-600 bg-opacity-50 space-x-3 text-center items-center">
+            <p className="text-lg flex p-2 w-fit  bg-gray-600 bg-opacity-50 space-x-6 text-center items-center">
               Rating:
               {
                 <FaStar  size={26} className={`ml-1 ${ movie.rating  ? 'text-red-500' : 'text-gray-500'}`} />
               }
               <span className="ml-2">{movie.rating}/10</span>
 
-              <button className='p-3 bg-white  w-fit h-fit text-lg text-slate-950' onClick={()=>setIsModelOpen(true)}> Rate Now</button>
+              <button className='p-2 bg-white min-h-8 w-fit h-fit text-base  text-slate-950' onClick={()=>setIsModelOpen(true)}> Rate Now</button>
             </p>
             <p className='space-x-4 text-base  text-slate-100'> <span>{MovieTime()}</span>  <span>{movie.genre.join(',')}</span>   <span> {new Date(movie.releaseDate).toDateString()}</span></p>
 
@@ -325,7 +326,7 @@ const upcoming=new Date(movie.releaseDate)<new Date()?true:false
           </motion.section>
           {/* Add Your Rating Button */}
           <div className="mt-6 flex justify-center">
-            <button className="bg-green-500 p-2 min-h-8 w-fit rounded hover:bg-green-600 transition duration-300 cursor-pointer" onClick={()=>setIsModelOpen(true)}>
+            <button className="bg-green-500 p-2 min-h-8 w-fit h-fit rounded hover:bg-green-600 transition duration-300 cursor-pointer" onClick={()=>setIsModelOpen(true)}>
               Add Your Rating
             </button>
           </div>
