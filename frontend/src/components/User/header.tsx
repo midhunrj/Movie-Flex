@@ -773,14 +773,14 @@ className="bg-red-600 min-h-8 w-fit  text-white rounded px-4 py-1 hover:bg-red-7
       </div>
       <div className='flex items-center ml-auto space-x-4'>
       <div className="relative">
-          {isActive('/home') &&(
-          <div className="relative block">
+          {isActive('/home')||isActive('/now-showing')||isActive('/upcoming-movies') &&(
+          <div className="relative block ml-auto">
           <input
             type="text"
             placeholder="Search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="p-2 rounded bg-gray-700 text-sm lg:text-base text-white pl-10 w-40"
+            className="p-2 rounded bg-gray-700 text-sm lg:text-base text-white pl-10 w-20"
           />
           <BiSearch className="absolute left-2 top-2 text-sm lg:text-base text-gray-300" size={24} />
         </div>)}
@@ -796,7 +796,7 @@ className="bg-red-600 min-h-8 w-fit  text-white rounded px-4 py-1 hover:bg-red-7
         </div>
 
         
-        <div className="relative w-fit">
+        <div className="relative w-fit ml-auto">
           <BiBell
             size={20}
             className="cursor-pointer"
@@ -808,10 +808,10 @@ className="bg-red-600 min-h-8 w-fit  text-white rounded px-4 py-1 hover:bg-red-7
             </span>
           )}
         </div>
-<div className='relative'>
+<div className='relative ml-auto'>
       <button
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        className="text-white p-2 h-fit"
+        className="text-white p-2 h-fit ml-auto" 
       >
         {/* <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -824,7 +824,7 @@ className="bg-red-600 min-h-8 w-fit  text-white rounded px-4 py-1 hover:bg-red-7
     
     {mobileMenuOpen && (
       <div className="mt-4 space-y-2">
-        <Link to="/" className="block py-2 px-4 hover:bg-gray-700 rounded">Home</Link>
+        <Link to="/home" className="block py-2 px-4 hover:bg-gray-700 rounded">Home</Link>
         <Link to="/profile" className="block py-2 px-4 hover:bg-gray-700 rounded">Profile</Link>
         <Link to="/orders" className="block py-2 px-4 hover:bg-gray-700 rounded">Your Orders</Link>
         <Link to="/favourites" className="block py-2 px-4 hover:bg-gray-700 rounded">Favourites</Link>
@@ -854,41 +854,61 @@ className="bg-red-600 min-h-8 w-fit  text-white rounded px-4 py-1 hover:bg-red-7
       <h1 className="text-2xl font-bold ml-2">Movie Flex</h1>
     </div>
 
-    <nav className="flex  gap-4">
-      <Link
-        to="/"
-        className={`hover:bg-amber-400 px-3 py-2 rounded text-sm lg:text-base ${
-          isActive("/home")
-            ? "bg-yellow-500 text-blue-950"
-            : "hover:bg-gray-700 hover:text-white"
-        }`}
-      >
-        Home
-      </Link>
-      <Link
-        to="/profile"
-        className={`px-3 py-2 rounded text-sm lg:text-base ${
-          isActive("/profile")
-            ? "disabled:opacity-50 text-gray-200 pointer-events-none"
-            : "hover:bg-gray-700 hover:text-white"
-        }`}
-      >
-        Profile
-      </Link>
-      <Link to="/orders" className="hover:bg-gray-700 px-3 py-2 rounded text-sm lg:text-base">
-        Your Orders
-      </Link>
-      <Link to="/favourites" className="hover:bg-gray-700 px-3 py-2 rounded text-sm lg:text-base">
-        Favourites
-      </Link>
-      <Link to="/wallet" className="hover:bg-gray-700 px-3 py-2 rounded text-sm lg:text-base">
-        Wallet
-      </Link>
-      
-    </nav>
+    <nav className="flex gap-4">
+  <Link
+    to="/home"
+    className={` px-3 py-2 rounded text-sm lg:text-base ${
+      isActive("/home")
+        ? "bg-yellow-400 text-blue-950"
+        : "hover:bg-gray-700 hover:text-white"
+    }`}
+  >
+    Home
+  </Link>
+  <Link
+    to="/profile"
+    className={` px-3 py-2 rounded text-sm lg:text-base ${
+      isActive("/profile")
+        ? "bg-yellow-400 text-blue-950"
+        : "hover:bg-gray-700 hover:text-white"
+    }`}
+  >
+    Profile
+  </Link>
+  <Link
+    to="/orders"
+    className={` px-3 py-2 rounded text-sm lg:text-base ${
+      isActive("/orders")
+        ? "bg-yellow-400 text-blue-950"
+        : "hover:bg-gray-700 hover:text-white"
+    }`}
+  >
+    Your Orders
+  </Link>
+  <Link
+    to="/favourites"
+    className={` px-3 py-2 rounded text-sm lg:text-base ${
+      isActive("/favourites")
+        ? "bg-yellow-400 text-blue-950"
+        : "hover:bg-gray-700 hover:text-white"
+    }`}
+  >
+    Favourites
+  </Link>
+  <Link
+    to="/wallet"
+    className={` px-3 py-2 rounded text-sm lg:text-base ${
+      isActive("/wallet")
+        ? "bg-yellow-400 text-blue-950"
+        : "hover:bg-gray-700 hover:text-white"
+    }`}
+  >
+    Wallet
+  </Link>
+</nav>
 
     <div className="flex items-center space-x-3">
-      {isActive('/home') && (
+      {isActive('/home')||isActive('/now-showing')||isActive('/upcoming-movies') && (
         <div className="relative hidden md:block">
           <input
             type="text"

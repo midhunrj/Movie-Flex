@@ -133,7 +133,7 @@ const VerifyUser = () => {
     {/* // <div className="flex flex-col items-center justify-center h-screen bg-gray-100"> */}
       {/* <div className="bg-white p-8 rounded-lg shadow-md w-96"> */}
       <div className="relative z-10 w-full max-w-fit p-8 bg-transparent backdrop-blur-md rounded-3xl shadow-lg border flex-col m-8  items-center justify-center border-gray-200">
-      <h1 className="text-2xl font-bold  align-text-top text-red-500 " >Welcome to Movie Ticket Booking</h1>
+      <h1 className="text-2xl font-bold  align-text-top text-center text-red-500 " >Welcome to Movie Flex</h1>
              <h2 className="text-xl font-bold  text-center text-amber-400 align-text-bottom mt-8">Otp Verification</h2>
         {/* <form id="registerForm"  className="mt-12" onSubmit={handleSubmit}> */}
        

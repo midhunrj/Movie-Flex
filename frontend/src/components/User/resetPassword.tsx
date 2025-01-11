@@ -44,7 +44,7 @@ useEffect(()=>{
         <div className="absolute inset-0 bg-black opacity-50"></div>
         <div className="relative z-10  max-w-fit  w-full bg-transparent backdrop-blur-md flex   rounded-2xl  shadow-lg border border-gray-500 flex-col m-8 p-16 items-center justify-center h-96 ">
        
-         <h1 className="text-2xl font-bold  align-text-top text-red-500 " >Welcome to Movie Ticket Booking</h1>
+         <h1 className="text-2xl font-bold  align-text-toptext-center text-red-500 " >Welcome to Movie Flex</h1>
          <h2 className="text-xl font-bold  text-center text-amber-400 align-text-bottom mt-8">Reset New Password</h2>
             <form id="loginForm" onSubmit={handleSubmit} className="space-y-4 text-center">
                 <input type='text' value={newPassword} placeholder="enter a new password" onChange={(e)=>setNewPassword(e.target.value)}/>

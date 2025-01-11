@@ -49,7 +49,7 @@ const TheatrePassVerify=()=>{
         <div className="absolute inset-0 bg-black opacity-50"></div>
         <div className="relative z-10 w-full max-w-fit p-8 bg-transparent backdrop-blur-md rounded-3xl shadow-lg border flex-col m-8  items-center justify-center border-gray-200">
   
-        <h1 className="text-2xl font-bold  align-text-top text-red-500 " >Welcome to Movie Ticket Booking</h1>
+        <h1 className="text-2xl font-bold text-center align-text-top text-red-500 " >Welcome to Movie Flex</h1>
         <h2 className="text-xl font-bold  text-center text-amber-400 align-text-bottom mt-8">Otp Verification</h2>
             <form id="loginForm" onSubmit={handleSubmit}>
                 <input type='text' value={otp} placeholder="enter a otp" onChange={(e)=>setOtp(e.target.value)}/>

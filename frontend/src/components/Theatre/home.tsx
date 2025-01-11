@@ -189,7 +189,7 @@ fetchRevenueTrends()
         </header>
 
         <h1 className="text-4xl font-bold text-blue-500 text-center mt-8">
-          Welcome to Movie Ticket Booking
+          Welcome to Movie Flex
         </h1>
 
         <div className="mt-4  mx-8">

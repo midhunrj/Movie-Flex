@@ -90,8 +90,8 @@ const TheatreLoginForm: React.FC = () => {
       <div className="absolute inset-0 bg-black opacity-50"></div>
 
       <div className="relative z-10 max-w-fit w-full bg-transparent backdrop-blur-md flex rounded-2xl shadow-lg border border-gray-500 flex-col m-8 p-16 items-center justify-center h-96">
-        <h1 className="mt-4 text-2xl font-bold text-red-500">
-          Welcome to Movie Ticket Booking
+        <h1 className="mt-4 text-2xl text-center font-bold text-red-500">
+          Welcome to Movie Flex
         </h1>
         <h2 className="text-xl font-bold mt-4 text-yellow-500">
           Theatre Login Form

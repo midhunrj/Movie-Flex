@@ -47,7 +47,12 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ children }) => {
             </>:<FaTimes className="text-xl"/>}
           </button>
           {!isCollapsed?<>
-            <h1 className="text-2xl font-bold">Movie Flex</h1></>:null}
+            <div className="flex items-center space-x-2">
+      
+      <img src="/movielogo 2.jpeg" alt="Logo" className="h-10 w-10 object-cover" />
+      
+      <h1 className="text-2xl font-bold">Movie Flex</h1>
+    </div></>:null}
           
         </div>
 

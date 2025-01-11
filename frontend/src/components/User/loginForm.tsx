@@ -100,7 +100,7 @@ const LoginForm:React.FC = () => {
 {/* </div><div className="bg-transparent backdrop-blur-lg border-slate-600 flex   ring-slate-500 shadow-red-800 rounded-3xl flex-col m-8 p-16 items-center justify-center min-h-screen "> */}
    <div className="relative z-10 w-full max-w-fit p-8 bg-transparent backdrop-blur-md rounded-3xl shadow-lg border flex-col m-8  items-center justify-center border-gray-200">
              
-            <h1 className=" mt-4 text-2xl font-bold  align-text-top text-red-500 " >Welcome to Movie Ticket Booking</h1>
+            <h1 className=" mt-4 text-2xl font-bold text-center align-text-top text-red-500 " >Welcome to Movie Flex</h1>
 
         <form id="loginForm" className="mt-12" onSubmit={handleSubmit}>
         {/* <div className="mb-6"> */}

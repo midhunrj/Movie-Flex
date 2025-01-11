@@ -731,7 +731,7 @@ export default HomePage;
   /* <header className="bg-blue-950 text-white py-4">
   <div className="container mx-auto grid grid-cols-12 ">
     <div className="col-span-8">
-      <h1 className="text-xl">Movie Ticket Booking</h1>
+      <h1 className="text-xl">Movie Flex</h1>
     </div>
     <div className="col-span-4 flex justify-end space-x-4">
       <Link to="/" className="hover:bg-amber-400 py-2 px-4 rounded">Home</Link>

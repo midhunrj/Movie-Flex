@@ -46,7 +46,7 @@ const ScreensList = () => {
       <div className="min-h-screen bg-zinc-100" >
         <TheatreHeader />
         <h1 className="text-4xl font-bold text-blue-400 text-center mt-8">
-          Welcome to Movie Ticket Booking
+          Welcome to Movie Flex
         </h1>
         <div className="flex mt-12 pb-8 gap-5 items-center justify-center">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12">

@@ -51,7 +51,7 @@ const dispatch=useDispatch<AppDispatch>()
         <div className="absolute inset-0 bg-black opacity-50"></div>
           <div className="relative z-10 bg-transparent  backdrop-blur-md shadow-lg border flex   rounded-2xl  border-gray-500 flex-col mx-8 my-12 p-16 items-center justify-center h-96 ">
             
-            <h1 className="text-2xl font-bold  align-text-top text-red-500 " >Welcome to Movie Ticket Booking</h1>
+            <h1 className="text-2xl font-bold text-center align-text-top text-red-500 " >Welcome to Movie Flex</h1>
              <h2 className="text-xl font-bold  align-text-bottom mt-8 text-yellow-400">Admin Login Form</h2>
         <form id="loginForm" className="mt-8" onSubmit={handleSubmit}>
         {/* <div className="mb-6"> */}

@@ -9,6 +9,7 @@ import "react-loading-skeleton/dist/skeleton.css"
 import { AppDispatch, RootState } from "@/redux/store/store";
 import { MovieType } from "@/types/movieTypes";
 import Footer from "./footer";
+import Header from "./header";
 
 interface FullMoviesListProps {
   movieType: string;
@@ -92,7 +93,7 @@ const FullMoviesList:React.FC<FullMoviesListProps> = ({ movieType }) => {
   return (
     <>
       {/* Header */}
-      <header className="flex items-center justify-between bg-blue-950  p-4 text-white">
+      {/* <header className="flex items-center justify-between bg-blue-950  p-4 text-white">
         <div className="flex items-center">
           <img src="movielogo 2.jpeg" alt="Movie Site Logo" className="h-12 w-12 mr-4" />
           <h1 className="text-2xl font-bold">Movie Flex</h1>
@@ -108,9 +109,9 @@ const FullMoviesList:React.FC<FullMoviesListProps> = ({ movieType }) => {
           <input type="text" placeholder="Search" value={searchQuery} className="p-2 rounded bg-gray-700 text-white pl-10"  onChange={handleSearchChange}/>
           <BiSearch className="absolute left-2 top-2 text-gray-300" size={24} />
         </div>
-      </header>
+      </header> */}
 
-      
+      <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery}/>
       <div className="p-4  bg-gray-100">
         <div className="flex justify-between mb-4">
           {/* Language Filter */}
@@ -144,12 +145,12 @@ const FullMoviesList:React.FC<FullMoviesListProps> = ({ movieType }) => {
 
         {/* Movie List */}
         {isLoading ? (
-          <div className="grid grid-cols-4 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-1 gap-12">
             {[...Array(8)].map((_, index) => (
               <Skeleton key={index} height={400} width={250} />
             ))}
           </div>):filteredMovies.length>0?(
-        <div className="grid grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-1 gap-12">
           {filteredMovies.map((movie) => (
             <div key={movie._id} className="text-center" onClick={() => handleMovieClick(movie?.id??'')}>
               <img
