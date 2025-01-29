@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../../application/services/authService';
+import { HttpStatusCodes } from '../../types/enums/httpStatusCode';
 
 export class AuthController {
   private authService: AuthService;
@@ -27,7 +28,7 @@ console.log("this",this.authService);
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-      res.status(200).json({
+      res.status(HttpStatusCodes.OK).json({
         message: 'Google sign-in successful',
         user,
         accessToken,
@@ -35,7 +36,7 @@ console.log("this",this.authService);
       });
     } catch (error) {
       console.error('Google sign-in failed:', error);
-      res.status(500).json({ message: 'Google sign-in failed' });
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Google sign-in failed' });
     }
   };
 
@@ -48,16 +49,16 @@ console.log("this",this.authService);
 
         if (!refreshToken) {
             console.log("No refresh token found");  
-            return res.status(401).json({ message: "Refresh token is missing" });
+            return res.status(HttpStatusCodes.UNAUTHORIZED).json({ message: "Refresh token is missing" });
         }
 
         const newAccessToken = await this.authService.refreshAccessToken(refreshToken);
         console.log("New Access Token:", newAccessToken); 
-        res.status(200).json({ message: "New access token created", accessToken: newAccessToken });
+        res.status(HttpStatusCodes.OK).json({ message: "New access token created", accessToken: newAccessToken });
 
     } catch (error) {
         console.error("Error while refreshing access token:", error);  
-        res.status(500).json({ message: "Failed to refresh access token" });
+        res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Failed to refresh access token" });
     }
 }
 
@@ -69,16 +70,16 @@ adminRefreshAccessToken= async(req: Request, res: Response) =>{
 
       if (!adminRefreshToken) {
           console.log("No refresh token found");  
-          return res.status(401).json({ message: "Refresh token is missing" });
+          return res.status(HttpStatusCodes.UNAUTHORIZED).json({ message: "Refresh token is missing" });
       }
 
       const newAccessToken = await this.authService.refreshAccessToken(adminRefreshToken);
       console.log("New Access Token:", newAccessToken); 
-      res.status(200).json({ message: "New access token created", accessToken: newAccessToken });
+      res.status(HttpStatusCodes.OK).json({ message: "New access token created", accessToken: newAccessToken });
 
   } catch (error) {
       console.error("Error while refreshing access token:", error);  
-      res.status(500).json({ message: "Failed to refresh access token" });
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Failed to refresh access token" });
   }
 }
 
@@ -90,16 +91,16 @@ theatreRefreshAccessToken= async(req: Request, res: Response) =>{
 
       if (!theatreRefreshToken) {
           console.log("No refresh token found");  
-          return res.status(401).json({ message: "Refresh token is missing" });
+          return res.status(HttpStatusCodes.UNAUTHORIZED).json({ message: "Refresh token is missing" });
       }
 
       const newAccessToken = await this.authService.refreshAccessToken(theatreRefreshToken);
       console.log("New Access Token:", newAccessToken); 
-      res.status(200).json({ message: "New access token created", accessToken: newAccessToken });
+      res.status(HttpStatusCodes.OK).json({ message: "New access token created", accessToken: newAccessToken });
 
   } catch (error) {
       console.error("Error while refreshing access token:", error);  
-      res.status(500).json({ message: "Failed to refresh access token" });
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Failed to refresh access token" });
   }
 }
 

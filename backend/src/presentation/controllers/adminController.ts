@@ -1,6 +1,7 @@
 import {Request,Response} from 'express'
 import { AdminUseCase } from '../../application/usecases/admin';
 import { BookingMovies } from '../../application/usecases/booking';
+import { HttpStatusCodes } from '../../types/enums/httpStatusCode';
 
 export class AdminController{
     constructor(private adminCase:AdminUseCase,private bookingUsecase:BookingMovies){}
@@ -19,7 +20,7 @@ export class AdminController{
             console.log(admin,"ifhih adm");
             
             if (!admin) {
-                return res.status(401).json({ error: "Invalid credentials" });
+                return res.status(HttpStatusCodes.UNAUTHORIZED).json({ error: "Invalid credentials" });
             }
                 
 
@@ -34,20 +35,20 @@ export class AdminController{
                 
                 // After setting the cookie
 // console.log('Cookies set:', req.cookies);
-                return res.status(200).json(admin)
+                return res.status(HttpStatusCodes.OK).json(admin)
             }
             
         
         catch(error)
         {
-            res.status(500).json({error:'failed to login'})
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({error:'failed to login'})
         }
 
     }
 
     async home(req:Request,res:Response)
     {
-        res.status(200).json({message:"welcome to the homepage"})
+        res.status(HttpStatusCodes.OK).json({message:"welcome to the homepage"})
     }
 
     async userData(req:Request,res:Response)
@@ -55,7 +56,7 @@ export class AdminController{
         try {
             console.log('errererer',req.cookies)
            const userData= await this.adminCase.fetchUserDetails()
-           res.status(200).json({message:"here all the user data available",userData})
+           res.status(HttpStatusCodes.OK).json({message:"here all the user data available",userData})
         } catch (error) {
             
         }
@@ -69,7 +70,7 @@ export class AdminController{
            const theatreData= await this.adminCase.fetchTheatreDetails()
            console.log(theatreData,"the data");
            
-           res.status(200).json({message:"here all the user data available",theatreData})
+           res.status(HttpStatusCodes.OK).json({message:"here all the user data available",theatreData})
         } catch (error) {
             
         }
@@ -85,12 +86,12 @@ export class AdminController{
             const user=await this.adminCase.blockUser(userId)
             console.log(user,"after block");
             
-            res.status(200).json({message:"the user has been blocked",user})
+            res.status(HttpStatusCodes.OK).json({message:"the user has been blocked",user})
         }
         catch(error)
         {
             console.error("Error blocking/unblocking user/theatre", error);
-            res.status(500).json({ message: "failed to blcok user" });
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "failed to blcok user" });
         }
     }
 
@@ -105,12 +106,12 @@ export class AdminController{
            
             // if(isUnBlocked)
             // {
-            res.status(200).json({message:"the user has been unblocked",user})
+            res.status(HttpStatusCodes.OK).json({message:"the user has been unblocked",user})
             }
         catch(error)
         {
             console.error("Error blocking/unblocking user/theatre", error);
-    res.status(500).json({ message: "failed to unblock user" });
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "failed to unblock user" });
         }
     }
 
@@ -123,12 +124,12 @@ export class AdminController{
             const theatre=await this.adminCase.blockTheatre(theatreId)
             console.log("after block",theatre);
             
-            res.status(200).json({message:"the user has been blocked",theatre})
+            res.status(HttpStatusCodes.OK).json({message:"the user has been blocked",theatre})
         }
         catch(error)
         {
             console.error("Error blocking/unblocking user/theatre", error);
-            res.status(500).json({ message:"failed to blcok theatre" });
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message:"failed to blcok theatre" });
         }
     }
 
@@ -143,12 +144,12 @@ export class AdminController{
             
             // if(isUnBlocked)
             // {
-            res.status(200).json({message:"the user has been unblocked",theatre})
+            res.status(HttpStatusCodes.OK).json({message:"the user has been unblocked",theatre})
             }
         catch(error)
         {
             console.error("Error blocking/unblocking user/theatre", error);
-    res.status(500).json({ message: "failed to unblock theatre" });
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "failed to unblock theatre" });
         }
     }
 
@@ -160,12 +161,12 @@ export class AdminController{
             const theatre = await this.adminCase.approveTheatre(theatreId);
             
             if (!theatre) {
-                return res.status(404).json({ message: "Theatre not found" });
+                return res.status(HttpStatusCodes.NOT_FOUND).json({ message: "Theatre not found" });
             }
-            return res.status(200).json({ message: "Theatre approved successfully", theatre });
+            return res.status(HttpStatusCodes.OK).json({ message: "Theatre approved successfully", theatre });
         } catch (error) {
             console.error("Error approving theatre", error);
-            return res.status(500).json({ message: "Failed to approve theatre" });
+            return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Failed to approve theatre" });
         }
     }
 
@@ -175,39 +176,39 @@ export class AdminController{
             const theatre = await this.adminCase.declineTheatre(theatreId);
             
             if (!theatre) {
-                return res.status(404).json({ message: "Theatre not found" });
+                return res.status(HttpStatusCodes.NOT_FOUND).json({ message: "Theatre not found" });
             }
-            return res.status(200).json({ message: "Theatre declined successfully", theatre });
+            return res.status(HttpStatusCodes.OK).json({ message: "Theatre declined successfully", theatre });
         } catch (error) {
             console.error("Error declining theatre", error);
-            return res.status(500).json({ message: "Failed to decline theatre" });
+            return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Failed to decline theatre" });
         }
     }
     
     async dashboardOverview(req: Request, res: Response) {
         try {
             const dashboardData=await this.bookingUsecase.overviewDashboarrd()
-            return res.status(200).json({ message: "here the below  details of bookings dashboard",dashboardData});
+            return res.status(HttpStatusCodes.OK).json({ message: "here the below  details of bookings dashboard",dashboardData});
         } catch (error) {
             console.error("Error declining theatre", error);
-            return res.status(500).json({ message: "Failed to decline theatre" });
+            return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Failed to decline theatre" });
         }
     }
     async bookingTrends(req: Request, res: Response): Promise<Response> {
         try {
             const { interval } = req.query;
             if (!interval) {
-                return res.status(400).json({ message: "Interval is required" });
+                return res.status(HttpStatusCodes.BAD_REQUEST).json({ message: "Interval is required" });
             }
 
             const bookingTrend = await this.bookingUsecase.fetchBookingTrends(interval as string);
 
             console.log(bookingTrend,"bookingTrend")
             
-            return res.status(200).json({ message: "Booking trends fetched successfully", bookingTrend });
+            return res.status(HttpStatusCodes.OK).json({ message: "Booking trends fetched successfully", bookingTrend });
         } catch (error) {
             console.error("Error fetching booking trends", error);
-            return res.status(500).json({ message: "Failed to fetch booking trends" });
+            return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Failed to fetch booking trends" });
         }
     }
 
@@ -215,16 +216,16 @@ export class AdminController{
         try {
             const { interval } = req.query; 
             if (!interval) {
-                return res.status(400).json({ message: "Interval is required" });
+                return res.status(HttpStatusCodes.BAD_REQUEST).json({ message: "Interval is required" });
             }
 
             const revenueTrend = await this.bookingUsecase.fetchRevenueTrends(interval as string);
             console.log(revenueTrend,"revenueTrend")
             
-            return res.status(200).json({ message: "Revenue trends fetched successfully", revenueTrend });
+            return res.status(HttpStatusCodes.OK).json({ message: "Revenue trends fetched successfully", revenueTrend });
         } catch (error) {
             console.error("Error fetching revenue trends", error);
-            return res.status(500).json({ message: "Failed to fetch revenue trends" });
+            return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Failed to fetch revenue trends" });
         }
     }
 
@@ -234,13 +235,13 @@ export class AdminController{
           const limit = parseInt(req.query.limit as string) || 10;
     
           const { bookings, total } = await this.bookingUsecase.getbookingHistory(page, limit);
-          res.status(200).json({
+          res.status(HttpStatusCodes.OK).json({
             bookings,
             totalPages: Math.ceil(total / limit),
             currentPage: page,
           });
         } catch (error) {
-          res.status(500).json({ message: "Error fetching bookings", error });
+          res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Error fetching bookings", error });
         }
       }
 

@@ -908,7 +908,7 @@ className="bg-red-600 min-h-8 w-fit  text-white rounded px-4 py-1 hover:bg-red-7
 </nav>
 
     <div className="flex items-center space-x-3">
-      {isActive('/home')||isActive('/now-showing')||isActive('/upcoming-movies') && (
+      {(isActive('/home')||isActive('/now-showing')||isActive('/upcoming-movies')) && (
         <div className="relative hidden md:block">
           <input
             type="text"

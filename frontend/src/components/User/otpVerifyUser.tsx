@@ -62,6 +62,7 @@ import { useNavigate } from "react-router";
 import { Toaster, toast } from "sonner";
 import { userVerify,resendOtp } from "../../redux/user/userThunk";
 import { AppDispatch, RootState } from "@/redux/store/store";
+import OtpInput from "./otpInput";
 
 const VerifyUser = () => {
   const [otp, setOtp] = useState("");
@@ -139,13 +140,14 @@ const VerifyUser = () => {
        
         {/* <h1 className="text-2xl font-bold mb-4 text-center">Enter OTP</h1> */}
         <form id="loginForm" onSubmit={handleSubmit} className="space-y-4 text-center">
-          <input
+          {/* <input
             type="text"
             value={otp}
             placeholder="Enter OTP"
             onChange={(e) => setOtp(e.target.value)}
             className="w-full mx-8 px-4 justify-center py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-4"
-            />
+            /> */}
+            <OtpInput length={4} handleSubmit={()=>{}}/>
           <button
             type="submit"
             className="max-w-max py-2 min-h-8 px-4 rounded-md transition duration-300 bg-blue-500 text-white  hover:bg-blue-700 "

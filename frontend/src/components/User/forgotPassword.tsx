@@ -16,22 +16,31 @@ const ForgotRoute=()=>{
        try {
         const response = await dispatch(forgotPass(email)).unwrap();
         console.log(response.data);
-        if(isSuccess)
-        {
-            navigate('/otp-pass')
-        }
+        // if(isSuccess)
+        // {
+        //     navigate('/otp-pass')
+        // }
        } catch (error:any) {
         console.error("forgot password failed:", error.response.data.error);
        }
        
     }
 
-    
+    useEffect(() => {
+        if (isSuccess) {
+          navigate("/otp-pass");
+        }
+      }, [isSuccess, navigate])
     useEffect(()=>{
         if(isError)
         {
            toast.error(message)
-        }},[isError])
+        }
+        // if(isSuccess)
+        // {
+        //     navigate('/otp-pass')
+        // }
+    },[isError])
 
     //const [email,setEmail]=useState("")
     return(

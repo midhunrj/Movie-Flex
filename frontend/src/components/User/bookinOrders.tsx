@@ -26,7 +26,7 @@ const BookingOrders = () => {
 const limit=12
  const paginate=(page:number)=>setCurrentPage(page)
   const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
-
+  const qrRef = useRef<HTMLCanvasElement>(null);
   const fetchBookings = async () => {
     try {
        setLoading(true)
@@ -77,8 +77,9 @@ const limit=12
   //     pdf.save(`Booking_Invoice_${booking._id}.pdf`);
   //   }
   // };
-  const qrRef = useRef<HTMLCanvasElement>(null);
+
 const downloadInvoice = async (booking:BookingType) => {
+  
   if(booking==undefined)
   {
     return
@@ -102,11 +103,31 @@ const downloadInvoice = async (booking:BookingType) => {
   // pdf.addImage(logoImage, "PNG", 10, 10, 30, 30);
 
   // Title
-  pdf.setFontSize(16);
+
+  // const logoImageURL = `${TMDB_IMAGE_BASE_URL}/${booking.movieId.poster_path}`;
+  // const logoImage = await fetch(logoImageURL)
+  //   .then((res) => res.blob())
+  //   .then(
+  //     (blob) =>
+  //       new Promise<string>((resolve) => {
+  //         const reader = new FileReader();
+  //         reader.onloadend = () => resolve(reader.result as string);
+  //         reader.readAsDataURL(blob);
+  //       })
+  //   );
+
+  // if (logoImage) {
+  //   pdf.addImage(logoImage, "PNG", 10, 10, 30, 30); // Adjust size and position
+  // }
+
+  pdf.setFontSize(24);
+  pdf.setFont("helvetica","bold")
+  pdf.setTextColor(0,0,0)
   pdf.text("Booking Invoice", 105, 20, { align: "center" });
 
   // Booking details
   pdf.setFontSize(12);
+  pdf.setTextColor(0,0,0)
   pdf.text(`Booking ID: ${booking.bookingId}`, 20, 40);
   pdf.text(`Movie: ${booking.movieId?.title}`, 20, 50);
   pdf.text(`Theatre: ${booking.theatreDetails?.name}`, 20, 60);
@@ -120,20 +141,24 @@ const downloadInvoice = async (booking:BookingType) => {
   pdf.text(`Showtime: ${booking.showtimeId?.showtime} on ${booking.showtimeId?.date}`, 20, 100);
 
   // Pricing details
-  pdf.text(`Total Price: ₹${booking.totalPrice}`, 20, 120);
-  pdf.text(`Convenience Rate (10.53%): ₹${convenienceRate.toFixed(2)}`, 20, 130);
-  pdf.setFontSize(14);
-  pdf.text(`Amount Paid: ₹${totalAmount.toFixed(2)}`, 20, 150);
+  pdf.setFontSize(12)
+  pdf.setFont("helvetica","bold")
+  pdf.text(`Total Price: ${Number(booking.totalPrice?.toFixed())}`, 20, 120);
+  pdf.text(`Convenience Rate (10.53%): ${Number(convenienceRate.toFixed(2))}`, 20, 130);
+  pdf.setFontSize(16)
+  pdf.text(`Amount Paid: ${Number(totalAmount.toFixed(2))}`, 20, 150);
 
   // Generate QR Code and add to PDF
-  const qrCodeData = `Booking ID: ${booking.bookingId}, Movie: ${booking.movieId?.title}, Amount: ₹${totalAmount.toFixed(2)}`;
+  const qrCodeData = `Booking ID: ${booking.bookingId}, Movie: ${booking.movieId?.title}, Amount: ₹${totalAmount.toFixed(2)}, Seats: ${booking?.screenData?.tierName} ${booking?.selectedSeats.join(', ')}
+   `;
   const qrCodeCanvas = qrRef.current; // Access the QR code's canvas element
   if (qrCodeCanvas) {
-    const qrCodeBase64 = qrCodeCanvas.toDataURL(qrCodeData); // Get base64 image
-    pdf.addImage(qrCodeBase64, "PNG", 150, 250, 40, 40);
+    const qrCodeBase64 = await qrCodeCanvas.toDataURL(qrCodeData); // Get base64 image
+    pdf.addImage(qrCodeBase64, "PNG", 140, 30, 50, 50);
   // Footer
   }
   pdf.setFontSize(10);
+  pdf.setFont("helvetica","italic")
   pdf.text("Thank you for booking with us!", 105, 280, { align: "center" });
 
   // Save the PDF
@@ -166,22 +191,6 @@ const downloadInvoice = async (booking:BookingType) => {
     }
   }
 
-  // const lastBookingRef = useCallback(
-  //   (node:any) => {
-  //     if (loading) return;
-  //     if (observer.current) observer.current.disconnect();
-
-  //     observer.current = new IntersectionObserver((entries) => {
-  //       if (entries[0].isIntersecting && hasMore) {
-  //         setCurrentPage((prevPage) => prevPage + 1);
-  //       }
-  //     });
-
-  //     if (node) observer.current.observe(node);
-  //   },
-  //   [loading, hasMore]
-  // );
-  
   return (
     <>
       <Header  searchQuery="" setSearchQuery={()=>{}}/>
@@ -194,77 +203,6 @@ const downloadInvoice = async (booking:BookingType) => {
         ) : (
           <>
           <div className="grid grid-cols-1 md:grid-cols-3  lg:grid-cols-3 gap-6 w-full  max-w-[90rem]">
-            {/* {bookings.slice().reverse().map((booking,index) => {
-              if (index === bookings.length - 1) {
-                return (
-                  <div
-                    ref={lastBookingRef}
-                    key={booking?._id}
-                    className="bg-white shadow-md rounded-lg p-4"
-                  >
-                    {/* Booking details go here */}
-                  {/* </div>
-                );
-              }
-              else{
-              return (<div key={booking?._id} className="bg-white   shadow-md rounded-lg p-4 h-[32rem]  hover:scale-105 cursor-pointer transition-all"
-             >
-                <img
-                  src={`${TMDB_IMAGE_BASE_URL}/${booking!.movieId.poster_path!}`}
-                  alt={booking?.movieId?.title}
-                  className="w-full h-48 object-fill rounded-md mb-4"
-                />
-                <div className='flex justify-between gap-4'>
-                 <div className=' flex justify-start flex-col'> 
-                <h2 className="text-lg font-bold mb-2">{booking?.movieId?.title}</h2>
-                <p>
-                  <strong>Theatre:</strong> {booking?.theatreDetails?.name}
-                </p>
-                <p>
-                  <strong>Screen:</strong> {booking?.screenData?.screenName} ({booking?.screenData?.screenType})
-                </p>
-                {booking?.showtimeId?.showtime?<p>
-                  <strong>Showtime:</strong> {booking?.showtimeId?.showtime}
-                </p>:<></>}
-                <p>
-                  <strong>Total Price:</strong> ₹{booking?.totalPrice}
-                </p>
-                <p>
-                  <strong>Seats:</strong> {booking?.screenData?.tierName} &nbsp; {booking?.selectedSeats.join(', ')}
-                </p>
-                </div> */}
-                 {/* {console.log(booking?._id,"booking")}  */}
-                {/* <div className="flex justify-end flex-col">
-                  
-                    <QRCode.QRCodeSVG
-                      value={`Booking ID: ${booking?._id}\nMovie: ${booking?.movieId?.title}\nTheatre: ${booking?.theatreDetails?.name}\n Seats:${booking?.screenData?.tierName}  ${booking?.selectedSeats.join(',')}  \nShowtime: ${booking?.showtimeId?.showtime }`}
-                    />
-                    <span className='text-lg font-bold'>{booking?.bookingId}</span>
-
-                    <span className='text-md text-blue-600 mt-4 mx-2 hover:text-blue-400 hover:underline'  onClick={() => setSelectedBooking(booking!)}>view info</span>
-                  </div>
-
-                </div>
-                {booking?(canCancelBooking(booking?.showtimeId?.showtime!,booking?.showtimeId?.date!) && booking?.status !== 'Cancelled' ?(
-                 <div> <button
-                    onClick={() => cancelBooking(booking?._id!,booking.totalPrice!)}
-                    className=" bg-gradient-to-r from-red-500 to-indigo-500 text-white w-fit px-4 py-2 min-h-8 transition-all  rounded-md hover:bg-red-600 hover:text-gray-300"
-                  >
-                    Cancel Booking
-                  </button>
-                  </div>
-                   */}
-                {/* ):( booking?.status === 'Cancelled' ? (
-                  <div className=' flex justify-center'>
-                  <span className=" text-red-500 rounded-md  bg-yellow-200 w-fit min-h-8 transition  p-1 font-semibold">Ticket is Cancelled</span></div>)
-                  : <div className=' flex justify-center'>
-                  <span className=" text-gray-800 rounded-md  bg-blue-200 w-fit min-h-8 transition  p-1 font-semibold">Ticket is Used</span></div>)):<></>}
-                  <div className='flex justify-start mt-4 '>
-              <span className='text-sm '>Booking date and time: {format(new Date(booking?.createdAt!), 'PPpp')}</span>
-              </div>
-              </div>
-               */}
-            {/* )}})}  */}
             {bookings.map((booking, index) => (
     <BookingCard
       key={index}
@@ -357,7 +295,9 @@ const downloadInvoice = async (booking:BookingType) => {
                 <strong>Total Price:</strong> ₹{selectedBooking.totalPrice}
               </p>
               <QRCode.QRCodeCanvas
-                  value={`Booking ID: ${selectedBooking._id}\nMovie: ${selectedBooking.movieId?.title}\nTheatre: ${selectedBooking.theatreDetails?.name}\nShowtime: ${selectedBooking.showtimeId?.showtime}`}
+              ref={qrRef}
+                  value={`Booking ID: ${selectedBooking._id}\nMovie: ${selectedBooking.movieId?.title}\nTheatre: ${selectedBooking.theatreDetails?.name}\nShowtime: ${selectedBooking.showtimeId?.showtime}\nSeats: ${selectedBooking?.screenData?.tierName} ${selectedBooking?.selectedSeats?.join(', ')}
+   `}
                   size={128}
                 />
                

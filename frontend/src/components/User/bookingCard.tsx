@@ -96,7 +96,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
           </p>
         </div>
         <div className="flex flex-col items-end">
-          <QRCodeCanvas value={qrValue} />
+          <QRCodeCanvas  value={qrValue} />
           <span className="text-lg font-bold">{booking?.bookingId}</span>
           <span
             className="text-md text-blue-600 mt-4 mx-2 hover:text-blue-400 hover:underline cursor-pointer"

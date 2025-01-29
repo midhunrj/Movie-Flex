@@ -4,6 +4,7 @@ import { NextFunction } from 'express-serve-static-core';
 import { log } from 'node:console';
 import { UserCoordinates } from '../../Domain/entities/user';
 import { Screen } from '../../Domain/entities/screens';
+import { HttpStatusCodes } from '../../types/enums/httpStatusCode';
 
 export class ScreenController {
   constructor(
@@ -17,11 +18,11 @@ export class ScreenController {
       console.log(screenData,"screenData")
       
       const newScreen = await this.screenUseCase.addNewScreen(screenData.screenData)
-      res.status(201).json(newScreen);
+      res.status(HttpStatusCodes.CREATED).json(newScreen);
     } catch (error) {
       console.log(error,"error");
       
-      res.status(500).json({ message: "failed to create Screen" });
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "failed to create Screen" });
     }
   }
 
@@ -33,9 +34,9 @@ export class ScreenController {
       console.log(theatreId,"theatreid in controller");
       
       const screens = await this.screenUseCase.findScreensByTheatre(theatreId);
-      res.status(200).json({message:'screens listed in theatre',screenData:screens});
+      res.status(HttpStatusCodes.OK).json({message:'screens listed in theatre',screenData:screens});
     } catch (error) {
-      res.status(500).json({ message: "failed to get screen by theatre"});
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "failed to get screen by theatre"});
     }
   }
 
@@ -52,9 +53,9 @@ export class ScreenController {
       
       const tierId=tierData._id
       const screens = await this.screenUseCase.updateTier(screenId,tierId,tierData);
-      res.status(200).json({message:'screens listed in theatre',screenData:screens});
+      res.status(HttpStatusCodes.OK).json({message:'screens listed in theatre',screenData:screens});
     } catch (error) {
-      res.status(500).json({ message: "failed to get screen by theatre"});
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "failed to get screen by theatre"});
     }
   }
 
@@ -73,13 +74,13 @@ export class ScreenController {
       const {success,screenData} = await this.screenUseCase.addMoviesViaScreen(screenId,movie)
       if(!success)
       {
-        res.status(400).json({message:'movie has already been added to the theatre'})
+        res.status(HttpStatusCodes.BAD_REQUEST).json({message:'movie has already been added to the theatre'})
       }
       else{
-      res.status(200).json({message:'movie has been added to the theatre',screenData:screenData});
+      res.status(HttpStatusCodes.OK).json({message:'movie has been added to the theatre',screenData:screenData});
       }
     } catch (error) {
-      res.status(500).json({ message: "failed to add movies to screen "});
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "failed to add movies to screen "});
     }
   }
   async updateScreen(req: Request, res: Response): Promise<void> {
@@ -95,9 +96,9 @@ export class ScreenController {
       
       
       const screens = await this.screenUseCase.updateScreen(screenId,screenData);
-      res.status(200).json({message:'screens listed in theatre',screenData:screens});
+      res.status(HttpStatusCodes.OK).json({message:'screens listed in theatre',screenData:screens});
     } catch (error) {
-      res.status(500).json({ message: "failed to get screen by theatre"});
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "failed to get screen by theatre"});
     }
   }
 
@@ -115,10 +116,10 @@ export class ScreenController {
       
       console.log(showTimeData,"showdata after movie added to showtime");
       
-      res.status(200).json({message:'movie has been added to the show',screenData:showTimeData});
+      res.status(HttpStatusCodes.OK).json({message:'movie has been added to the show',screenData:showTimeData});
       
     } catch (error) {
-      res.status(500).json({ message: "failed to add movies to screen "});
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "failed to add movies to screen "});
     }
   }
   async removeShowtime(req: Request, res: Response): Promise<void> {
@@ -134,10 +135,10 @@ export class ScreenController {
       const screenData = await this.screenUseCase.removeShowFromScreen(showtimeId as string,screenId as string)
       
       
-      res.status(200).json({message:'show has been removed from the screen',screenData});
+      res.status(HttpStatusCodes.OK).json({message:'show has been removed from the screen',screenData});
       
     } catch (error) {
-      res.status(500).json({ message: "failed to remove showtime "});
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "failed to remove showtime "});
     }
   }
 
@@ -146,7 +147,7 @@ export class ScreenController {
         const { latitude, longitude } = req.query
     
         if (!latitude || !longitude) {
-          return res.status(400).json({ error: 'Latitude and Longitude are required' });
+          return res.status(HttpStatusCodes.BAD_REQUEST).json({ error: 'Latitude and Longitude are required' });
         }
         const userCoords: UserCoordinates = {
             latitude: parseFloat(req.query.latitude as string),
@@ -154,10 +155,10 @@ export class ScreenController {
           };
         const theatres = await this.screenUseCase.getTheatresWithScreens(userCoords)
     
-        return res.status(200).json({ theatres });
+        return res.status(HttpStatusCodes.OK).json({ theatres });
       } catch (error) {
         console.error('Error in getting theatres with screens:', error);
-        return res.status(500).json({ error: 'Internal Server Error' });
+        return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error' });
       }
     }
 
@@ -174,10 +175,10 @@ export class ScreenController {
         const screenData = await this.screenUseCase.removeMovieFromEnroll(movieId as string,screenId as string)
         
         
-        res.status(200).json({message:'movie has been removed from the screen',screenData});
+        res.status(HttpStatusCodes.OK).json({message:'movie has been removed from the screen',screenData});
         
       } catch (error) {
-        res.status(500).json({ message: "failed to remove movie "});
+        res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "failed to remove movie "});
       }
     }
   
@@ -194,10 +195,10 @@ export class ScreenController {
         const screenData = await this.screenUseCase.updateShowtimeFromScreen(screenId as string,prevTime as string,newTime as string)
         
         
-        res.status(200).json({message:'showtime has been updated from the screen',screenData});
+        res.status(HttpStatusCodes.OK).json({message:'showtime has been updated from the screen',screenData});
         
       } catch (error) {
-        res.status(500).json({ message: "failed to remove movie "});
+        res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "failed to remove movie "});
       }
     }
 }

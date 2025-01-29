@@ -2,6 +2,7 @@
 import { Request, Response } from 'express';
 import { ManageMovies } from '../../application/usecases/movies'; 
 import { Movie } from '../../Domain/entities/movies';
+import { HttpStatusCodes } from '../../types/enums/httpStatusCode';
 
 export class MovieController {
   constructor(private manageMovies: ManageMovies) {}
@@ -18,24 +19,24 @@ export class MovieController {
 //       posterUrl
 //     );
 //     const movie = await this.manageMovies.createMovie(newMovie);
-//     res.status(201).json(movie);
+//     res.status(HttpStatusCodes.CREATED).json(movie);
 //   }
 
 //   async approveMovie(req: Request, res: Response) {
 //     const { movieId } = req.params;
 //     const movie = await this.manageMovies.approveMovie(movieId);
-//     res.status(200).json(movie);
+//     res.status(HttpStatusCodes.OK).json(movie);
 //   }
 
 //   async blockMovie(req: Request, res: Response) {
 //     const { movieId } = req.params;
 //     const movie = await this.manageMovies.blockMovie(movieId);
-//     res.status(200).json(movie);
+//     res.status(HttpStatusCodes.OK).json(movie);
 //   }
 
 //   async getMovies(req: Request, res: Response) {
 //     const movies = await this.manageMovies.getMovies();
-//     res.status(200).json(movies);
+//     res.status(HttpStatusCodes.OK).json(movies);
 //   }
 // }
 
@@ -83,7 +84,7 @@ async createMovie(req: Request, res: Response) {
     if (!title || !overview || !releaseDate  || !genre || !poster_path || !movie_id || !language  || !backdrop_path || !cast ) {
        console.log(req.body,"input fields");
         
-      return res.status(400).json({ error: 'Missing required fields' });
+      return res.status(HttpStatusCodes.BAD_REQUEST).json({ error: 'Missing required fields' });
     }
     
     const newMovie = new Movie(
@@ -111,13 +112,13 @@ async createMovie(req: Request, res: Response) {
     );
     
     const movie = await this.manageMovies.createMovie(newMovie);
-    res.status(201).json(movie);
+    res.status(HttpStatusCodes.CREATED).json(movie);
     
   }
   catch(error)
   {
     console.error("failed to upload movie", error);
-    res.status(500).json({ message: "failed to upload movie" });
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "failed to upload movie" });
   }
 }
 
@@ -126,23 +127,23 @@ async fetchMovies(req:Request,res:Response){
     const movieData=await this.manageMovies.fetchMovieDetails()
     console.log(movieData,"database movieData details");
     
-    res.status(200).json({message:"here all the movies available in the theatre",movieData})
+    res.status(HttpStatusCodes.OK).json({message:"here all the movies available in the theatre",movieData})
   } catch (error) {
     console.error("failed to fetch movie details", error);
-    res.status(500).json({ message: "failed to fetch moviedatas" });
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "failed to fetch moviedatas" });
   }
 }
 async deleteMovie(req: Request, res: Response) {
   try {
     const movieid = req.params.movieid;
     const movieData = await this.manageMovies.deleteMovieCase(movieid); // Call service to delete the movie
-    res.status(200).json({
+    res.status(HttpStatusCodes.OK).json({
       message: "Movie deleted successfully",
       movieData,
     });
   } catch (error) {
     console.error("Failed to delete movie", error);
-    res.status(500).json({ message: "Failed to delete movie" });
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Failed to delete movie" });
   }
 }
 
@@ -157,13 +158,13 @@ async blockMovie(req: Request, res: Response) {
     console.log(req.body,"fss req body");
     
     const movieData = await this.manageMovies.blockUnblockCase(movieId,isBlocked); // Call service to block/unblock the movie
-    res.status(200).json({
+    res.status(HttpStatusCodes.OK).json({
       message:isBlocked ? "Movie blocked successfully" : "Movie unblocked successfully",
       movieData,
     });
   } catch (error) {
     console.error("Failed to block/unblock movie", error);
-    res.status(500).json({ message: "Failed to block/unblock movie" });
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Failed to block/unblock movie" });
   }
 }
 
@@ -171,10 +172,10 @@ async addFavorite(req: Request, res: Response): Promise<void> {
   try {
     const { userId, movieId } = req.body;
     await this.manageMovies.addToFavourites(userId, movieId);
-    res.status(201).json({ message: 'Movie added to favorites successfully' });
+    res.status(HttpStatusCodes.CREATED).json({ message: 'Movie added to favorites successfully' });
   } catch (error) {
     console.error("Failed to add movie to favourites", error);
-    res.status(500).json({ message: "Failed to add movie to favourites" });
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Failed to add movie to favourites" });
   }
 }
 
@@ -184,10 +185,10 @@ async removeFavorite(req: Request, res: Response): Promise<void> {
     console.log(req.body,"body req");
     
     await this.manageMovies.removeFromFavourites(userId, movieId);
-    res.status(200).json({ message: 'Movie removed from favorites' });
+    res.status(HttpStatusCodes.OK).json({ message: 'Movie removed from favorites' });
   } catch (error) {
     console.error("Failed to delete movies from favourites", error);
-    res.status(500).json({ message: "Failed to delete movies from favourites" });
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Failed to delete movies from favourites" });
   }
 }
 
@@ -199,10 +200,10 @@ async getFavorites(req: Request, res: Response): Promise<void> {
     const favorites = await this.manageMovies.getFavouritesByUser(userId as string);
     console.log(favorites,"return movies of favorites");
     
-    res.status(200).json(favorites);
+    res.status(HttpStatusCodes.OK).json(favorites);
   } catch (error) {
     console.error("Failed to fetch movie favourites of user", error);
-    res.status(500).json({ message: "Failed to fetch movie favourites of user" });
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Failed to fetch movie favourites of user" });
   }    
   }
 

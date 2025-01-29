@@ -3,6 +3,7 @@ import { TheatreUseCase } from '../../application/usecases/theatre';
 import { FileUploadService } from '../../infrastructure/services/fileService';
 import { CloudinaryService } from '../../infrastructure/services/cloudinaryService';
 import { BookingMovies } from '../../application/usecases/booking';
+import { HttpStatusCodes } from '../../types/enums/httpStatusCode';
 
 export class TheatreController{
     constructor(private theatreUseCase:TheatreUseCase,private fileUploadService:FileUploadService,private CloudinaryService:CloudinaryService,private bookingUseCase:BookingMovies){}
@@ -19,17 +20,17 @@ export class TheatreController{
       const theatre=await this.theatreUseCase.register(req.body,theatreLicensePath)
       if(theatre=='403')
         {
-          res.status(403).json({message:"your email is already   registered try different email"})
+          res.status(HttpStatusCodes.FORBIDDEN).json({message:"your email is already   registered try different email"})
         }
         else{
             console.log('theattre',theatre);
             'hhhh'
-         res.status(201).json(theatre)
+         res.status(HttpStatusCodes.CREATED).json(theatre)
         }
     }
         catch(error)
         {
-            res.status(500).json({error:"Failed to reigister theatre"})
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({error:"Failed to reigister theatre"})
         }
     }
 
@@ -44,14 +45,14 @@ export class TheatreController{
             console.log(theatre,"ifhih thet");
             
             if (!theatre) {
-                return res.status(401).json({ error: "Invalid credentials" });
+                return res.status(HttpStatusCodes.UNAUTHORIZED).json({ error: "Invalid credentials" });
             }
             if(theatre.theatre.is_approved=="Pending")
             {
-                return res.status(403).json({ message: "Your Account has been under verification we will notify you once approved" });
+                return res.status(HttpStatusCodes.FORBIDDEN).json({ message: "Your Account has been under verification we will notify you once approved" });
             }
             if (theatre.theatre.is_blocked) {
-                return res.status(403).json({ message: "Your Account has been blocked" });
+                return res.status(HttpStatusCodes.FORBIDDEN).json({ message: "Your Account has been blocked" });
             }
             
                 // console.log(user,"user");
@@ -66,20 +67,20 @@ export class TheatreController{
                 
                 console.log(theatre,"its before sending theatre details to frontend");
                 
-                return res.status(200).json(theatre)
+                return res.status(HttpStatusCodes.OK).json(theatre)
             }
             
         
         catch(error)
         {
-            res.status(500).json({error:'failed to login'})
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({error:'failed to login'})
         }
 
     }
 
     async home(req:Request,res:Response)
     {
-        res.status(200).json({message:"welcome to the homepage"})
+        res.status(HttpStatusCodes.OK).json({message:"welcome to the homepage"})
     }
 
 
@@ -88,12 +89,12 @@ export class TheatreController{
         try{
             const {email}=req.body
             await this.theatreUseCase.sendOtp(email)
-            res.status(200).json({message:"Otp sent successfully"})
+            res.status(HttpStatusCodes.OK).json({message:"Otp sent successfully"})
 
         }
         catch(error)
         {
-            res.status(500).json({error:"Failed to send otp"})
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({error:"Failed to send otp"})
         }
     }
 
@@ -110,16 +111,16 @@ export class TheatreController{
             {
                 console.log("true dan dana dan dan dana dan");
                 
-                res.status(200).json({message:"otp verified successfully"})
+                res.status(HttpStatusCodes.OK).json({message:"otp verified successfully"})
             }
             else
             {
-                res.status(400).json({error:"Invalid OTP "})
+                res.status(HttpStatusCodes.BAD_REQUEST).json({error:"Invalid OTP "})
             }
         }
         catch(error)
         {
-            res.status(500).json({error:"failed to verify otp"})
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({error:"failed to verify otp"})
         }
     }
 
@@ -131,16 +132,16 @@ export class TheatreController{
             const isValid=await this.theatreUseCase.verifyOtp(email,otp)
             if(isValid)
             {
-                res.status(200).json({message:"otp verified successfully"})
+                res.status(HttpStatusCodes.OK).json({message:"otp verified successfully"})
             }
             else
             {
-                res.status(400).json({error:"Invalid OTP "})
+                res.status(HttpStatusCodes.BAD_REQUEST).json({error:"Invalid OTP "})
             }
         }
         catch(error)
         {
-            res.status(500).json({error:"failed to verify otp"})
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({error:"failed to verify otp"})
         }
     }
 
@@ -150,10 +151,10 @@ export class TheatreController{
         try {
             const {email,newPassword}=req.body
             await this.theatreUseCase.resetPassword(email,newPassword) 
-            res.status(200).json({message:"password reset successfully"}) 
+            res.status(HttpStatusCodes.OK).json({message:"password reset successfully"}) 
         } catch (error) {
          
-            res.status(500).json({error:"failed to reset password"})
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({error:"failed to reset password"})
         }
     }
 
@@ -162,13 +163,13 @@ export class TheatreController{
         try{
            const {token}=req.body
           const theatre= await this.theatreUseCase.resendOtp(token)
-           res.status(200).json({message:"otp has been resent successfully",theatre})
+           res.status(HttpStatusCodes.OK).json({message:"otp has been resent successfully",theatre})
         }
         catch(error)
         {
             console.log(error);
             
-            res.status(500).json({message:'failed to resend otp'})
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({message:'failed to resend otp'})
         }
     }
 
@@ -183,9 +184,9 @@ export class TheatreController{
             const updatedProfile = await this.theatreUseCase.completeTheatreprofile(theatreId, addressData);
             console.log(updatedProfile,"updatedProfile ");
             
-            res.status(200).json({updatedProfile,message:"Profile has been updated Successfully"});
+            res.status(HttpStatusCodes.OK).json({updatedProfile,message:"Profile has been updated Successfully"});
         } catch (error) {
-            res.status(500).json({ message: "failed to complete theatre profile"});
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "failed to complete theatre profile"});
         }
     }
 
@@ -197,9 +198,9 @@ export class TheatreController{
     //         const movieData = await this.theatreUseCase.rollingMovies();
     //         console.log(movieData,"MovieData ");
             
-    //         res.status(200).json({movieData,message:"Movies has been loaded from backend successfully"});
+    //         res.status(HttpStatusCodes.OK).json({movieData,message:"Movies has been loaded from backend successfully"});
     //     } catch (error) {
-    //         res.status(500).json({ message: "failed to complete theatre profile"});
+    //         res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "failed to complete theatre profile"});
     //     }
     // }
 
@@ -208,7 +209,7 @@ export class TheatreController{
         try {
             const { interval } = req.query;
             if (!interval) {
-                return res.status(400).json({ message: "Interval is required" });
+                return res.status(HttpStatusCodes.BAD_REQUEST).json({ message: "Interval is required" });
             }
           console.log(req.headers,"req headers");
           
@@ -218,10 +219,10 @@ export class TheatreController{
 
             console.log(bookingTrend,"bookingTrend")
             
-            return res.status(200).json({ message: "Booking trends fetched successfully", bookingTrend });
+            return res.status(HttpStatusCodes.OK).json({ message: "Booking trends fetched successfully", bookingTrend });
         } catch (error) {
             console.error("Error fetching booking trends", error);
-            return res.status(500).json({ message: "Failed to fetch booking trends" });
+            return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Failed to fetch booking trends" });
         }
     }
 
@@ -229,17 +230,17 @@ export class TheatreController{
         try {
             const { interval } = req.query; 
             if (!interval) {
-                return res.status(400).json({ message: "Interval is required" });
+                return res.status(HttpStatusCodes.BAD_REQUEST).json({ message: "Interval is required" });
             }
              
             const theatreId=req.headers.theatreid
             const revenueTrend = await this.bookingUseCase.theatreRevenueTrends(interval as string,theatreId as string);
             console.log(revenueTrend,"revenueTrend")
             
-            return res.status(200).json({ message: "Revenue trends fetched successfully", revenueTrend });
+            return res.status(HttpStatusCodes.OK).json({ message: "Revenue trends fetched successfully", revenueTrend });
         } catch (error) {
             console.error("Error fetching revenue trends", error);
-            return res.status(500).json({ message: "Failed to fetch revenue trends" });
+            return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Failed to fetch revenue trends" });
         }
     }
 
@@ -256,11 +257,11 @@ export class TheatreController{
         const showtimes = await this.theatreUseCase.getTheatreShowtimes(screenId as string,date as string);
         console.log(showtimes,"showtimes");
         
-        res.status(200).json({message:"available showtimes for movie in this region",showtimes});
+        res.status(HttpStatusCodes.OK).json({message:"available showtimes for movie in this region",showtimes});
       } catch (error:any) {
         console.log(error,"error");
         
-        res.status(500).json({ error: 'Error fetching showtimes' });
+        res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching showtimes' });
       }
     }
     async showtimeSeatLayout(req:Request,res:Response){
@@ -271,11 +272,11 @@ export class TheatreController{
           const seatData = await this.theatreUseCase.showtimeSeats(showtimeId as string)
           console.log(seatData,"booking data in contorller")
           
-          res.status(200).json({message:"seatlayout on this showtime",seatData})
+          res.status(HttpStatusCodes.OK).json({message:"seatlayout on this showtime",seatData})
         } catch (error:any) {
           console.log(error,"error");
           
-          res.status(500).json({ error: 'Error fetching showtimes' });
+          res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching showtimes' });
         }
       }
 
@@ -287,11 +288,11 @@ export class TheatreController{
           const bookingData = await this.bookingUseCase.theatreSideBooking(req.body)
           console.log(bookingData,"booking data in contorller")
           
-          res.status(200).json({message:"tickets have been reserved for this seats on this showtime",bookingId:bookingData._id})
+          res.status(HttpStatusCodes.OK).json({message:"tickets have been reserved for this seats on this showtime",bookingId:bookingData._id})
         } catch (error:any) {
           console.log(error,"error");
           
-          res.status(500).json({ error: 'Error fetching showtimes' });
+          res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching showtimes' });
         }
       }
 
@@ -301,13 +302,13 @@ export class TheatreController{
           const limit = parseInt(req.query.limit as string) || 10;
             const theatreId=req.query.theatreId as string
           const { bookings, total } = await this.bookingUseCase.getTheatrebookingHistory(page, limit,theatreId);
-          res.status(200).json({
+          res.status(HttpStatusCodes.OK).json({
             bookings,
             totalPages: Math.ceil(total / limit),
             currentPage: page,
           });
         } catch (error) {
-          res.status(500).json({ message: "Error fetching bookings", error });
+          res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Error fetching bookings", error });
         }
       }
 

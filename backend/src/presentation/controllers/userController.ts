@@ -8,6 +8,8 @@ import { Notification } from '../../application/usecases/notification';
 import { socketService } from '../../infrastructure/websocket/socketService';
 import { NotificationType } from '../../Domain/entities/notification';
 
+import { HttpStatusCodes } from '../../types/enums/httpStatusCode';
+
 export class UserController{
     constructor(private userUseCases:UserUseCases,private bookingUseCase:BookingMovies,private notificationUsecase:Notification, ){}
 
@@ -20,15 +22,15 @@ export class UserController{
       const user=await this.userUseCases.register(req.body)
       if(user=='403')
       {
-        res.status(403).json({message:"your email is already registered try different email"})
+        res.status(HttpStatusCodes.FORBIDDEN).json({message:"your email is already registered try different email"})
       }
       else{
-         res.status(201).json(user)
+         res.status(HttpStatusCodes.CREATED).json(user)
       }
         }
         catch(error)
         {
-            res.status(500).json({error:"Failed to reigister user"})
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({error:"Failed to reigister user"})
         }
     }
 
@@ -43,11 +45,11 @@ export class UserController{
             console.log(userData,"ifhih")
             
             if (!userData) {
-                return res.status(401).json({ message: "Invalid credentials" });
+                return res.status(HttpStatusCodes.UNAUTHORIZED).json({ message: "Invalid credentials" });
             }
             
             if (userData.user.is_blocked) {
-                return res.status(403).json({ message: "Your Account has been blocked" });
+                return res.status(HttpStatusCodes.FORBIDDEN).json({ message: "Your Account has been blocked" });
             }
             
                 console.log(userData,"user");
@@ -61,32 +63,32 @@ export class UserController{
                     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
                 });
                 const user={...userData,wallet}
-                return res.status(200).json(user)
+                return res.status(HttpStatusCodes.OK).json(user)
             }
             
         
         catch(error)
         {
-            res.status(500).json({error:'failed to login'})
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({error:'failed to login'})
         }
 
     }
 
     async home(req:Request,res:Response,next:NextFunction)
     {
-        res.status(200).json({message:"welcome to the homepage"})
+        res.status(HttpStatusCodes.OK).json({message:"welcome to the homepage"})
     }
 
     async forgotPassword(req:Request,res:Response){
         try{
             const {email}=req.body
             await this.userUseCases.sendOtp(email)
-            res.status(200).json({message:"Otp sent successfully"})
+            res.status(HttpStatusCodes.OK).json({message:"Otp sent successfully"})
            
         }
         catch(error)
         {
-            res.status(500).json({error:"Failed to send otp"})
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({error:"Failed to send otp"})
         }
     }
 
@@ -103,16 +105,16 @@ export class UserController{
             {
                 console.log("true dan dana dan dan dana dan");
                 
-                res.status(200).json({message:"otp verified successfully"})
+                res.status(HttpStatusCodes.OK).json({message:"otp verified successfully"})
             }
             else
             {
-                res.status(400).json({message:"Invalid OTP "})
+                res.status(HttpStatusCodes.BAD_REQUEST).json({message:"Invalid OTP "})
             }
         }
         catch(error)
         {
-            res.status(500).json({error:"failed to verify otp"})
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({error:"failed to verify otp"})
         }
     }
 
@@ -121,19 +123,21 @@ export class UserController{
     {
         try{
             const {otp}=req.body
+            console.log(req.body,"request body otp");
+            
             const isValid=await this.userUseCases.verifyOtp(otp)
             if(isValid)
             {
-                res.status(200).json({message:"otp verified successfully"})
+                res.status(HttpStatusCodes.OK).json({message:"otp verified successfully"})
             }
             else
             {
-                res.status(400).json({error:"Invalid OTP "})
+                res.status(HttpStatusCodes.BAD_REQUEST).json({error:"Invalid OTP "})
             }
         }
         catch(error)
         {
-            res.status(500).json({error:"failed to verify otp"})
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({error:"failed to verify otp"})
         }
     }
 
@@ -143,11 +147,11 @@ export class UserController{
         try {
             const {newPassword}=req.body
             await this.userUseCases.resetPassword(newPassword) 
-            res.status(200).json({message:"password reset successfully"}) 
+            res.status(HttpStatusCodes.OK).json({message:"password reset successfully"}) 
         } catch (error) {
              console.log(error);
              
-            res.status(500).json({error:"failed to reset password"})
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({error:"failed to reset password"})
         }
     }
 
@@ -156,13 +160,13 @@ export class UserController{
         try{
            const {token}=req.body
           const user= await this.userUseCases.resendOtp(token)
-           res.status(200).json({message:"otp has been resent successfully",user})
+           res.status(HttpStatusCodes.OK).json({message:"otp has been resent successfully",user})
         }
         catch(error)
         {
             console.log(error);
             
-            res.status(500).json({message:'failed to resend otp'})
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({message:'failed to resend otp'})
         }
     }
 
@@ -180,14 +184,14 @@ export class UserController{
 //             const updatedUserData = await this.userUseCases.updateProfile(userId, profileData);
 
         
-//             res.status(200).json({
+//             res.status(HttpStatusCodes.OK).json({
 //                 message: 'Profile updated successfully',
 //                 data: updatedUserData,
 //             });
 //         } catch (error) {
 //             console.log(error);
             
-//             res.status(500).json({message:'failed to update Profile'}) 
+//             res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({message:'failed to update Profile'}) 
 //         } 
 // }
 
@@ -211,18 +215,18 @@ async updateUserProfile(req: Request, res: Response,next:NextFunction): Promise<
 
     
       if (!result) {
-        return res.status(404).json({ success: false, message: 'User not found or no updates made' });
+        return res.status(HttpStatusCodes.NOT_FOUND).json({ success: false, message: 'User not found or no updates made' });
       }
 
       
-      return res.status(200).json({ success: true, message: 'Profile updated successfully', data: result });
+      return res.status(HttpStatusCodes.OK).json({ success: true, message: 'Profile updated successfully', data: result });
     } catch (error) {
       
     if (error instanceof Error) {
-        return res.status(400).json({ success: false, message: error.message });
+        return res.status(HttpStatusCodes.BAD_REQUEST).json({ success: false, message: error.message });
       }
       
-      return res.status(500).json({ success: false, message: 'An unexpected error occurred' });
+      return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ success: false, message: 'An unexpected error occurred' });
     }
     
   }
@@ -256,7 +260,7 @@ async upcomingMovies(req:Request,res:Response,next:NextFunction){
         const totalMovies = await this.userUseCases.upcomingMoviesCount(filters); 
         const upcomingMovieData = await this.userUseCases.upcomingMovies(filters, Number(page), Number(limit),sortOptions); 
 
-        res.status(200).json({
+        res.status(HttpStatusCodes.OK).json({
             message: "Here are the upcoming movies",
             upcomingMovies: upcomingMovieData,
             totalMovies,
@@ -266,7 +270,7 @@ async upcomingMovies(req:Request,res:Response,next:NextFunction){
     } catch (error) {
         console.log(error);
             
-            res.status(500).json({message:'failed to load upcoming movies'})
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({message:'failed to load upcoming movies'})
     }
 }
 
@@ -299,7 +303,7 @@ async nowShowingMovies(req:Request,res:Response,next:NextFunction){
         const nowShowingMovieData = await this.userUseCases.nowShowingMovies(filters, Number(page), Number(limit),sortOptions); // Fetch data
          console.log(nowShowingMovieData,"now showing  after search");
          
-        res.status(200).json({
+        res.status(HttpStatusCodes.OK).json({
             message: "These are the movies running in cinemas",
             runningMovies: nowShowingMovieData,
             totalMovies,
@@ -309,7 +313,7 @@ async nowShowingMovies(req:Request,res:Response,next:NextFunction){
     } catch (error) {
         console.log(error);
             
-            res.status(500).json({message:'failed to load now Showing movies'})
+            res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({message:'failed to load now Showing movies'})
     }
 }
 
@@ -328,11 +332,11 @@ async listShowtimes(req:Request,res:Response,next:NextFunction){
     const showtimes = await this.userUseCases.getShowtimes(objectIdMovieId, date as string,userCoords as UserCoordinates);
     console.log(showtimes,"showtimes");
     
-    res.status(200).json({message:"available showtimes for movie in this region",showtimes});
+    res.status(HttpStatusCodes.OK).json({message:"available showtimes for movie in this region",showtimes});
   } catch (error:any) {
     console.log(error,"error");
     
-    res.status(500).json({ error: 'Error fetching showtimes' });
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching showtimes' });
   }
 }
 async listTheatreShowtimes(req:Request,res:Response,next:NextFunction){
@@ -348,11 +352,11 @@ async listTheatreShowtimes(req:Request,res:Response,next:NextFunction){
     const showtimes = await this.userUseCases.getTheatreShowtimes(screenId as string,date as string);
     console.log(showtimes,"showtimes");
     
-    res.status(200).json({message:"available showtimes for movie in this region",showtimes});
+    res.status(HttpStatusCodes.OK).json({message:"available showtimes for movie in this region",showtimes});
   } catch (error:any) {
     console.log(error,"error");
     
-    res.status(500).json({ error: 'Error fetching showtimes' });
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching showtimes' });
   }
 }
 
@@ -364,11 +368,11 @@ async bookMovieTickets(req:Request,res:Response){
     const bookingData = await this.bookingUseCase.userSideBooking(req.body)
     console.log(bookingData,"booking data in contorller")
     
-    res.status(200).json({message:"tickets have been reserved for this seats on this showtime",bookingId:bookingData._id})
+    res.status(HttpStatusCodes.OK).json({message:"tickets have been reserved for this seats on this showtime",bookingId:bookingData._id})
   } catch (error:any) {
     console.log(error,"error");
     
-    res.status(500).json({ error: 'Error fetching showtimes' });
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching showtimes' });
   }
 }
 
@@ -382,11 +386,11 @@ async bookMovieTickets(req:Request,res:Response){
 //       const bookingData = await this.bookingUseCase.confirmPayment(bookingId,totalCost)
 //       console.log(bookingData,"booking data in contorller")
       
-//       res.status(200).json({message:"booking has been confirmed with the payment",bookingData,success:true})
+//       res.status(HttpStatusCodes.OK).json({message:"booking has been confirmed with the payment",bookingData,success:true})
 //     } catch (error:any) {
 //       console.log(error,"error");
       
-//       res.status(500).json({ error: 'Error fetching showtimes' });
+//       res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching showtimes' });
 //     }
 //   }
   
@@ -402,15 +406,15 @@ async bookMovieTickets(req:Request,res:Response){
       console.log(paymentData,"payment data in contorller")
        if(!paymentData)
        {
-        res.status(403).json({message:"your session has been expired",success:false})
+        res.status(HttpStatusCodes.FORBIDDEN).json({message:"your session has been expired",success:false})
        }
        else{
-      res.status(200).json({message:"Razorpay has been initiated with the payment",paymentData,success:true})
+      res.status(HttpStatusCodes.OK).json({message:"Razorpay has been initiated with the payment",paymentData,success:true})
        }
     } catch (error:any) {
       console.log(error,"error");
       
-      res.status(500).json({ error: 'Error having initiating razorpay' });
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Error having initiating razorpay' });
     }
   }
 
@@ -433,7 +437,7 @@ async bookMovieTickets(req:Request,res:Response){
         
         if(userWallet?.balance!<totalPrice)
         {
-          return res.status(400).json({message:"insufficeint balance in wallet"})
+          return res.status(HttpStatusCodes.BAD_REQUEST).json({message:"insufficeint balance in wallet"})
         }
         const type='Debit'
          await this.userUseCases.updateUserWallet(req.user?.id!,-totalPrice,Description,type)
@@ -493,11 +497,11 @@ async bookMovieTickets(req:Request,res:Response){
         bookingId: bookingData._id,
     });
       
-      res.status(200).json({message:"booking has been confirmed with the payment",success:true})
+      res.status(HttpStatusCodes.OK).json({message:"booking has been confirmed with the payment",success:true})
     } catch (error:any) {
       console.log(error,"error");
       
-      res.status(500).json({ error: 'Error in verifying signature in payment verfication' });
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Error in verifying signature in payment verfication' });
     }
   }
 
@@ -509,11 +513,11 @@ async bookMovieTickets(req:Request,res:Response){
       const seatData = await this.userUseCases.showtimeSeats(showtimeId as string)
       console.log(seatData,"booking data in contorller")
       
-      res.status(200).json({message:"seatlayout on this showtime",seatData})
+      res.status(HttpStatusCodes.OK).json({message:"seatlayout on this showtime",seatData})
     } catch (error:any) {
       console.log(error,"error");
       
-      res.status(500).json({ error: 'Error fetching showtimes' });
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching showtimes' });
     }
   }
   async bookingOrders(req:Request,res:Response){
@@ -526,11 +530,11 @@ async bookMovieTickets(req:Request,res:Response){
       const {bookings,total} = await this.bookingUseCase.bookingHistory(userId as string,limits,pageNumber)
       //console.log(bookingData,"booking data for user")
       
-      res.status(200).json({message:"movie booking history of this user",bookingData:bookings,totalPages: Math.ceil(total / limits)})
+      res.status(HttpStatusCodes.OK).json({message:"movie booking history of this user",bookingData:bookings,totalPages: Math.ceil(total / limits)})
     } catch (error:any) {
       console.log(error,"error");
       
-      res.status(500).json({ error: 'Error fetching movie booking history' });
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching movie booking history' });
     }
   }
 
@@ -582,11 +586,11 @@ async bookMovieTickets(req:Request,res:Response){
       };
       await this.notificationUsecase.newNotification(notificationData);
     }
-      res.status(200).json({message:"tickets have been reserved for this seats on this showtime",success:cancelTicket})
+      res.status(HttpStatusCodes.OK).json({message:"tickets have been reserved for this seats on this showtime",success:cancelTicket})
     } catch (error:any) {
       console.log(error,"error");
       
-      res.status(500).json({ error: 'Error fetching showtimes' });
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching showtimes' });
     }
   }
   
@@ -600,11 +604,11 @@ async bookMovieTickets(req:Request,res:Response){
       const movieData = await this.userUseCases.ratingMovie(movieId,rating,userId as string)
       console.log(movieData,"booking data in contorller")
       
-      res.status(200).json({message:"tickets have been reserved for this seats on this showtime",movieData})
+      res.status(HttpStatusCodes.OK).json({message:"tickets have been reserved for this seats on this showtime",movieData})
     } catch (error:any) {
       console.log(error,"error");
       
-      res.status(500).json({ error: 'Error fetching showtimes' });
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Error fetching showtimes' });
     }
   }
 
@@ -619,10 +623,10 @@ async bookMovieTickets(req:Request,res:Response){
       console.log(userId,req.params,"user with params")
       // const wallet = await this.userUseCases.walletByUser(userId)
       const wallet=await this.userUseCases.WalletTransaction(userId,pages,limits)
-      res.status(200).json(wallet);
+      res.status(HttpStatusCodes.OK).json(wallet);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: 'Failed to fetch wallet data' });
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Failed to fetch wallet data' });
     }
   }
 
@@ -631,10 +635,10 @@ async bookMovieTickets(req:Request,res:Response){
 
     try {
       await this.userUseCases.updateUserWallet(userId, amount, description, type);
-      res.status(200).json({ message: 'Wallet updated successfully' });
+      res.status(HttpStatusCodes.OK).json({ message: 'Wallet updated successfully' });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: 'Failed to update wallet' });
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Failed to update wallet' });
     }
   }
   
@@ -650,9 +654,9 @@ async bookMovieTickets(req:Request,res:Response){
         data,
       });
 
-      res.status(201).json({ message: "Notification created successfully" });
+      res.status(HttpStatusCodes.CREATED).json({ message: "Notification created successfully" });
     } catch (error:any) {
-      res.status(500).json({ error: error.message });
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   }
 
@@ -665,9 +669,9 @@ async bookMovieTickets(req:Request,res:Response){
         role
       );
 
-      res.status(200).json(notifications);
+      res.status(HttpStatusCodes.OK).json(notifications);
     } catch (error:any) {
-      res.status(500).json({ error: error.message });
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   }
   

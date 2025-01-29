@@ -1,12 +1,13 @@
 import React,{useEffect, useState} from "react";
 import { useNavigate } from "react-router";
-import './css/login.css'
+
 // import { newPassVerify } from "../../services/api";
 import { newPassVerify } from "../../redux/theatre/theatreThunk";
 //import { Toaster, toast } from "sonner";
 import { useDispatch,useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store/store";
 import { Toaster, toast } from "sonner";
+import OtpInput from "../User/otpInput";
 const TheatrePassVerify=()=>{
     const [otp,setOtp]=useState("")
     //const [confirmPass,setConfirmPass]=useState("")
@@ -51,10 +52,11 @@ const TheatrePassVerify=()=>{
   
         <h1 className="text-2xl font-bold text-center align-text-top text-red-500 " >Welcome to Movie Flex</h1>
         <h2 className="text-xl font-bold  text-center text-amber-400 align-text-bottom mt-8">Otp Verification</h2>
-            <form id="loginForm" onSubmit={handleSubmit}>
-                <input type='text' value={otp} placeholder="enter a otp" onChange={(e)=>setOtp(e.target.value)}/>
-                
-                <button type="submit">Submit</button>
+            <form  className="flex w-fit h-fit justify-center flex-col p-[10px] items-center space-y-4" onSubmit={handleSubmit}>
+                {/* <input type='text' value={otp} placeholder="enter a otp" onChange={(e)=>setOtp(e.target.value)}/> */}
+                <OtpInput length={4} handleSubmit={()=>{}}/>
+               <div className="flex justify-center"><button type="submit" className="max-w-max py-2  min-h-8 px-4 h-fit w-fit rounded-md transition duration-300  bg-blue-500 text-white  hover:bg-blue-700 "
+         >Submit</button></div>
             </form>
             </div>
         </div>

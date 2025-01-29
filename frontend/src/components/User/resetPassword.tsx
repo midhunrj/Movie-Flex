@@ -49,7 +49,7 @@ useEffect(()=>{
             <form id="loginForm" onSubmit={handleSubmit} className="space-y-4 text-center">
                 <input type='text' value={newPassword} placeholder="enter a new password" onChange={(e)=>setNewPassword(e.target.value)}/>
                 <input type="text" value={confirmPass} placeholder="confirm new password" onChange={(e)=>setConfirmPass(e.target.value)}/>
-                <button type="submit">Submit</button>
+                <button type="submit" className="max-w-max py-2 min-h-8 px-4 h-fit w-fit rounded-md transition duration-300 bg-blue-500 text-white  hover:bg-blue-700 ">Submit</button>
             </form>
             </div>
         </div>
