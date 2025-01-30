@@ -218,7 +218,7 @@ export const blockTheatreActive = async (theatreId:string) => {
     try {
       console.log(movieData,"movie details before storing");
       
-       const response=await adminAuthenticate.post('/Add-movies',{movieData})
+       const response=await adminAuthenticate.post('/add-movies',{movieData})
        return response.data
     } catch (error:any) {
       console.error("Error during addmovies", error.response?.data || error.message);
