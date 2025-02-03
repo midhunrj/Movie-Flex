@@ -252,10 +252,10 @@ export class ShowRepository implements IShowRepository {
       await showModel.deleteMany({screenId:screenId,showtime:showtime})
   }
   async listTheatreShowtimes(screenId: string, date: string): Promise<IShowtime[]> {
-    const currentDate = new Date();
-    const today = currentDate.toISOString().split('T')[0];  // Get today's date in YYYY-MM-DD format
+    const currentUTC = new Date();
+    const todayUTC = currentUTC.toISOString().split('T')[0];  // Get today's UTC date in YYYY-MM-DD
     
-    console.log(currentDate, "current server time (AWS)"); 
+    console.log(currentUTC, "Current UTC time (AWS Server)");
 
     const showtimes = await showModel.find({ screenId, date: new Date(date) })
         .populate('movieId')
@@ -265,17 +265,19 @@ export class ShowRepository implements IShowRepository {
     console.log(showtimes, "Fetched showtimes before filtering");
 
     const filteredShowtimes = showtimes.filter((show) => {
-        if (new Date(date).toISOString().split('T')[0] === today) {
-            // Convert showtime to a full Date object
-            const [hour, minute] = show.showtime.split(':').map(Number);
-            const showtimeDate = new Date(show.date);
-            showtimeDate.setHours(hour, minute, 0, 0);
-            
-            console.log(`Comparing showtime ${showtimeDate} with current time ${currentDate}`);
+        const showDateUTC = new Date(show.date).toISOString().split('T')[0];
 
-            return showtimeDate.getTime() > currentDate.getTime();  // Ensure the show is in the future
+        if (showDateUTC === todayUTC) {
+            // Convert `show.showtime` (HH:mm) to a full Date object
+            const [hour, minute] = show.showtime.split(':').map(Number);
+            const showtimeUTC = new Date(show.date);
+            showtimeUTC.setUTCHours(hour, minute, 0, 0);  // Ensure UTC conversion
+
+            console.log(`Comparing showtime ${showtimeUTC} with current UTC time ${currentUTC}`);
+
+            return showtimeUTC.getTime() > currentUTC.getTime();  // Ensure future shows only
         }
-        return true;
+        return true; // If date is not today, keep the showtime
     });
 
     console.log(filteredShowtimes, "Filtered upcoming showtimes");
