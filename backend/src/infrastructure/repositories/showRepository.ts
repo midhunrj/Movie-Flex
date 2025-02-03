@@ -8,7 +8,7 @@ import { theatreModel } from "../database/models/theatreModel";
 import { BookingModel, IBooking } from "../database/models/bookingModel";
 import { userModel } from "../database/models/userModel";
 import walletModel from "../database/models/walletModel";
-
+import { toZonedTime } from 'date-fns-tz';
 import { NotificationType } from "../database/models/notficationModel";
 import { NotificationRepository } from "./notficationRepository";
 import { RefundService } from "../services/refundService";
@@ -251,37 +251,48 @@ export class ShowRepository implements IShowRepository {
   async removeShowtimes(showtime: string, screenId: string):Promise<void>{
       await showModel.deleteMany({screenId:screenId,showtime:showtime})
   }
+
+
   async listTheatreShowtimes(screenId: string, date: string): Promise<IShowtime[]> {
-    const currentDate = new Date();
-    const today = currentDate.toISOString().split('T')[0];  // Get today's date in YYYY-MM-DD format
-    
-    console.log(currentDate, "current server time (AWS)"); 
-
-    const showtimes = await showModel.find({ screenId, date: new Date(date) })
-        .populate('movieId')
-        .populate('screenId')
-        .populate('theatreId');
-
-    console.log(showtimes, "Fetched showtimes before filtering");
-
-    const filteredShowtimes = showtimes.filter((show) => {
-        if (new Date(date).toISOString().split('T')[0] === today) {
-            // Convert showtime to a full Date object
-            const [hour, minute] = show.showtime.split(':').map(Number);
-            const showtimeDate = new Date(show.date);
-            showtimeDate.setHours(hour, minute, 0, 0);
-            
-            console.log(`Comparing showtime ${showtimeDate} with current time ${currentDate}`);
-
-            return showtimeDate.getTime() > currentDate.getTime();  // Ensure the show is in the future
-        }
-        return true;
-    });
-
-    console.log(filteredShowtimes, "Filtered upcoming showtimes");
-
-    return filteredShowtimes;
-}
+      const currentDate = new Date();
+      const today = currentDate.toISOString().split('T')[0];  // Get today's date in YYYY-MM-DD format
+  
+      const timeZone = 'UTC';  // Set the desired timezone, e.g., 'America/Los_Angeles'
+      
+      // Convert current time to the desired timezone
+      const currentLocalDate = toZonedTime(currentDate, timeZone);
+      console.log(currentLocalDate, "current server time in local timezone");
+  
+      // Fetch showtimes
+      const showtimes = await showModel.find({ screenId, date: new Date(date) })
+          .populate('movieId')
+          .populate('screenId')
+          .populate('theatreId');
+  
+      console.log(showtimes, "Fetched showtimes before filtering");
+  
+      const filteredShowtimes = showtimes.filter((show) => {
+          if (new Date(date).toISOString().split('T')[0] === today) {
+              // Convert showtime to local time for comparison
+              const [hour, minute] = show.showtime.split(':').map(Number);
+              const showtimeDate = new Date(show.date);
+              showtimeDate.setHours(hour, minute, 0, 0);
+  
+              // Convert showtimeDate to the same timezone as currentLocalDate for comparison
+              const showtimeInZone = toZonedTime(showtimeDate, timeZone);
+  
+              console.log(`Comparing showtime ${showtimeInZone} with current time ${currentLocalDate}`);
+  
+              return showtimeInZone.getTime() > currentLocalDate.getTime();  // Ensure the show is in the future
+          }
+          return true;
+      });
+  
+      console.log(filteredShowtimes, "Filtered upcoming showtimes");
+  
+      return filteredShowtimes;
+  }
+  
 
    async getSeatlayout( showtimeId: string): Promise< ITier[]|null> {
     const showtime=await showModel.findById(showtimeId)
