@@ -8,3 +8,7 @@ declare global {
     }
   }
 }
+declare module 'date-fns-tz' {
+  export function toZonedTime(date: Date | number, timeZone: string): Date;
+}
+
