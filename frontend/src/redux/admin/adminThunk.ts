@@ -55,7 +55,7 @@ interface FetchtheatresResponse{
   theatreData:TheatreType[]
 }
 interface BlockMoviePayload{
-  movieId:string,
+  movieId:number,
   isBlocked:boolean
 }
  interface LoginPayload{

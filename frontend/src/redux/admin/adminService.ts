@@ -251,7 +251,7 @@ export const blockTheatreActive = async (theatreId:string) => {
 
   
 
-  export const blockMovieData=async({movieId,isBlocked}:{movieId:string,isBlocked:boolean})=>{
+  export const blockMovieData=async({movieId,isBlocked}:{movieId:number,isBlocked:boolean})=>{
     try{
       console.log({movieId,isBlocked},"log for block");
       

@@ -14,13 +14,15 @@ const RunningMovies = () => {
   
   const dispatch = useDispatch<AppDispatch>();
   const { movies, isError, isSuccess, isLoading } = useSelector((state:RootState) => state.admin);
-
+  const [searchQuery, setSearchQuery] = useState('');
   const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500'; // Base URL for images
  const [selectedMovie,setSelectedMovie]=useState<MovieType|null>(null)
   const getYouTubeEmbedUrl = (videoLink:string) => {
     const videoId = videoLink.split('v=')[1];
     return `https://www.youtube.com/embed/${videoId}`;
   };
+  const [languageFilter, setLanguageFilter] = useState('');
+  const [visibleMovies, setVisibleMovies] = useState(20);
 
   useEffect(() => {
     dispatch(fetchMovies());
@@ -53,7 +55,7 @@ const RunningMovies = () => {
     }});
   };
   
-  const handleBlock = (movieId:string, isBlocked:boolean) => {
+  const handleBlock = (movieId:number, isBlocked:boolean) => {
     const confirmMessage = isBlocked ? 'Unblock this movie?' : 'Block this movie?';
     Swal.fire({
       title: confirmMessage,
@@ -80,6 +82,11 @@ const RunningMovies = () => {
           }
     });
   };
+
+  const filteredMovies = movies.filter(movie =>
+    movie.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
+    (languageFilter ? movie.language === languageFilter : true)
+  );
   
   return (
     <>
@@ -91,13 +98,33 @@ const RunningMovies = () => {
           <Link to='/admin/movies' className='bg-lime-500 rounded text-sm p-2  text-slate-100 hover:bg-green-700 hover:text-white hover:text-md transition-all  border-collapse '>Add Movie</Link>
         </div>
 
+        <div className="flex justify-start gap-4 mb-4">
+        <input
+          type="text"
+          placeholder="Search movies..."
+          className="p-2 border rounded w-fit"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <select
+          className="p-2 border rounded"
+          value={languageFilter}
+          onChange={(e) => setLanguageFilter(e.target.value)}
+        >
+          <option value="">All Languages</option>
+          {[...new Set(movies.map(m => m.language))].map(lang => (
+            <option key={lang} value={lang}>{lang}</option>
+          ))}
+        </select>
+      </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
           {isLoading ? (
             <p>Loading movies...</p>
           ) : isError ? (
             <p className="text-red-500">Error loading movies</p>
           ) : movies.length > 0 ? (
-            movies.map((movie:MovieType,index:number) => (
+            filteredMovies.slice(0, visibleMovies).map((movie:MovieType,index:number) => (
               <div key={movie.id||index} className="bg-white shadow-md rounded-lg p-4 flex flex-col justify-between">
                 <div className='relative'>
                   {/* Movie Poster */}
@@ -116,34 +143,15 @@ const RunningMovies = () => {
                     </button>
                     </div>
                   )}
-                  {/* Movie Title */}
+                
                   <h2 className="text-lg font-bold text-gray-800 mb-2">{movie.title}</h2>
 
-                  {/* Movie Details */}
+                
                   <p className="text-sm text-gray-600 mb-1">Language: {movie.language}</p>
                   <p className="text-sm text-gray-600 mb-1">Release Date: {new Date(movie.releaseDate).toDateString()}</p>
                   <p className="text-sm text-gray-600 mb-1">Rating: {movie.rating}</p>
 
-                  {/* Movie Video (Trailer) */}
-                  {/* {movie.video_link && movie.video_link.includes('youtube.com')&&( */}
-                    {/* <a */}
-                    {/* //   href={movie.video_link}
-                    //   target="_blank"
-                    //   rel="noopener noreferrer"
-                    //   className="text-blue-500 hover:underline text-sm"
-                    // >
-                    //   Watch Trailer
-                    // </a>
-                //     <iframe className='w-full h-48' */}
-                {/* //     src={getYouTubeEmbedUrl(movie.video_link)}
-                //     frameBorder="0"
-                //     allow='accelerometer;autoplay;clipboard-write,encrypted-media;gyroscope;picture-in-picture'
-                //     allowFullScreen
-                //     title={movie.title}
-                //     />
-                //   )} */}
-
-               
+                 
                 </div>
 
                 {/* Actions */}
@@ -167,13 +175,27 @@ const RunningMovies = () => {
                     Delete
                   </button>
                 </div>
+                
               </div>
+              
+              
             ))
+            
+            
           ) : (
             <p>No movies found.</p>
           )}
+           
         </div>
-        {/* Video Modal */}
+        {visibleMovies < filteredMovies.length && (
+        <div className="text-center mt-4">
+          <button onClick={() => setVisibleMovies(prev => prev + 20)}
+            className="bg-blue-600 text-white  w-fit h-fit p-2 rounded">Load More</button>
+        </div>
+      )}
+
+
+      
         {selectedMovie && (
           <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
             <div className="bg-white p-4 rounded-lg max-w-lg w-full relative">

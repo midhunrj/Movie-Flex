@@ -10,18 +10,18 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
   const generatePageNumbers = (): (number | string)[] => {
     const pages: (number | string)[] = [];
 
-    // Show the first page if the current page is greater than 5
+    
     if (currentPage > 5) {
       pages.push(1);
       pages.push('...');
     }
 
-    // Show 3 pages close to the current page
+    
     for (let i = Math.max(1, currentPage - 2); i <= Math.min(currentPage + 2, totalPages); i++) {
       pages.push(i);
     }
 
-    // Show the last page if the current page is not too close to the end
+    
     if (currentPage < totalPages - 2) {
       pages.push('...');
       pages.push(totalPages);
