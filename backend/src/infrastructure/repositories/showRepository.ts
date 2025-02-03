@@ -251,28 +251,37 @@ export class ShowRepository implements IShowRepository {
   async removeShowtimes(showtime: string, screenId: string):Promise<void>{
       await showModel.deleteMany({screenId:screenId,showtime:showtime})
   }
-   async listTheatreShowtimes(screenId: string,date:string): Promise<IShowtime[]> {
+  async listTheatreShowtimes(screenId: string, date: string): Promise<IShowtime[]> {
     const currentDate = new Date();
-    const today = currentDate.toISOString().split('T')[0];
-    const currentTime = currentDate.toISOString();
-    console.log(currentTime, "current timee");
-    const showtimes = await showModel.find({ screenId,date: new Date(date) }).populate('movieId').populate('screenId').populate('theatreId');
-    console.log(showtimes,"today showtimes");
+    const today = currentDate.toISOString().split('T')[0];  // Get today's date in YYYY-MM-DD format
     
+    console.log(currentDate, "current server time (AWS)"); 
+
+    const showtimes = await showModel.find({ screenId, date: new Date(date) })
+        .populate('movieId')
+        .populate('screenId')
+        .populate('theatreId');
+
+    console.log(showtimes, "Fetched showtimes before filtering");
+
     const filteredShowtimes = showtimes.filter((show) => {
-      if (new Date(date).toISOString().split('T')[0]==today) {
-        const [hour, minute] = show.showtime.split(':').map(Number);
-        const showtimeDate = new Date(show.date); 
-        showtimeDate.setHours(hour, minute, 0, 0); 
-        return showtimeDate > currentDate; 
-      }
-      return true; 
+        if (new Date(date).toISOString().split('T')[0] === today) {
+            // Convert showtime to a full Date object
+            const [hour, minute] = show.showtime.split(':').map(Number);
+            const showtimeDate = new Date(show.date);
+            showtimeDate.setHours(hour, minute, 0, 0);
+            
+            console.log(`Comparing showtime ${showtimeDate} with current time ${currentDate}`);
+
+            return showtimeDate.getTime() > currentDate.getTime();  // Ensure the show is in the future
+        }
+        return true;
     });
-    console.log(filteredShowtimes,"filterred showtimes");
-   
+
+    console.log(filteredShowtimes, "Filtered upcoming showtimes");
+
     return filteredShowtimes;
-    
-   }
+}
 
    async getSeatlayout( showtimeId: string): Promise< ITier[]|null> {
     const showtime=await showModel.findById(showtimeId)

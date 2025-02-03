@@ -53,7 +53,21 @@ const TheatreShows: React.FC = () => {
       const response = await userAuthenticate.get('/theatre-showtimes', {
         params: { screenId ,date: selectedDate },
       });
-      setShowtimes(response.data.showtimes);
+      let sortedShowtimes = response.data.showtimes.sort((a: IShowtime, b: IShowtime) => {
+        const timeA = a.showtime.split(':').map(Number);
+        const timeB = b.showtime.split(':').map(Number);
+
+        const dateA = new Date(selectedDate);
+        dateA.setHours(timeA[0], timeA[1], 0, 0);
+
+        const dateB = new Date(selectedDate);
+        dateB.setHours(timeB[0], timeB[1], 0, 0);
+
+        return dateA.getTime() - dateB.getTime();
+    });
+
+    setShowtimes(sortedShowtimes);
+    console.log(sortedShowtimes, "Sorted Showtimes");
       console.log(response.data.showtimes);
       
     } catch (error) {
