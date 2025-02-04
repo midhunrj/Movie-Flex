@@ -292,6 +292,17 @@ export class ShowRepository implements IShowRepository {
   
       console.log(filteredShowtimes, "Filtered upcoming showtimes");
   
+      console.log("AWS Server Current UTC Time:", new Date().toISOString());
+
+// const currentDate = new Date();
+// const today = currentDate.toISOString().split('T')[0];
+
+// const timeZone = 'UTC'; // Ensure this matches the AWS server's time zone
+// const currentLocalDate = toZonedTime(currentDate, timeZone);
+
+console.log("AWS Server Local Time:", currentLocalDate);
+console.log("Today's Date:", today);
+
       return filteredShowtimes;
   }
   
