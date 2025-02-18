@@ -40,7 +40,10 @@ const ShowtimeModal: React.FC<ShowtimeModalProps> = ({
 }) => {
   const handleOverwriteShowtime = (showtime: Showtime) => {
     const today = new Date().toISOString().split('T')[0]; 
+    console.log(new Date(movieReleaseDate),"movie release and selected",new Date(selectedDate));
   if (movieReleaseDate && new Date(movieReleaseDate) > new Date(selectedDate)) {
+
+    
     toast.error('Movie release date is in the future. Cannot add to showtime.');
     return; // Prevent further execution
   }
@@ -70,7 +73,7 @@ const ShowtimeModal: React.FC<ShowtimeModalProps> = ({
   const handleConfirmShowtime = () => {
     
     const today = new Date().toISOString().split('T')[0]; 
-    if (movieReleaseDate && new Date(movieReleaseDate) > new Date()) {
+    if (movieReleaseDate && new Date(movieReleaseDate) > new Date(selectedDate)) {
       toast.error('Movie release date is in the future. Cannot add to showtime.');
       return
     }
