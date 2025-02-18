@@ -14,7 +14,7 @@ const RollingMovies: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { movies, isError, isLoading } = useSelector((state: RootState) => state.theatre);
-  
+  const[searchQuery,setSearchQuery]=useState('')
   const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
   const enrolledMovies: EnrolledMovie[] = location.state?.enrolledMovies || [];
   const screenId = location.state?.screenId;
@@ -82,19 +82,32 @@ const RollingMovies: React.FC = () => {
     }
   };
 
+  const filteredMovies = movies.filter(movie =>
+    movie.title.toLowerCase().includes(searchQuery.toLowerCase()) 
+  );
+
   return (
     <>
       {/* <div className="min-h-screen" style={{ backgroundColor: "#FEE685" }}> */}
       <div className="min-h-screen bg-gray-100">
         <TheatreHeader />
         <h1 className="text-blue-800 text-3xl mt-4 font-medium text-center">Available Movies</h1>
+        <div className="flex justify-start gap-4 mb-4 ml-10">
+        <input
+          type="text"
+          placeholder="Search movies..."
+          className="p-2 border rounded w-fit focus:blue-"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        /></div>
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-28 mx-20 my-6">
           {isLoading ? (
             <p>Loading movies...</p>
           ) : isError ? (
             <p className="text-red-500">Error loading movies</p>
-          ) : movies.length > 0 ? (
-            movies.map((movie, index) => (
+          ) : filteredMovies.length > 0 ? (
+            
+            filteredMovies.map((movie, index) => (
               <div key={movie.id || index} className="bg-white shadow-md rounded-lg p-4 flex flex-col justify-between">
                 <img
                   src={movie.poster_path ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}` : 'default_poster.jpg'}

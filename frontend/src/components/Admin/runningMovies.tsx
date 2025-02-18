@@ -87,7 +87,14 @@ const RunningMovies = () => {
     movie.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
     (languageFilter ? movie.language === languageFilter : true)
   );
-  
+  const [currentPage, setCurrentPage] = useState(1);
+const moviesPerPage = 20;
+
+const paginateMovies = filteredMovies.slice((currentPage - 1) * moviesPerPage, currentPage * moviesPerPage);
+
+const handleNextPage = () => setCurrentPage(prev => prev + 1);
+const handlePrevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
+
   return (
     <>
       <SidebarMenu>
@@ -123,8 +130,8 @@ const RunningMovies = () => {
             <p>Loading movies...</p>
           ) : isError ? (
             <p className="text-red-500">Error loading movies</p>
-          ) : movies.length > 0 ? (
-            filteredMovies.slice(0, visibleMovies).map((movie:MovieType,index:number) => (
+          ) : paginateMovies.length > 0 ? (
+            paginateMovies.map((movie:MovieType,index:number) => (
               <div key={movie.id||index} className="bg-white shadow-md rounded-lg p-4 flex flex-col justify-between">
                 <div className='relative'>
                   {/* Movie Poster */}
@@ -187,12 +194,20 @@ const RunningMovies = () => {
           )}
            
         </div>
-        {visibleMovies < filteredMovies.length && (
+        {/* {visibleMovies < filteredMovies.length && (
         <div className="text-center mt-4">
           <button onClick={() => setVisibleMovies(prev => prev + 20)}
             className="bg-blue-600 text-white  w-fit h-fit p-2 rounded">Load More</button>
         </div>
-      )}
+      )} */}
+
+<div className="flex justify-center mt-8 space-x-4">
+  <button onClick={handlePrevPage} disabled={currentPage === 1} className="bg-blue-500 px-4 py-2 w-fit h-fit text-white  rounded-md">Previous</button>
+  <span className="self-center cursor-pointer px-4 py-2 rounded-lg bg-blue-500 text-white">
+               {currentPage}
+            </span>
+  <button onClick={handleNextPage} disabled={currentPage * moviesPerPage >= filteredMovies.length} className="  w-fit h-fit px-4 py-2 bg-blue-500 text-white rounded-md">Next</button>
+</div>
 
 
       

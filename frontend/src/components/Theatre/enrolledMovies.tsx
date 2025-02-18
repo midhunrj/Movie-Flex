@@ -6,6 +6,7 @@ import { EnrolledMovie,  ScreenDatas, Seat, Showtime, Tier } from '@/types/theat
 import { AppDispatch, RootState } from '@/redux/store/store';
 import { ScreenData } from './EditScreen';
 import { FaTrash } from 'react-icons/fa';
+import { toast } from 'sonner';
 
 
 
@@ -55,6 +56,13 @@ const EnrolledMovies: React.FC<EnrolledMoviesProps> = ({
   }
   const handleAddMovieToShowtime = async () => {
     if (selectedMovie && selectedShowtime && selectedDate && selectedEndDate) {
+
+      const movieReleaseDate = new Date(selectedMovie.releaseDate); 
+      const selectedStartDate = new Date(selectedDate);
+    if (selectedStartDate < movieReleaseDate) {
+      toast.error("Cannot schedule showtime before the movie's release date.")
+      return
+    }
       const seatLayoutByTier = screenData.tiers.map((tier: Tier) => ({
         tierName: tier.name,
         ticketRate: tier.ticketRate,
