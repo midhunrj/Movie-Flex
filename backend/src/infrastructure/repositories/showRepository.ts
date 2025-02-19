@@ -248,7 +248,14 @@ export class ShowRepository implements IShowRepository {
       return filteredByTime;
     }
   
-    return filteredByPrice;
+    const sortedShowtimes = filteredByPrice.sort((a, b) => {
+      const [aHour, aMinute] = a.showtime.split(':').map(Number);
+      const [bHour, bMinute] = b.showtime.split(':').map(Number);
+      return aHour * 60 + aMinute - (bHour * 60 + bMinute);
+    });
+    
+    return sortedShowtimes;
+    
   }
   async removeShowtimes(showtime: string, screenId: string):Promise<void>{
       await showModel.deleteMany({screenId:screenId,showtime:showtime})
@@ -303,7 +310,14 @@ export class ShowRepository implements IShowRepository {
 console.log("AWS Server Local Time:", currentLocalDate);
 console.log("Today's Date:", today);
 
-      return filteredShowtimes;
+const sortedShowtimes = filteredShowtimes.sort((a, b) => {
+  const [aHour, aMinute] = a.showtime.split(':').map(Number);
+  const [bHour, bMinute] = b.showtime.split(':').map(Number);
+  return aHour * 60 + aMinute - (bHour * 60 + bMinute);
+});
+
+return sortedShowtimes;
+
   }
   
 

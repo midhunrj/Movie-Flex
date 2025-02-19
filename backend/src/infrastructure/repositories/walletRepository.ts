@@ -51,14 +51,14 @@ export class WalletRepository implements IWalletRepository
 
         //const walletData = await wlletModel.findOne({ userId: user.user.id });
         const wallet = await walletModel.aggregate([
-          { $match: { userId } }, // Match the wallet by userId
+          { $match: { userId } }, 
           {
               $project: {
                   _id: 1,
                   userId: 1,
                   balance: 1,
                   transactions: {
-                      $slice: ['$transactions', skip, limit], // Paginate transactions array
+                      $slice: [{$reverseArray:"$transactions"}, skip, limit],
                   },
               },
           },
