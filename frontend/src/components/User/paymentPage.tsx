@@ -1,6 +1,6 @@
 import { RootState } from "@/redux/store/store";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import MovieDetails from "./movieDetails";
 import { MovieType } from "@/types/movieTypes";
@@ -18,7 +18,7 @@ const PaymentPage: React.FC = () => {
   const [movieDetails, setMovieDetails] = useState<MovieType | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<"wallet" | "online">("wallet");
   const [walletBalance, setWalletBalance] = useState(wallet);
-
+ const dispatch=useDispatch()
 const RAZORPAY_ID_KEY="rzp_test_3oY2qxkce538eY"
   const { selectedSeats, totalCost, movieName, theatreName, date, showtime, seatNames,bookingId } =
     location.state || {}; 
@@ -55,7 +55,7 @@ const RAZORPAY_ID_KEY="rzp_test_3oY2qxkce538eY"
 
       if (response.data.success) {
         setWalletBalance(walletBalance - totalPrice);
-        updateWalletBalance(-totalPrice)
+        dispatch(updateWalletBalance(-totalPrice));
         toast.success("Payment successful via wallet!");
         navigate("/orders", { state: location.state });
       } else {

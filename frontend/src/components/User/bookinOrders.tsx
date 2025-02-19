@@ -8,10 +8,11 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas'
 import { userAuthenticate } from '@/utils/axios/userInterceptor';
 import { BookingType } from '@/types/bookingOrderTypes';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/redux/store/store';
 import { format } from 'date-fns';
 import BookingCard from './bookingCard';
+import { updateWalletBalance } from '@/redux/user/userSlice';
 
 const BookingOrders = () => {
   const [bookings, setBookings] = useState<Partial<BookingType[]>>([]);
@@ -19,6 +20,7 @@ const BookingOrders = () => {
   const[selectedBooking,setSelectedBooking]=useState<Partial<BookingType>|null>(null)
   const { user } = useSelector((state: RootState) => state.user);
   const userId = user?._id!;
+  const dispatch=useDispatch()
   const [totalPages, setTotalPages] = useState(1)
  const [currentPage,setCurrentPage]=useState(1)
 //  const [hasMore, setHasMore] = useState(true); // Tracks if there's more data to load
@@ -58,6 +60,8 @@ const limit=12
         await userAuthenticate.put(`/cancel-Booking`, {refundAmount}, {
           params: { bookingId: bookingId }, 
         });
+
+        dispatch(updateWalletBalance(refundAmount))
   //  console.log(response.data);
    
       fetchBookings();

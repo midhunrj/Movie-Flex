@@ -134,7 +134,11 @@ const userSlice = createSlice({
     },
     updateWalletBalance(state,action:PayloadAction<number>)
     {
+      console.log(action.payload,"action payload");
+      
       state.wallet +=action.payload
+      console.log("state wallet",state.wallet)
+      
     }
   },
   extraReducers: (builder) => {
