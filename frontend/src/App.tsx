@@ -31,7 +31,7 @@ function App() {
             <Route path="/*" element={<UserRoute />} />
             <Route path="/theatre/*" element={<TheatreRoute />} />
             <Route path="/admin/*" element={<AdminRoute />} />
-            <Route path="*" element={<NotFound404 />} />
+
           </Routes>
           {/* </ChakraProvider> */}
       </DndProvider>

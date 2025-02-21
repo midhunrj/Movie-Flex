@@ -21,6 +21,7 @@ import BookingOrders from "@/components/User/bookinOrders";
 import FavouriteMovies from "@/components/User/FavouriteList";
 import Wallet from "@/components/User/wallet";
 import Notifications from "@/components/User/notifications";
+import NotFound404 from "./protected/404Page";
 // import PaymentComponent from "@/components/User/confirmation";
 
 
@@ -51,6 +52,7 @@ export const UserRoute = () => {
         path="/upcoming-movies"
         element={<UserProtected><FullMoviesList movieType="upcoming" /></UserProtected>}
       />
+                  <Route path="*" element={<NotFound404 />} />
     </Routes>
   );
 };
