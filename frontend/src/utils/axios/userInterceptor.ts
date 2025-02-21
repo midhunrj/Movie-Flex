@@ -1,5 +1,10 @@
 import axios from "axios";
 import { userUrl } from "./config/urlConfig";
+import { useDispatch } from "react-redux";
+import { logout } from "@/redux/user/userSlice";
+import { toast } from "sonner";
+import { useNavigate } from "react-router";
+import store from "@/redux/store/store";
 console.log(userUrl,"userurl");
 
 export const userAuthenticate = axios.create({
@@ -9,6 +14,7 @@ export const userAuthenticate = axios.create({
     },
     withCredentials: true
 });
+
 
 userAuthenticate.interceptors.request.use(
     (request) => {
@@ -22,12 +28,37 @@ userAuthenticate.interceptors.request.use(
         return Promise.reject(error);
     }
 );
+// const handleUnauthorizedAccess = async(message:string) => {
+//     localStorage.removeItem("accessToken");
+    
+    
+//      window.location.href = "/"; // Use window.location.href to navigate
+//     toast.error(message);
+// };
 
+const handleUnauthorizedAccess = (message: string) => {
+    localStorage.removeItem("accessToken");
+     
+
+    toast.error(message, {
+        description: "Your session has expired. Please login again.",
+        duration: 4000,  
+        position: "top-right", 
+    });
+
+    
+    setTimeout(() => {
+        window.location.replace("/"); 
+    }, 2000);
+    
+};
 userAuthenticate.interceptors.response.use(
     (response) => {
         return response;
     },
     async (error) => {
+        console.log(error,"error of response in interceptor");
+        
         const originalRequest = error.config; 
         if (error.response.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
@@ -42,6 +73,14 @@ userAuthenticate.interceptors.response.use(
             } catch (error) {
                 console.log("Token refresh failed", error);
             }
+        }
+        else if(error.response.status === 403)
+        {
+         console.log('balle balle')
+            localStorage.removeItem('accessToken')
+            
+            handleUnauthorizedAccess('User has been blocked temporarily')
+          
         }
         return Promise.reject(error);
     }

@@ -65,7 +65,7 @@ export class AuthHandler {
             
             const isUserValid = await this.userRepository.findById(decodeToken.userId);
             if (!isUserValid || isUserValid.is_blocked) {
-                throw new HttpError("Not Authorized", 403);
+                throw new HttpError("Not Authorized the user has been blocked temporarily", 403);
             }
               // req.user=decodeToken
             next();

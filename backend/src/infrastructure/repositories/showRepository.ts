@@ -272,7 +272,7 @@ export class ShowRepository implements IShowRepository {
       const currentLocalDate = toZonedTime(currentDate, timeZone);
       console.log(currentLocalDate, "current server time in local timezone");
   
-      // Fetch showtimes
+    
       const showtimes = await showModel.find({ screenId, date: new Date(date) })
           .populate('movieId')
           .populate('screenId')

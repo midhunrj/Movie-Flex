@@ -654,6 +654,12 @@ default:return null
       {renderTabComponent()}
     </div>
   </div>
+
+  {/* <div className="flex-1 p-2 m-4 bg-slate-900 mx-4 md:mx-20 w-full max-w-screen-xl rounded-lg text-white">
+  <div className="tab-content w-full">
+    {renderTabComponent()}
+  </div>
+</div> */}
       <Footer />
       </div>
     </>

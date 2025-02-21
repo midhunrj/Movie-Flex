@@ -15,6 +15,9 @@ const config: Config = {
       borderRadius: {
         '4xl': '2rem',
       },
+      fontFamily: {
+        cinzel: ['Cinzel', 'serif'], // Optional: for movie-like typography
+      },
     },
   },
   plugins: [

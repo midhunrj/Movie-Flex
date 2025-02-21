@@ -182,6 +182,38 @@ async removeMovieFromScreen(movieId: string, screenId: string): Promise<Screen |
   const screenData=await ScreenModel.findByIdAndUpdate(screenId,{$pull:{'enrolledMovies':{movieId:movieId}}},{new:true})
   console.log(screenData,"after return from deleting enroll Movie");
   
+  const now = new Date();
+
+  const nowUTC = new Date(); // Current UTC time
+
+  // Update expiryDate only for the given movie
+  
+
+    if (!screenData) {
+      console.log(`Screen ${screenId} not found`);
+      return null;
+    }
+  // screenData.showtimes = screenData.showtimes.filter(showtime => {
+  //   const showtimeDate = new Date(showtime.expiryDate || '');
+  //   return !(showtime.movieId === movieId && showtimeDate >= today);
+  // });
+
+  screenData.showtimes.forEach(showtime => {
+    if (showtime.movieId === movieId) {
+      showtime.expiryDate = nowUTC;  // Set expiryDate to the current UTC time
+    }
+  });
+
+
+
+
+  await screenData.save();
+
+  await showModel.deleteMany({
+    movieId: movieId,
+    screenId: screenId,
+    date: { $gt: nowUTC } 
+  });
   return screenData
   }
   catch(error:any)

@@ -292,7 +292,7 @@ const ShowtimeAndSeatBooking: React.FC<{ screenId: string }> = ({ screenId }) =>
 
   return (
     <div className="bg-slate-900 min-h-screen text-white">
-      {/* Date Selection Tabs */}
+      
       <div className="mt-4 w-full md:w-fit  ">
       <div className=" flex  justify-center items-center  mb-4 p-2 rounded-lg bg-slate-200">
       <button
@@ -335,7 +335,8 @@ const ShowtimeAndSeatBooking: React.FC<{ screenId: string }> = ({ screenId }) =>
 </div>
       {/* Main Booking Layout */}
 
-      <div className="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-1 gap-4 p-4">
+      {/* <div className="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-1 gap-4 p-4"> */}
+      <div className="flex flex-col p-4 w-full">
         {/* Movie Selection Column */}
         {currentBoat=='movies' &&
         <div className="space-y-4">
@@ -345,7 +346,7 @@ const ShowtimeAndSeatBooking: React.FC<{ screenId: string }> = ({ screenId }) =>
           ) : error ? (
             <div className="text-red-500">{error}</div>
           ) : (
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-2 gap-3">
               {uniqueMovies.map(movie => (
                 <div 
                   key={movie._id}

@@ -1,6 +1,7 @@
 
 import axios from "axios";
 import { theatreUrl } from "./config/urlConfig";
+import { toast } from "sonner";
 
 
 export const theatreAuthenticate = axios.create({
@@ -29,7 +30,23 @@ theatreAuthenticate.interceptors.request.use(
     }
 );
 
-// Response Interceptor for handling token expiration
+const handleUnauthorizedAccess = (message: string) => {
+    localStorage.removeItem("theatreAccessToken");
+     
+
+    toast.error(message, {
+        description: "Your session has expired. Please login again.",
+        duration: 4000,  
+        position: "top-right", 
+    });
+
+    
+    setTimeout(() => {
+        window.location.replace("/theatre/"); 
+    }, 2000);
+};
+
+
 theatreAuthenticate.interceptors.response.use(
     (response) => {
         console.log(response,"response got");
@@ -65,6 +82,12 @@ theatreAuthenticate.interceptors.response.use(
                 // window.location.href = "/login"; // Redirect to login page
                 return Promise.reject(refreshError);
             }
+        }
+        else if(error.response.status==403)
+        {
+            localStorage.removeItem('theatreAccessToken')
+            
+            handleUnauthorizedAccess('User has been blocked temporarily')
         }
 
         return Promise.reject(error);

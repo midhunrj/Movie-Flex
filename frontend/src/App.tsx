@@ -6,6 +6,7 @@ import { AdminRoute } from "./routes/adminRoute";
 import { DndProvider } from "react-dnd";
 import {Toaster} from 'sonner'
 import { HTML5Backend } from "react-dnd-html5-backend";
+import NotFound404 from "./routes/protected/404Page";
 
 // import { ChakraProvider, extendTheme } from '@chakra-ui/react'
 
@@ -30,6 +31,7 @@ function App() {
             <Route path="/*" element={<UserRoute />} />
             <Route path="/theatre/*" element={<TheatreRoute />} />
             <Route path="/admin/*" element={<AdminRoute />} />
+            <Route path="*" element={<NotFound404 />} />
           </Routes>
           {/* </ChakraProvider> */}
       </DndProvider>

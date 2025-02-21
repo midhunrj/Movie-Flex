@@ -20,6 +20,7 @@ import ScreensForm from "../components/Theatre/Screens";
 import { IdentifierProvider } from "../utils/context/identifierContext";
 import EditScreen from "../components/Theatre/EditScreen";
 import Notifications from "@/components/Theatre/notification";
+import NotFound404 from "./protected/404Page";
 
 export const TheatreRoute = () => {
   return (
@@ -97,6 +98,7 @@ export const TheatreRoute = () => {
             </TheatreProtected>
           }
         />
+        <Route path="*" element={<NotFound404 />} />
       </Routes>
     </IdentifierProvider>
   );

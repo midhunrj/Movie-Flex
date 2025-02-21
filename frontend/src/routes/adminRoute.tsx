@@ -10,6 +10,7 @@ import AdminProtected from "./protected/adminProtected";
 import MovieList from "../components/Admin/movieManagement";
 import RunningMovies from "../components/Admin/runningMovies";
 import Dashboard from "../components/Admin/home";
+import NotFound404 from "./protected/404Page";
 
 export const AdminRoute = () => {
   return (
@@ -55,6 +56,7 @@ export const AdminRoute = () => {
           </AdminProtected>
         }
       />
+      <Route path="*" element={<NotFound404 />} />
     </Routes>
   );
 };
